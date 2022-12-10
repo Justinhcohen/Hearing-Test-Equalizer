@@ -7,18 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0D65AD9A293D14F10017E4F8 /* Hearing_Test_EqualizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D65AD99293D14F10017E4F8 /* Hearing_Test_EqualizerApp.swift */; };
+		0D65AD9A293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D65AD99293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift */; };
 		0D65AD9C293D14F10017E4F8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D65AD9B293D14F10017E4F8 /* ContentView.swift */; };
 		0D65AD9E293D14F40017E4F8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0D65AD9D293D14F40017E4F8 /* Assets.xcassets */; };
 		0D65ADA1293D14F40017E4F8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0D65ADA0293D14F40017E4F8 /* Preview Assets.xcassets */; };
+		0D7BD6AC293E0F9D0015C429 /* Play.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D7BD6AB293E0F9D0015C429 /* Play.swift */; };
+		0DD438F2293E9C8800C9301E /* edamame.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0DD438F1293E9C8800C9301E /* edamame.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0D65AD96293D14F10017E4F8 /* Hearing Test Equalizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hearing Test Equalizer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		0D65AD99293D14F10017E4F8 /* Hearing_Test_EqualizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hearing_Test_EqualizerApp.swift; sourceTree = "<group>"; };
+		0D65AD96293D14F10017E4F8 /* Hearing Test Stereo Equalizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hearing Test Stereo Equalizer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0D65AD99293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hearing_Test_Stereo_EqualizerApp.swift; sourceTree = "<group>"; };
 		0D65AD9B293D14F10017E4F8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		0D65AD9D293D14F40017E4F8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0D65ADA0293D14F40017E4F8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		0D7BD6AB293E0F9D0015C429 /* Play.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Play.swift; sourceTree = "<group>"; };
+		0DD438F1293E9C8800C9301E /* edamame.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = edamame.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,7 +39,7 @@
 		0D65AD8D293D14F10017E4F8 = {
 			isa = PBXGroup;
 			children = (
-				0D65AD98293D14F10017E4F8 /* Hearing Test Equalizer */,
+				0D65AD98293D14F10017E4F8 /* Hearing Test Stereo Equalizer */,
 				0D65AD97293D14F10017E4F8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -43,20 +47,22 @@
 		0D65AD97293D14F10017E4F8 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0D65AD96293D14F10017E4F8 /* Hearing Test Equalizer.app */,
+				0D65AD96293D14F10017E4F8 /* Hearing Test Stereo Equalizer.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		0D65AD98293D14F10017E4F8 /* Hearing Test Equalizer */ = {
+		0D65AD98293D14F10017E4F8 /* Hearing Test Stereo Equalizer */ = {
 			isa = PBXGroup;
 			children = (
-				0D65AD99293D14F10017E4F8 /* Hearing_Test_EqualizerApp.swift */,
+				0D65AD99293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift */,
 				0D65AD9B293D14F10017E4F8 /* ContentView.swift */,
+				0D7BD6AB293E0F9D0015C429 /* Play.swift */,
+				0DD438F3293E9CAC00C9301E /* Tracks */,
 				0D65AD9D293D14F40017E4F8 /* Assets.xcassets */,
 				0D65AD9F293D14F40017E4F8 /* Preview Content */,
 			);
-			path = "Hearing Test Equalizer";
+			path = "Hearing Test Stereo Equalizer";
 			sourceTree = "<group>";
 		};
 		0D65AD9F293D14F40017E4F8 /* Preview Content */ = {
@@ -67,12 +73,20 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		0DD438F3293E9CAC00C9301E /* Tracks */ = {
+			isa = PBXGroup;
+			children = (
+				0DD438F1293E9C8800C9301E /* edamame.mp3 */,
+			);
+			path = Tracks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		0D65AD95293D14F10017E4F8 /* Hearing Test Equalizer */ = {
+		0D65AD95293D14F10017E4F8 /* Hearing Test Stereo Equalizer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0D65ADA4293D14F40017E4F8 /* Build configuration list for PBXNativeTarget "Hearing Test Equalizer" */;
+			buildConfigurationList = 0D65ADA4293D14F40017E4F8 /* Build configuration list for PBXNativeTarget "Hearing Test Stereo Equalizer" */;
 			buildPhases = (
 				0D65AD92293D14F10017E4F8 /* Sources */,
 				0D65AD93293D14F10017E4F8 /* Frameworks */,
@@ -82,9 +96,9 @@
 			);
 			dependencies = (
 			);
-			name = "Hearing Test Equalizer";
+			name = "Hearing Test Stereo Equalizer";
 			productName = "Hearing Test Equalizer";
-			productReference = 0D65AD96293D14F10017E4F8 /* Hearing Test Equalizer.app */;
+			productReference = 0D65AD96293D14F10017E4F8 /* Hearing Test Stereo Equalizer.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -102,7 +116,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 0D65AD91293D14F10017E4F8 /* Build configuration list for PBXProject "Hearing Test Equalizer" */;
+			buildConfigurationList = 0D65AD91293D14F10017E4F8 /* Build configuration list for PBXProject "Hearing Test Stereo Equalizer" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -115,7 +129,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0D65AD95293D14F10017E4F8 /* Hearing Test Equalizer */,
+				0D65AD95293D14F10017E4F8 /* Hearing Test Stereo Equalizer */,
 			);
 		};
 /* End PBXProject section */
@@ -125,6 +139,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0DD438F2293E9C8800C9301E /* edamame.mp3 in Resources */,
 				0D65ADA1293D14F40017E4F8 /* Preview Assets.xcassets in Resources */,
 				0D65AD9E293D14F40017E4F8 /* Assets.xcassets in Resources */,
 			);
@@ -138,7 +153,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				0D65AD9C293D14F10017E4F8 /* ContentView.swift in Sources */,
-				0D65AD9A293D14F10017E4F8 /* Hearing_Test_EqualizerApp.swift in Sources */,
+				0D65AD9A293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift in Sources */,
+				0D7BD6AC293E0F9D0015C429 /* Play.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -266,10 +282,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Equalizer/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Hearing Test Stereo Equalizer";
+				"INFOPLIST_KEY_CFBundleDisplayName[sdk=*]" = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -280,7 +298,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.JCohenMusic.Hearing-Test-Equalizer";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.JCohenMusic.Hearing-Test-Stereo-Equalizer";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -295,10 +313,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Equalizer/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Hearing Test Stereo Equalizer";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -309,7 +328,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.JCohenMusic.Hearing-Test-Equalizer";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.JCohenMusic.Hearing-Test-Stereo-Equalizer";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -320,7 +339,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		0D65AD91293D14F10017E4F8 /* Build configuration list for PBXProject "Hearing Test Equalizer" */ = {
+		0D65AD91293D14F10017E4F8 /* Build configuration list for PBXProject "Hearing Test Stereo Equalizer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0D65ADA2293D14F40017E4F8 /* Debug */,
@@ -329,7 +348,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0D65ADA4293D14F40017E4F8 /* Build configuration list for PBXNativeTarget "Hearing Test Equalizer" */ = {
+		0D65ADA4293D14F40017E4F8 /* Build configuration list for PBXNativeTarget "Hearing Test Stereo Equalizer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0D65ADA5293D14F40017E4F8 /* Debug */,
