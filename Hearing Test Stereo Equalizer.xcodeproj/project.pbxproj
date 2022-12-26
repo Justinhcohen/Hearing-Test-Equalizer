@@ -24,7 +24,8 @@
 		0D8762A32947CEC50089B138 /* Band60.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629B2947CEC50089B138 /* Band60.mp3 */; };
 		0D8762A42947CEC50089B138 /* Band5400.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629C2947CEC50089B138 /* Band5400.mp3 */; };
 		0D8762A52947CEC50089B138 /* Band12000.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629D2947CEC50089B138 /* Band12000.mp3 */; };
-		0D8762A92948B2CE0089B138 /* StoredValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8762A82948B2CE0089B138 /* StoredValues.swift */; };
+		0DCDD9A8295903A5000E9E94 /* rumour.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0DCDD9A7295903A5000E9E94 /* rumour.mp3 */; };
+		0DCDD9AA295904A7000E9E94 /* water.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0DCDD9A9295904A7000E9E94 /* water.mp3 */; };
 		0DD438F2293E9C8800C9301E /* edamame.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0DD438F1293E9C8800C9301E /* edamame.mp3 */; };
 /* End PBXBuildFile section */
 
@@ -47,7 +48,8 @@
 		0D87629B2947CEC50089B138 /* Band60.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band60.mp3; sourceTree = "<group>"; };
 		0D87629C2947CEC50089B138 /* Band5400.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band5400.mp3; sourceTree = "<group>"; };
 		0D87629D2947CEC50089B138 /* Band12000.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band12000.mp3; sourceTree = "<group>"; };
-		0D8762A82948B2CE0089B138 /* StoredValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredValues.swift; sourceTree = "<group>"; };
+		0DCDD9A7295903A5000E9E94 /* rumour.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = rumour.mp3; sourceTree = "<group>"; };
+		0DCDD9A9295904A7000E9E94 /* water.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = water.mp3; sourceTree = "<group>"; };
 		0DD438F1293E9C8800C9301E /* edamame.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = edamame.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -84,10 +86,9 @@
 				0D65AD99293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift */,
 				0D19B1522955F3E600D17C16 /* Model.swift */,
 				0D65AD9B293D14F10017E4F8 /* ContentView.swift */,
-				0D37678E29551DC100F3FF59 /* TestView.swift */,
 				0D37679029551E0E00F3FF59 /* PlayView.swift */,
+				0D37678E29551DC100F3FF59 /* TestView.swift */,
 				0D19B1502955DD2000D17C16 /* ProfileView.swift */,
-				0D8762A82948B2CE0089B138 /* StoredValues.swift */,
 				0D8762952947CE1C0089B138 /* Frequencies */,
 				0DD438F3293E9CAC00C9301E /* Tracks */,
 				0D65AD9D293D14F40017E4F8 /* Assets.xcassets */,
@@ -122,6 +123,8 @@
 		0DD438F3293E9CAC00C9301E /* Tracks */ = {
 			isa = PBXGroup;
 			children = (
+				0DCDD9A9295904A7000E9E94 /* water.mp3 */,
+				0DCDD9A7295903A5000E9E94 /* rumour.mp3 */,
 				0D5557962950AE970006CF9E /* levitating.mp3 */,
 				0DD438F1293E9C8800C9301E /* edamame.mp3 */,
 			);
@@ -190,11 +193,13 @@
 				0D8762A32947CEC50089B138 /* Band60.mp3 in Resources */,
 				0D8762A22947CEC50089B138 /* Band1100.mp3 in Resources */,
 				0DD438F2293E9C8800C9301E /* edamame.mp3 in Resources */,
+				0DCDD9A8295903A5000E9E94 /* rumour.mp3 in Resources */,
 				0D65ADA1293D14F40017E4F8 /* Preview Assets.xcassets in Resources */,
 				0D65AD9E293D14F40017E4F8 /* Assets.xcassets in Resources */,
 				0D87629E2947CEC50089B138 /* Band500.mp3 in Resources */,
 				0D8762A12947CEC50089B138 /* Band230.mp3 in Resources */,
 				0D5557972950AE970006CF9E /* levitating.mp3 in Resources */,
+				0DCDD9AA295904A7000E9E94 /* water.mp3 in Resources */,
 				0D8762A42947CEC50089B138 /* Band5400.mp3 in Resources */,
 				0D8762A02947CEC50089B138 /* Band2400.mp3 in Resources */,
 				0D8762A52947CEC50089B138 /* Band12000.mp3 in Resources */,
@@ -214,7 +219,6 @@
 				0D65AD9A293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift in Sources */,
 				0D37679129551E0E00F3FF59 /* PlayView.swift in Sources */,
 				0D19B1512955DD2000D17C16 /* ProfileView.swift in Sources */,
-				0D8762A92948B2CE0089B138 /* StoredValues.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

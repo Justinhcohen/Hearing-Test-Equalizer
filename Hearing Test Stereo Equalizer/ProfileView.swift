@@ -9,28 +9,8 @@ import SwiftUI
 
 struct ProfileView: View {
 
-   // @EnvironmentObject var model: Model
-    
-    let storedValues = StoredValues.shared
-
-    
-    @State var currentProfile = 1
-    
-    func updateCurrentProfile () {
-        currentProfile = storedValues.currentProfile
-    }
-    
-    func setProfile1 () {
-        currentProfile = 1
-        storedValues.currentProfile = 1
-       
-    }
-    
-    func setProfile2 () {
-        currentProfile = 2
-        storedValues.currentProfile = 2
-    }
-    
+    @EnvironmentObject var model: Model
+   
     var body: some View {
         
         VStack {
@@ -38,24 +18,42 @@ struct ProfileView: View {
                 .font(.largeTitle)
                 .padding(25)
             
-            Text ("Current Profile: \(currentProfile)")
+            Text ("Current Profile: \(model.currentProfile)")
                 .padding(25)
             
             Button("Profile 1", 
                    action: {
-                setProfile1()
+                model.setProfile1()
             })
             .padding(25)
             
             Button("Profile 2", 
                    action: {
-                setProfile2()
+                model.setProfile2()
+            })
+            .padding(25) 
+            
+            Button("Profile 3", 
+                   action: {
+                model.setProfile3()
+            })
+            .padding(25) 
+            
+            Button("Profile 4", 
+                   action: {
+                model.setProfile4()
+            })
+            .padding(25) 
+            
+            Button("Profile 5", 
+                   action: {
+                model.setProfile5()
             })
             .padding(25) 
         }
         
         .onAppear {
-            updateCurrentProfile()
+           
         }
     }
 }
