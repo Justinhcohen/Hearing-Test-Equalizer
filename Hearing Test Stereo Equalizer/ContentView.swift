@@ -12,16 +12,31 @@ struct ContentView: View {
     
     @EnvironmentObject var model: Model
     
+    
+    let audioSession = AVAudioSession.sharedInstance()
+    
+    
     var body: some View {
         
+//        Text ("Hello World")
+        
         TabView { 
-            PlayView() 
-                .tabItem({ Label("Play", systemImage: "book.circle") }) 
-            TestView() 
-                .tabItem({ Label("Test", systemImage: "gear") }) }
+            LibraryView()
+                .tabItem({ Label("Library", systemImage: "music.note.list")})
+            EQView()
+                .tabItem({ Label("EQ", systemImage: "speaker") }) 
+            TestView()
+                .tabItem({ Label("Test", systemImage: "ear.and.waveform") }) 
+        }
         .onAppear {
             print ("ContentView on Appear CALLED")
             model.readFromUserDefaults()
+            do {
+                try audioSession.setCategory(.playback)
+                try audioSession.setActive(true)
+            } catch _ {
+                
+            }
             model.printUserDefaults()
             
         }
