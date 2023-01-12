@@ -11,14 +11,20 @@ import MediaPlayer
 
 class Model: ObservableObject {
     
+    init () {
+        prepareAudioEngine(currentProfile: currentProfile, intensity: currentIntensity)
+    }
+    
     let userDefaults = UserDefaults.standard
+    
+    let bandNames = ["L60", "R60", "L100", "R100", "L230", "R230", "L500", "R500", "L1100", "R1100", "L2400", "R2400", "L5400", "R5400", "L12000", "R12000"]
     
     @Published var currentProfile = 1 {
         willSet {
             userDefaults.set(newValue, forKey: "currentProfile")
         }
     }
-    @Published var currentIntensity = 2 {
+    @Published var currentIntensity = 8.0 {
         willSet {
             userDefaults.set(newValue, forKey: "currentIntensity")
         }
@@ -33,8 +39,9 @@ class Model: ObservableObject {
     @Published var currentBand = "Ready"
     @Published var testInProgress = false
     @Published var tempURL: URL = URL(fileURLWithPath: "temp")
-    @Published var bassBoost: Float = 0.0
-    @Published var reverb: Float = 0.0
+//    @Published var bassBoost: Float = 0.0
+//    @Published var reverb: Float = 0.0
+    @Published var currentVolume: Float = 0.0
     
     @Published var systemVolume = AVAudioSession.sharedInstance().outputVolume
     
@@ -551,7 +558,7 @@ class Model: ObservableObject {
         lowestAudibleDecibelBand12000R_5 = userDefaults.double(forKey: "lowestAudibleDecibelBand12000R_5")
         
         currentProfile = max (userDefaults.integer(forKey: "currentProfile"), 1)
-        currentIntensity = userDefaults.integer(forKey: "currentIntensity")
+        currentIntensity = userDefaults.double(forKey: "currentIntensity")
         equalizerIsActive = userDefaults.bool(forKey: "equalizerIsActive")
     }
     
@@ -687,14 +694,15 @@ class Model: ObservableObject {
     let reverbL: AVAudioUnitReverb = AVAudioUnitReverb()
     let reverbR: AVAudioUnitReverb = AVAudioUnitReverb()
     
-    let audioPlayerNodeS: AVAudioPlayerNode = AVAudioPlayerNode()
+    let audioPlayerNodeLS: AVAudioPlayerNode = AVAudioPlayerNode()
+    let audioPlayerNodeRS: AVAudioPlayerNode = AVAudioPlayerNode()
     var audioFile: AVAudioFile!
     var currentTrack = ""
     var bandsGain1 = [Float]()
-    var bandsGain2 = [Float]()
-    var bandsGain3 = [Float]()
-    var bandsGain4 = [Float]()
-    var bandsGain5 = [Float]()
+//    var bandsGain2 = [Float]()
+//    var bandsGain3 = [Float]()
+//    var bandsGain4 = [Float]()
+//    var bandsGain5 = [Float]()
     
     var EQStatusText = "" 
     
@@ -704,6 +712,7 @@ class Model: ObservableObject {
     func setEQBandsGainForSlider (currentProfile: Int, intensity: Double) {
         print ("CALLED SET EQ BANDS FOR SLIDER")
         // intensity has a value between 0.00001 and 14
+        currentIntensity = intensity
         var currentLowestAudibleDecibelBands = [Double]()
         switch currentProfile {
         case 1: currentLowestAudibleDecibelBands = profile_1_lowestAudibleDecibelBands
@@ -727,52 +736,102 @@ class Model: ObservableObject {
             minValue += 1
         }
         let multiplier: Double = min(intensity / abs(minValue - maxValue), 1.0)
-       
-        
-        // Intensity 1 band gain
         
         var workingBandsGain = [Float]()
         for i in 0...currentLowestAudibleDecibelBands.count - 1 {
             workingBandsGain.insert(Float(multiplier * abs(minValue - currentLowestAudibleDecibelBands[i]) ), at: i)
         }
-        
-        workingBandsGain[0] += bassBoost
-        workingBandsGain[1] += bassBoost
-        workingBandsGain[8] += bassBoost
-        workingBandsGain[9] += bassBoost
+    
         bandsGain1 = workingBandsGain
         
+        let bandsL = equalizerL1.bands
+        let bandsR = equalizerR1.bands
+        bandsL[0].gain = bandsGain1[0]
+        bandsR[0].gain = bandsGain1[1]
+        for i in 2...bandsGain1.count - 1 {
+            if i .isMultiple(of: 2) {
+                bandsL[i / 2].gain = bandsGain1[i]
+            } else {
+                bandsR[i / 2].gain = bandsGain1[i]
+            }
+        }
         for i in 0...currentLowestAudibleDecibelBands.count - 1 {
-            print ("\(workingBandsGain[i])")
+            print ("\(bandNames[i]): \(workingBandsGain[i])")
         }
     }
     
-    func changeEQOnSliderUpdate (EQL: AVAudioUnitEQ, EQR: AVAudioUnitEQ) {
-        let bandsL = EQL.bands
-        let bandsR = EQR.bands
-        for i in 0...bandsL.count - 1 {
-            bandsL[i].gain = bandsGain1[i]
-            bandsR[i].gain = bandsGain1[bandsR.count + i]
+
+    
+    func stopTrack () {
+        audioPlayerNodeL1.stop()
+        audioPlayerNodeR1.stop()
+        audioPlayerNodeLS.stop()
+        audioPlayerNodeRS.stop()
+    }
+    
+    func pauseTrack () {
+        audioPlayerNodeL1.pause()
+        audioPlayerNodeR1.pause()
+        audioPlayerNodeLS.pause()
+        audioPlayerNodeRS.pause()
+    }
+    
+    func unPauseTrack () {
+        let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
+        audioPlayerNodeL1.play(at: audioTime)
+        audioPlayerNodeR1.play(at: audioTime)
+        audioPlayerNodeLS.play(at: audioTime)
+        audioPlayerNodeRS.play(at: audioTime)
+    }
+    
+    func setNodeVolumesBasedOnEQActive (EQIsActive: Bool) {
+        if EQIsActive {
+            audioPlayerNodeL1.volume = 1.0
+            audioPlayerNodeR1.volume = 1.0
+            audioPlayerNodeLS.volume = 0.0
+            audioPlayerNodeRS.volume = 0.0
+        } else {
+            audioPlayerNodeL1.volume = 0.0
+            audioPlayerNodeR1.volume = 0.0
+            audioPlayerNodeLS.volume = 1.0
+            audioPlayerNodeRS.volume = 1.0
         }
     }
     
-    func changeReverbOnSliderUpdate (reverb: Float) {
-        reverbL.wetDryMix = reverb
-        reverbR.wetDryMix = reverb
-        self.reverb = reverb
+    func toggleEqualizer () {
+        if equalizerIsActive {
+            equalizerIsActive = false
+            userDefaults.set(false, forKey: "equalizerIsActive")
+            print ("Equalizer is off")
+        } else {
+            equalizerIsActive = true
+            userDefaults.set(true, forKey: "equalizerIsActive")
+            print ("Equalizer is active")
+        }
+        setNodeVolumesBasedOnEQActive(EQIsActive: equalizerIsActive)
     }
     
-    func bassBoost (/*EQL: AVAudioUnitEQ, EQR: AVAudioUnitEQ, */bassBoost: Float) {
-        print ("CALLED MODEL.BASSBOOST")
-//        EQL.bands[0].gain += bassBoost
-//        EQR.bands[0].gain += bassBoost
-//        EQL.bands[1].gain += bassBoost
-//        EQR.bands[1].gain += bassBoost
-        self.bassBoost = bassBoost
-    }    
+
     
-    func setEQBandsGain (currentProfile: Int) {
-        print ("CALLED SET EQ BANDS GAIN")
+   
+    
+    func prepareAudioEngine (currentProfile: Int, intensity: Double) {
+        let bandwidth: Float = 0.5
+        let freqs = [60, 100, 230, 500, 1100, 2400, 5400, 12000]
+        
+        // Left Ear 
+        
+        equalizerL1 = AVAudioUnitEQ(numberOfBands: 8)
+        audioEngine.attach(audioPlayerNodeL1) 
+       // audioEngine.attach(reverbL)
+        audioEngine.attach(equalizerL1) 
+        audioEngine.attach(mixerL1)
+        audioEngine.connect(audioPlayerNodeL1, to: mixerL1, format: nil)
+       // audioEngine.connect(reverbL, to: mixerL1, format: nil)
+        audioEngine.connect(mixerL1, to: equalizerL1, format: nil)
+       // audioEngine.connect(equalizerL1, to: reverbL, format: nil)
+       audioEngine.connect(equalizerL1, to: audioEngine.mainMixerNode, format: nil)
+       // audioEngine.connect(reverbL, to: audioEngine.mainMixerNode, format: nil)
         var currentLowestAudibleDecibelBands = [Double]()
         switch currentProfile {
         case 1: currentLowestAudibleDecibelBands = profile_1_lowestAudibleDecibelBands
@@ -795,414 +854,83 @@ class Model: ObservableObject {
         if minValue == maxValue {
             minValue += 1
         }
-        let multiplier1: Double = min(6 / abs(minValue - maxValue), 1.0)
-        let multiplier2: Double = min(8 / abs(minValue - maxValue), 1.0)
-        let multiplier3: Double = min(10 / abs(minValue - maxValue), 1.0)
-        let multiplier4: Double = min(12 / abs(minValue - maxValue), 1.0)
-        let multiplier5: Double = min(14 / abs(minValue - maxValue), 1.0)
+        let multiplier: Double = min(intensity / abs(minValue - maxValue), 1.0)
         
-        // Intensity 1 band gain
-        
-        var workingBandsGain1 = [Float]()
+        var workingBandsGain = [Float]()
         for i in 0...currentLowestAudibleDecibelBands.count - 1 {
-            workingBandsGain1.insert(Float(multiplier1 * abs(minValue - currentLowestAudibleDecibelBands[i]) ), at: i)
+            workingBandsGain.insert(Float(multiplier * abs(minValue - currentLowestAudibleDecibelBands[i]) ), at: i)
         }
-        
-        bandsGain1 = workingBandsGain1
-        
-        for i in 0...currentLowestAudibleDecibelBands.count - 1 {
-            print ("\(workingBandsGain1[i])")
-        }
-        
-        // Intensity 2 band gain
-        
-        var workingBandsGain2 = [Float]()
-        for i in 0...currentLowestAudibleDecibelBands.count - 1 {
-            workingBandsGain2.insert(Float(multiplier2 * abs(minValue - currentLowestAudibleDecibelBands[i]) ), at: i)
-        }
-//        for i in 0...currentLowestAudibleDecibelBands.count - 1 {
-//            print ("\(workingBandsGain2[i])")
-//        }
-        bandsGain2 = workingBandsGain2
-        
-        // Intensity 3 band gain
-        
-        var workingBandsGain3 = [Float]()
-        for i in 0...currentLowestAudibleDecibelBands.count - 1 {
-            workingBandsGain3.insert(Float(multiplier3 * abs(minValue - currentLowestAudibleDecibelBands[i]) ), at: i)
-        }
-//        for i in 0...currentLowestAudibleDecibelBands.count - 1 {
-//            print ("\(workingBandsGain3[i])")
-//        }
-        bandsGain3 = workingBandsGain3
-        
-        // Intensity 4 band gain 
-        var workingBandsGain4 = [Float]()
-        for i in 0...currentLowestAudibleDecibelBands.count - 1 {
-            workingBandsGain4.insert(Float(multiplier4 * abs(minValue - currentLowestAudibleDecibelBands[i]) ), at: i)
-        }
-//        for i in 0...currentLowestAudibleDecibelBands.count - 1 {
-//            print ("\(workingBandsGain4[i])")
-//        }
-        bandsGain4 = workingBandsGain4
-        
-        // Intensity 5 band gain
-        
-        var workingBandsGain5 = [Float]()
-        for i in 0...currentLowestAudibleDecibelBands.count - 1 {
-            workingBandsGain5.insert(Float(multiplier5 * abs(minValue - currentLowestAudibleDecibelBands[i]) ), at: i)
-        }
-//        for i in 0...currentLowestAudibleDecibelBands.count - 1 {
-//            print ("\(workingBandsGain5[i])")
-//        }
-        bandsGain5 = workingBandsGain5
-    }
     
-    func stopTrack () {
-        audioPlayerNodeL1.stop()
-//        audioPlayerNodeL2.stop()
-//        audioPlayerNodeL3.stop()
-//        audioPlayerNodeL4.stop()
-//        audioPlayerNodeL5.stop()
-        audioPlayerNodeR1.stop()
-//        audioPlayerNodeR2.stop()
-//        audioPlayerNodeR3.stop()
-//        audioPlayerNodeR4.stop()
-//        audioPlayerNodeR5.stop()
-        audioPlayerNodeS.stop()
-    }
-    
-    func pauseTrack () {
-        audioPlayerNodeL1.pause()
-//        audioPlayerNodeL2.pause()
-//        audioPlayerNodeL3.pause()
-//        audioPlayerNodeL4.pause()
-//        audioPlayerNodeL5.pause()
-        audioPlayerNodeR1.pause()
-//        audioPlayerNodeR2.pause()
-//        audioPlayerNodeR3.pause()
-//        audioPlayerNodeR4.pause()
-//        audioPlayerNodeR5.pause()
-        audioPlayerNodeS.pause()
-    }
-    
-    func unPauseTrack () {
-        let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
-        audioPlayerNodeL1.play(at: audioTime)
-//        audioPlayerNodeL2.play(at: audioTime)
-//        audioPlayerNodeL3.play(at: audioTime)
-//        audioPlayerNodeL4.play(at: audioTime)
-//        audioPlayerNodeL5.play(at: audioTime)
-        audioPlayerNodeR1.play(at: audioTime)
-//        audioPlayerNodeR2.play(at: audioTime)
-//        audioPlayerNodeR3.play(at: audioTime)
-//        audioPlayerNodeR4.play(at: audioTime)
-//        audioPlayerNodeR5.play(at: audioTime)
-        audioPlayerNodeS.play(at: audioTime)
-    }
-    
-    
-    func toggleEqualizer () {
-        if equalizerIsActive {
-            equalizerIsActive = false
-            userDefaults.set(false, forKey: "equalizerIsActive")
-            print ("Equalizer is off")
-        } else {
-            equalizerIsActive = true
-            userDefaults.set(true, forKey: "equalizerIsActive")
-            print ("Equalizer is active")
+        bandsGain1 = workingBandsGain
+        
+        // Set bands for Left Ear
+        
+        let bandsL = equalizerL1.bands
+        for i in 0...(bandsL.count - 1) {
+            bandsL[i].frequency = Float(freqs[i])
+            bandsL[i].bypass = false
+            bandsL[i].bandwidth = bandwidth
+            bandsL[i].filterType = .parametric
         }
-        setEqualizerVolume(currentIntensity: currentIntensity, currentProfile: currentProfile)
-    }
-    
-    func setEqualizerVolume (currentIntensity: Int, currentProfile: Int) {
-        setEQBandsGain(currentProfile: currentProfile)
-        if equalizerIsActive {
-            switch currentIntensity {
-            case 1: 
-                audioPlayerNodeL1.volume = 1
-                print("IntensityL-1")
-//                audioPlayerNodeL2.volume = 0
-//                audioPlayerNodeL3.volume = 0
-//                audioPlayerNodeL4.volume = 0
-//                audioPlayerNodeL5.volume = 0
-                audioPlayerNodeR1.volume = 1
-                print ("IntensityR-1")
-//                audioPlayerNodeR2.volume = 0
-//                audioPlayerNodeR3.volume = 0
-//                audioPlayerNodeR4.volume = 0
-//                audioPlayerNodeR5.volume = 0
-                audioPlayerNodeS.volume = 0
-            case 2:
-                audioPlayerNodeL1.volume = 0
-//                audioPlayerNodeL2.volume = 1
-//                print("IntensityL-2")
-//                audioPlayerNodeL3.volume = 0
-//                audioPlayerNodeL4.volume = 0
-//                audioPlayerNodeL5.volume = 0
-                audioPlayerNodeR1.volume = 0
-//                audioPlayerNodeR2.volume = 1
-//                print("IntensityR-2")
-//                audioPlayerNodeR3.volume = 0
-//                audioPlayerNodeR4.volume = 0
-//                audioPlayerNodeR5.volume = 0
-                audioPlayerNodeS.volume = 0
-            case 3: 
-                audioPlayerNodeL1.volume = 0
-//                audioPlayerNodeL2.volume = 0
-//                audioPlayerNodeL3.volume = 1
-//                print("IntensityL-3")
-//                audioPlayerNodeL4.volume = 0
-//                audioPlayerNodeL5.volume = 0
-                audioPlayerNodeR1.volume = 0
-//                audioPlayerNodeR2.volume = 0
-//                audioPlayerNodeR3.volume = 1
-//                print("IntensityR-3")
-//                audioPlayerNodeR4.volume = 0
-//                audioPlayerNodeR5.volume = 0
-                audioPlayerNodeS.volume = 0
-                
-            case 4: 
-                audioPlayerNodeL1.volume = 0
-//                audioPlayerNodeL2.volume = 0
-//                audioPlayerNodeL3.volume = 0
-//                audioPlayerNodeL4.volume = 1
-//                print("IntensityL-4")
-//                audioPlayerNodeL5.volume = 0
-                audioPlayerNodeR1.volume = 0
-//                audioPlayerNodeR2.volume = 0
-//                audioPlayerNodeR3.volume = 0
-//                audioPlayerNodeR4.volume = 1
-//                print("IntensityR-4")
-//                audioPlayerNodeR5.volume = 0
-                audioPlayerNodeS.volume = 0
-            case 5: 
-                audioPlayerNodeL1.volume = 0
-//                audioPlayerNodeL2.volume = 0
-//                audioPlayerNodeL3.volume = 0
-//                audioPlayerNodeL4.volume = 0
-//                audioPlayerNodeL5.volume = 1
-//                print("IntensityL-5")
-                audioPlayerNodeR1.volume = 0
-//                audioPlayerNodeR2.volume = 0
-//                audioPlayerNodeR3.volume = 0
-//                audioPlayerNodeR4.volume = 0
-//                audioPlayerNodeR5.volume = 1
-//                print("IntensityR-5")
-                audioPlayerNodeS.volume = 0
-            default: break
-            }
-        } else {
-            audioPlayerNodeL1.volume = 0
-//            audioPlayerNodeL2.volume = 0
-//            audioPlayerNodeL3.volume = 0
-//            audioPlayerNodeL4.volume = 0
-//            audioPlayerNodeL5.volume = 0
-            audioPlayerNodeR1.volume = 0
-//            audioPlayerNodeR2.volume = 0
-//            audioPlayerNodeR3.volume = 0
-//            audioPlayerNodeR4.volume = 0
-//            audioPlayerNodeR5.volume = 0
-            audioPlayerNodeS.volume = 1
-            print("Flat Stereo")
-        }
-    }
-    
-   
-    
-    func prepareAudioEngine () {
-        let bandwidth: Float = 0.5
-        let freqs = [60, 100, 230, 500, 1100, 2400, 5400, 12000]
-        
-        // Left Ear 
-        
-        equalizerL1 = AVAudioUnitEQ(numberOfBands: 8)
-        audioEngine.attach(audioPlayerNodeL1) 
-        audioEngine.attach(reverbL)
-        audioEngine.attach(equalizerL1) 
-        audioEngine.attach(mixerL1)
-        audioEngine.connect(audioPlayerNodeL1, to: mixerL1, format: nil)
-       // audioEngine.connect(reverbL, to: mixerL1, format: nil)
-        audioEngine.connect(mixerL1, to: equalizerL1, format: nil)
-        audioEngine.connect(equalizerL1, to: reverbL, format: nil)
-     //   audioEngine.connect(equalizerL1, to: audioEngine.mainMixerNode, format: nil)
-        audioEngine.connect(reverbL, to: audioEngine.mainMixerNode, format: nil)
-        let bandsL1 = equalizerL1.bands
-        for i in 0...(bandsL1.count - 1) {
-            bandsL1[i].frequency = Float(freqs[i])
-            bandsL1[i].bypass = false
-            bandsL1[i].bandwidth = bandwidth
-            bandsL1[i].filterType = .parametric
-            bandsL1[i].gain = bandsGain1[i]
-        }
-        reverbL.loadFactoryPreset(.largeHall)
-        reverbL.wetDryMix = reverb
-        
-//        equalizerL2 = AVAudioUnitEQ(numberOfBands: 8)
-//        audioEngine.attach(audioPlayerNodeL2) 
-//        audioEngine.attach(equalizerL2) 
-//        audioEngine.attach(mixerL2)
-//        audioEngine.connect(audioPlayerNodeL2, to: mixerL2, format: nil)
-//        audioEngine.connect(mixerL2, to: equalizerL2, format: nil)
-//        audioEngine.connect(equalizerL2, to: audioEngine.mainMixerNode, format: nil)
-//        let bandsL2 = equalizerL2.bands
-//        for i in 0...(bandsL2.count - 1) {
-//            bandsL2[i].frequency = Float(freqs[i])
-//            bandsL2[i].bypass = false
-//            bandsL2[i].bandwidth = bandwidth
-//            bandsL2[i].filterType = .parametric
-//            bandsL2[i].gain = bandsGain2[i]
-//        }
-//        
-//        equalizerL3 = AVAudioUnitEQ(numberOfBands: 8)
-//        audioEngine.attach(audioPlayerNodeL3) 
-//        audioEngine.attach(equalizerL3) 
-//        audioEngine.attach(mixerL3)
-//        audioEngine.connect(audioPlayerNodeL3, to: mixerL3, format: nil)
-//        audioEngine.connect(mixerL3, to: equalizerL3, format: nil)
-//        audioEngine.connect(equalizerL3, to: audioEngine.mainMixerNode, format: nil)
-//        let bandsL3 = equalizerL3.bands
-//        for i in 0...(bandsL3.count - 1) {
-//            bandsL3[i].frequency = Float(freqs[i])
-//            bandsL3[i].bypass = false
-//            bandsL3[i].bandwidth = bandwidth
-//            bandsL3[i].filterType = .parametric
-//            bandsL3[i].gain = bandsGain3[i]
-//        }
-//        
-//        equalizerL4 = AVAudioUnitEQ(numberOfBands: 8)
-//        audioEngine.attach(audioPlayerNodeL4) 
-//        audioEngine.attach(equalizerL4) 
-//        audioEngine.attach(mixerL4)
-//        audioEngine.connect(audioPlayerNodeL4, to: mixerL3, format: nil)
-//        audioEngine.connect(mixerL4, to: equalizerL4, format: nil)
-//        audioEngine.connect(equalizerL4, to: audioEngine.mainMixerNode, format: nil)
-//        let bandsL4 = equalizerL4.bands
-//        for i in 0...(bandsL4.count - 1) {
-//            bandsL4[i].frequency = Float(freqs[i])
-//            bandsL4[i].bypass = false
-//            bandsL4[i].bandwidth = bandwidth
-//            bandsL4[i].filterType = .parametric
-//            bandsL4[i].gain = bandsGain4[i]
-//        }
-//        
-//        equalizerL5 = AVAudioUnitEQ(numberOfBands: 8)
-//        audioEngine.attach(audioPlayerNodeL5) 
-//        audioEngine.attach(equalizerL5) 
-//        audioEngine.attach(mixerL5)
-//        audioEngine.connect(audioPlayerNodeL5, to: mixerL3, format: nil)
-//        audioEngine.connect(mixerL5, to: equalizerL5, format: nil)
-//        audioEngine.connect(equalizerL5, to: audioEngine.mainMixerNode, format: nil)
-//        let bandsL5 = equalizerL5.bands
-//        for i in 0...(bandsL5.count - 1) {
-//            bandsL5[i].frequency = Float(freqs[i])
-//            bandsL5[i].bypass = false
-//            bandsL5[i].bandwidth = bandwidth
-//            bandsL5[i].filterType = .parametric
-//            bandsL5[i].gain = bandsGain5[i]
-//        }
-        
-        
+
         
         // Right Ear
         equalizerR1 = AVAudioUnitEQ(numberOfBands: 8)
         audioEngine.attach(audioPlayerNodeR1) 
-        audioEngine.attach(reverbR)
+    //    audioEngine.attach(reverbR)
         audioEngine.attach(equalizerR1) 
         audioEngine.attach(mixerR1)
         audioEngine.connect(audioPlayerNodeR1, to: mixerR1, format: nil)
     //    audioEngine.connect(reverbR, to: mixerR1, format: nil)
         audioEngine.connect(mixerR1, to: equalizerR1, format: nil)
-        audioEngine.connect(equalizerR1, to: reverbR, format: nil)
-        audioEngine.connect(reverbR, to: audioEngine.mainMixerNode, format: nil)
-//audioEngine.connect(reverbR, to: audioEngine.mainMixerNode, format: nil)
-        let bandsR1 = equalizerR1.bands
-        for i in 0...(bandsR1.count - 1) {
-            bandsR1[i].frequency = Float(freqs[i])
-            bandsR1[i].bypass = false
-            bandsR1[i].bandwidth = bandwidth
-            bandsR1[i].filterType = .parametric
-            bandsR1[i].gain = bandsGain1[i + bandsR1.count]
-        }
-        reverbR.loadFactoryPreset(.largeHall)
-        reverbR.wetDryMix = reverb
+   //     audioEngine.connect(equalizerR1, to: reverbR, format: nil)
+     //   audioEngine.connect(reverbR, to: audioEngine.mainMixerNode, format: nil)
+        audioEngine.connect(equalizerR1, to: audioEngine.mainMixerNode, format: nil)
         
-//        equalizerR2 = AVAudioUnitEQ(numberOfBands: 8)
-//        audioEngine.attach(audioPlayerNodeR2) 
-//        audioEngine.attach(equalizerR2) 
-//        audioEngine.attach(mixerR2)
-//        audioEngine.connect(audioPlayerNodeR2, to: mixerR2, format: nil)
-//        audioEngine.connect(mixerR2, to: equalizerR2, format: nil)
-//        audioEngine.connect(equalizerR2, to: audioEngine.mainMixerNode, format: nil)
-//        let bandsR2 = equalizerR2.bands
-//        for i in 0...(bandsR2.count - 1) {
-//            bandsR2[i].frequency = Float(freqs[i])
-//            bandsR2[i].bypass = false
-//            bandsR2[i].bandwidth = bandwidth
-//            bandsR2[i].filterType = .parametric
-//            bandsR2[i].gain = bandsGain2[i + bandsR2.count]
-//        }
-//        
-//        equalizerR3 = AVAudioUnitEQ(numberOfBands: 8)
-//        audioEngine.attach(audioPlayerNodeR3) 
-//        audioEngine.attach(equalizerR3) 
-//        audioEngine.attach(mixerR3)
-//        audioEngine.connect(audioPlayerNodeR3, to: mixerR3, format: nil)
-//        audioEngine.connect(mixerR3, to: equalizerR3, format: nil)
-//        audioEngine.connect(equalizerR3, to: audioEngine.mainMixerNode, format: nil)
-//        let bandsR3 = equalizerR3.bands
-//        for i in 0...(bandsR3.count - 1) {
-//            bandsR3[i].frequency = Float(freqs[i])
-//            bandsR3[i].bypass = false
-//            bandsR3[i].bandwidth = bandwidth
-//            bandsR3[i].filterType = .parametric
-//            bandsR3[i].gain = bandsGain3[i + bandsR3.count]
-//        }
-//        
-//        equalizerR4 = AVAudioUnitEQ(numberOfBands: 8)
-//        audioEngine.attach(audioPlayerNodeR4) 
-//        audioEngine.attach(equalizerR4) 
-//        audioEngine.attach(mixerR4)
-//        audioEngine.connect(audioPlayerNodeR4, to: mixerR4, format: nil)
-//        audioEngine.connect(mixerR4, to: equalizerR4, format: nil)
-//        audioEngine.connect(equalizerR4, to: audioEngine.mainMixerNode, format: nil)
-//        let bandsR4 = equalizerR4.bands
-//        for i in 0...(bandsR4.count - 1) {
-//            bandsR4[i].frequency = Float(freqs[i])
-//            bandsR4[i].bypass = false
-//            bandsR4[i].bandwidth = bandwidth
-//            bandsR4[i].filterType = .parametric
-//            bandsR4[i].gain = bandsGain4[i + bandsR4.count]
-//        }
-//        
-//        equalizerR5 = AVAudioUnitEQ(numberOfBands: 8)
-//        audioEngine.attach(audioPlayerNodeR5) 
-//        audioEngine.attach(equalizerR5) 
-//        audioEngine.attach(mixerR5)
-//        audioEngine.connect(audioPlayerNodeR5, to: mixerR5, format: nil)
-//        audioEngine.connect(mixerR5, to: equalizerR5, format: nil)
-//        audioEngine.connect(equalizerR5, to: audioEngine.mainMixerNode, format: nil)
-//        let bandsR5 = equalizerR5.bands
-//        for i in 0...(bandsR5.count - 1) {
-//            bandsR5[i].frequency = Float(freqs[i])
-//            bandsR5[i].bypass = false
-//            bandsR5[i].bandwidth = bandwidth
-//            bandsR5[i].filterType = .parametric
-//            bandsR5[i].gain = bandsGain5[i + bandsR5.count]
-//        }
+        // Set bands for right ear
+
+        let bandsR = equalizerR1.bands
+        for i in 0...(bandsR.count - 1) {
+            bandsR[i].frequency = Float(freqs[i])
+            bandsR[i].bypass = false
+            bandsR[i].bandwidth = bandwidth
+            bandsR[i].filterType = .parametric
+        }
+        
+        // Set gain for left and right ear
+        
+        bandsL[0].gain = bandsGain1[0]
+        bandsR[0].gain = bandsGain1[1]
+        for i in 2...bandsGain1.count - 1 {
+            if i .isMultiple(of: 2) {
+                bandsL[i / 2].gain = bandsGain1[i]
+            } else {
+                bandsR[i / 2].gain = bandsGain1[i]
+            }
+        }
+        for i in 0...currentLowestAudibleDecibelBands.count - 1 {
+            print ("\(bandNames[i]): \(workingBandsGain[i])")
+        }
+    
         
         
         // Flat Stereo
-        audioEngine.attach(audioPlayerNodeS) 
-        audioEngine.connect(audioPlayerNodeS, to: audioEngine.mainMixerNode, format: nil)
+        audioEngine.attach(audioPlayerNodeLS) 
+        audioEngine.connect(audioPlayerNodeLS, to: audioEngine.mainMixerNode, format: nil)
+        audioEngine.attach(audioPlayerNodeRS) 
+        audioEngine.connect(audioPlayerNodeRS, to: audioEngine.mainMixerNode, format: nil)
     }
     
    
     
     func playTrack (playQueue: [MPMediaItem], index: Int) {
-        self.stopTrack()
-        setEqualizerVolume(currentIntensity: currentIntensity, currentProfile: currentProfile)
-        prepareAudioEngine()
+        
+        print ("Play Track, Current Proifle = \(currentProfile)")
+        print ("Play Track, Current Intensity = \(currentIntensity)")
+        if audioPlayerNodeL1.isPlaying {
+            self.stopTrack()
+        }
+        prepareAudioEngine(currentProfile: currentProfile, intensity: currentIntensity)
         do {
             let currentMPMediaItem = playQueue[index]
             if let currentURL = currentMPMediaItem.assetURL {
@@ -1213,91 +941,33 @@ class Model: ObservableObject {
                 audioEngine.prepare()
                 try audioEngine.start()
                 
-                
-                setEqualizerVolume(currentIntensity: currentIntensity, currentProfile: currentProfile)
+                setNodeVolumesBasedOnEQActive(EQIsActive: equalizerIsActive)
+    
                 
                 let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
                 
-                // Left Ear 
+                // Left Ear EQ
                 audioPlayerNodeL1.scheduleFile(audioFile, at: audioTime, completionHandler: nil) 
                 audioPlayerNodeL1.pan = -1
-                audioPlayerNodeL1.play()
-//                
-//                audioPlayerNodeL2.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
-//                audioPlayerNodeL2.pan = -1
-//                audioPlayerNodeL2.play()
-//                
-//                audioPlayerNodeL3.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
-//                audioPlayerNodeL3.pan = -1
-//                audioPlayerNodeL3.play()
-//                
-//                audioPlayerNodeL4.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
-//                audioPlayerNodeL4.pan = -1
-//                audioPlayerNodeL4.play()
-//                
-//                audioPlayerNodeL5.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
-//                audioPlayerNodeL5.pan = -1
-//                audioPlayerNodeL5.play()
+                audioPlayerNodeL1.play()              
                 
-                
-                // Right Ear
+                // Right Ear EQ
                 audioPlayerNodeR1.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
                 audioPlayerNodeR1.pan = 1
                 audioPlayerNodeR1.play()
                 
-//                audioPlayerNodeR2.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
-//                audioPlayerNodeR2.pan = 1
-//                audioPlayerNodeR2.play()
-//                
-//                audioPlayerNodeR3.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
-//                audioPlayerNodeR3.pan = 1
-//                audioPlayerNodeR3.play()
-//                
-//                audioPlayerNodeR4.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
-//                audioPlayerNodeR4.pan = 1
-//                audioPlayerNodeR4.play()
-//                
-//                audioPlayerNodeR5.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
-//                audioPlayerNodeR5.pan = 1
-//                audioPlayerNodeR5.play()
+                // Left Ear Flat
+                audioPlayerNodeLS.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
+                audioPlayerNodeLS.pan = -1
+                audioPlayerNodeLS.play()
                 
-                // Flat Stereo
-                audioPlayerNodeS.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
-                audioPlayerNodeS.pan = 0
-                audioPlayerNodeS.play()
+                // Right Ear Flat
+                audioPlayerNodeRS.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
+                audioPlayerNodeRS.pan = 1
+                audioPlayerNodeRS.play()
             }
             
         } catch _ {print ("Catching Audio Engine Error")}
-    }
-    
-    func setIntensity1 () {
-        currentIntensity = 1
-        setEqualizerVolume(currentIntensity: currentIntensity, currentProfile: currentProfile)
-        print ("Intesnity set to: \(currentIntensity)")
-    }
-    
-    func setIntensity2 () {
-        currentIntensity = 2
-        setEqualizerVolume(currentIntensity: currentIntensity, currentProfile: currentProfile)
-        print ("Intesnity set to: \(currentIntensity)")
-    }
-    
-    func setIntensity3 () {
-        currentIntensity = 3
-        setEqualizerVolume(currentIntensity: currentIntensity, currentProfile: currentProfile)
-        print ("Intesnity set to: \(currentIntensity)")
-    }
-    
-    func setIntensity4 () {
-        currentIntensity = 4
-        setEqualizerVolume(currentIntensity: currentIntensity, currentProfile: currentProfile)
-        print ("Intesnity set to: \(currentIntensity)")
-    }
-    
-    func setIntensity5 () {
-        currentIntensity = 5
-        setEqualizerVolume(currentIntensity: currentIntensity, currentProfile: currentProfile)
-        print ("Intesnity set to: \(currentIntensity)")
     }
     
     var tonePlayer: AVAudioPlayer?
@@ -1491,6 +1161,12 @@ class Model: ObservableObject {
         }
     }
     
+    func resumeTone () {
+        if let tonePlayer = tonePlayer {
+            tonePlayer.play()
+        }
+    }
+    
     func stopTone () {
         if let tonePlayer = tonePlayer {
             tonePlayer.stop()
@@ -1615,11 +1291,11 @@ class Model: ObservableObject {
     }
     
     func tapStartTest () {
-        let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
-        playTone(volume: volume)
+        currentVolume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
+        playTone(volume: currentVolume)
         testStatus = "Test in Progress"
         testInProgress = true
-        print ("tapStartTest volume = \(volume)")
+        print ("tapStartTest volume = \(currentVolume)")
         print ("tapStartTest maxUnheard = \(maxUnheard)")
         print ("tapStartTest minHeard = \(minHeard)")
     }

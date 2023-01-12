@@ -26,6 +26,7 @@
 		0D8762A32947CEC50089B138 /* Band60.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629B2947CEC50089B138 /* Band60.mp3 */; };
 		0D8762A42947CEC50089B138 /* Band5400.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629C2947CEC50089B138 /* Band5400.mp3 */; };
 		0D8762A52947CEC50089B138 /* Band12000.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629D2947CEC50089B138 /* Band12000.mp3 */; };
+		0DA95DB0296F177000D03A93 /* CompareSilenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DA95DAF296F177000D03A93 /* CompareSilenceView.swift */; };
 		0DCB0E2E2964FF8800083DB4 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */; };
 		0DCB0E302965000000083DB4 /* LibraryRowViewTemp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCB0E2F2965000000083DB4 /* LibraryRowViewTemp.swift */; };
 		0DCB0E33296504E000083DB4 /* SongsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCB0E32296504E000083DB4 /* SongsView.swift */; };
@@ -56,6 +57,7 @@
 		0D87629B2947CEC50089B138 /* Band60.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band60.mp3; sourceTree = "<group>"; };
 		0D87629C2947CEC50089B138 /* Band5400.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band5400.mp3; sourceTree = "<group>"; };
 		0D87629D2947CEC50089B138 /* Band12000.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band12000.mp3; sourceTree = "<group>"; };
+		0DA95DAF296F177000D03A93 /* CompareSilenceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompareSilenceView.swift; sourceTree = "<group>"; };
 		0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		0DCB0E2F2965000000083DB4 /* LibraryRowViewTemp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryRowViewTemp.swift; sourceTree = "<group>"; };
 		0DCB0E32296504E000083DB4 /* SongsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongsView.swift; sourceTree = "<group>"; };
@@ -111,6 +113,7 @@
 				0D71B326296B0C3C00C467FD /* VolumeObserver.swift */,
 				0D71B324296B07C200C467FD /* RepresentedMPVolumeView.swift */,
 				0D37678E29551DC100F3FF59 /* TestView.swift */,
+				0DA95DAF296F177000D03A93 /* CompareSilenceView.swift */,
 				0DCB0E312965017100083DB4 /* Unused */,
 				0D8762952947CE1C0089B138 /* Frequencies */,
 				0DD438F3293E9CAC00C9301E /* Tracks */,
@@ -247,6 +250,7 @@
 				0DCB0E2E2964FF8800083DB4 /* LibraryView.swift in Sources */,
 				0D37679129551E0E00F3FF59 /* EQView.swift in Sources */,
 				0DE942D7296A474200FFA006 /* SongsRowView.swift in Sources */,
+				0DA95DB0296F177000D03A93 /* CompareSilenceView.swift in Sources */,
 				0DE942D52969F3DC00FFA006 /* Extensions.swift in Sources */,
 				0D429B3E295B36DA007810AC /* MediaPlayerView.swift in Sources */,
 				0D19B1512955DD2000D17C16 /* ProfileView.swift in Sources */,
