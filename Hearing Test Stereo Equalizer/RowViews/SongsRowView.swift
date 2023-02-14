@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct SongsRowView: View {
     
     var albumCover: Image
@@ -23,7 +24,6 @@ struct SongsRowView: View {
             Spacer()
         }
         .contentShape(Rectangle())
-        
     }
 }
 

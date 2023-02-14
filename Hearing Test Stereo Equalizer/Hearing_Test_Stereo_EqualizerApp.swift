@@ -10,11 +10,15 @@ import SwiftUI
 @main
 struct Hearing_Test_Stereo_EqualizerApp: App {
     
-   @StateObject private var model = Model()
+    @StateObject private var model = Model()
+    @StateObject private var player = Player()
+    @StateObject private var dataController = DataController()
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(model)
+                .environmentObject(player)
+                .environment(\.managedObjectContext, dataController.container.viewContext)
         }
     }
 }

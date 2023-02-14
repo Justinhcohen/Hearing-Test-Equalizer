@@ -10,6 +10,8 @@ import MediaPlayer
 
 struct PlaylistView: View {
     
+    @EnvironmentObject var model: Model
+ 
     var allPlaylists: [MPMediaItemCollection] {
         let query = MPMediaQuery.playlists()
         return query.collections!
@@ -17,21 +19,22 @@ struct PlaylistView: View {
     
     var body: some View {
         
-        NavigationView {
-            List (allPlaylists, id: \.self) { playlist in
-                let playlistName = playlist.value(forProperty: MPMediaPlaylistPropertyName) as? String
-                
-                NavigationLink {
-                    SongsView(playQueue: playlist.items)
-                } label: {
-                    Text (playlistName ?? "No Playlist Name")
+        List (allPlaylists, id: \.self) { playlist in
+            let playlistName = playlist.value(forProperty: MPMediaPlaylistPropertyName) as? String
+            NavigationLink {
+                PlaylistSongsView(playlistName: playlistName ?? "No Name").onAppear {
+                    model.songList = playlist.items
                 }
-                
+            } label: {
+                HStack {    
+                    Text (playlistName ?? "No Playlist Name")
+                    Spacer()
+                }
+                .contentShape(Rectangle())
             }
         }
+        .listStyle(PlainListStyle())
         .navigationTitle("Playlists")
-        
-        
     }
 }
 

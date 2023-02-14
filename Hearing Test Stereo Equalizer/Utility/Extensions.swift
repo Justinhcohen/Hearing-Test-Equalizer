@@ -19,6 +19,10 @@ extension AVAudioFile{
         let lengthSongSeconds = Double(length) / sampleRateSong
         return lengthSongSeconds
     }
+    
+    func seek (to framePosition: AVAudioFramePosition) {
+        self.framePosition = framePosition
+    }
 
 }
 
@@ -30,6 +34,8 @@ extension AVAudioPlayerNode{
         }
         return 0
     }
+    
+    
 }
 
 extension MPVolumeView {
@@ -40,6 +46,12 @@ extension MPVolumeView {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.01) {
             slider?.value = volume
         }
+    }
+}
+
+extension Float {
+    func decimals(_ nbr: Int) -> String {
+        String(self.formatted(.number.precision(.fractionLength(nbr))))
     }
 }
 
