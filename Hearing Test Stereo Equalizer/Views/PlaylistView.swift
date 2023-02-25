@@ -35,6 +35,13 @@ struct PlaylistView: View {
         }
         .listStyle(PlainListStyle())
         .navigationTitle("Playlists")
+        
+        if model.songList.isEmpty {
+            HStack {
+                Text ("You have no playlists.")
+                Spacer()
+            }
+        }
     }
 }
 

@@ -9,55 +9,214 @@ import Foundation
 import AVKit
 import MediaPlayer
 
-class Model: ObservableObject {
+class Model: ObservableObject, RemoteCommandHandler {
     
     enum NowPlayableInterruption {
         case began, ended(Bool), failed(Error)
     }
     
+    enum PlayState {
+        case playing, paused, stopped
+    }
+    
+    @Published var playState: PlayState = .stopped
+    
+    let systemMusicPlayer = MPMusicPlayerController.systemMusicPlayer
+    
     let userDefaults = UserDefaults.standard
     
     // The observer of audio session interruption notifications.
     private var interruptionObserver: NSObjectProtocol!
+    private var routeChangeObserver: NSObjectProtocol!
+    private var headphonesConnected = false
     
     // The handler to be invoked when an interruption begins or ends.
     private var interruptionHandler: (NowPlayableInterruption) -> Void = { _ in }
     
-    private var cachedTrackProgress: AVAudioFramePosition = 0 {
+    var cachedAudioFrame: AVAudioFramePosition? {
         didSet {
-            print ("CACHED TRACK PROGRESS = \(cachedTrackProgress)")
+            print ("CACHED AUDIO FRAME = \(cachedAudioFrame ?? 0)")
         }
     }
     
-    private var isInterrupted = false {
-        didSet {
-            print ("IS INTERRUPTED = \(isInterrupted)")
-        }
-    }
+//    private var isInterrupted = false {
+//        didSet {
+//            print ("IS INTERRUPTED = \(isInterrupted)")
+//        }
+//    }
     
     func setInterruptionObserver () {
         let audioSession = AVAudioSession.sharedInstance()
         
         // Observe interruptions to the audio session.
         
-        interruptionObserver = NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification,
-                                                                      object: audioSession,
-                                                                      queue: .main) {
+        interruptionObserver = NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification, object: audioSession, queue: .main) {
             [unowned self] notification in
             self.handleAudioSessionInterruption(notification: notification)
+        }
+    }	
+    
+    func setRouteChangeObserver() {
+        let audioSession = AVAudioSession.sharedInstance()
+        
+        // Observe route change interruptions
+        
+        routeChangeObserver = NotificationCenter.default.addObserver(forName: AVAudioSession.routeChangeNotification, object: nil, queue: .main) {
+            [unowned self] notification in
+            self.handleRouteChangeNotification(notification: notification)
+        }
+    }
+    
+    func setEnabledStatusOnRemoteCommands () {
+        let rmc = MPRemoteCommandCenter.shared()
+        rmc.pauseCommand.isEnabled = false
+        rmc.playCommand.isEnabled = false
+        rmc.stopCommand.isEnabled = false
+        rmc.togglePlayPauseCommand.isEnabled = true
+        rmc.nextTrackCommand.isEnabled = true
+        rmc.previousTrackCommand.isEnabled = true
+        rmc.changeRepeatModeCommand.isEnabled = false
+        rmc.changeShuffleModeCommand.isEnabled = false
+        rmc.changePlaybackRateCommand.isEnabled = false
+        rmc.seekBackwardCommand.isEnabled = false
+        rmc.seekForwardCommand.isEnabled = false
+        rmc.skipBackwardCommand.isEnabled = false
+        rmc.skipForwardCommand.isEnabled = false
+        rmc.changePlaybackPositionCommand.isEnabled = false
+        rmc.ratingCommand.isEnabled = false
+        rmc.likeCommand.isEnabled = false
+        rmc.dislikeCommand.isEnabled = false
+        rmc.bookmarkCommand.isEnabled = false
+        rmc.enableLanguageOptionCommand.isEnabled = false
+        rmc.disableLanguageOptionCommand.isEnabled = false
+    }
+    
+    func performRemoteCommand(_ command: RemoteCommand) {
+        
+        switch command {
+            
+        case .pause:
+            print ("RECEIVED REMOTE PAUSE COMMAND")
+            pauseTrack()
+            
+        case .play:
+            print ("RECEIVED REMOTE PLAY COMMAND")
+            playTrack()
+            
+        case .nextTrack:
+            print ("RECIEVED REMOTE NEXT TRACK COMMAND")
+            playNextTrack()
+            
+        case .previousTrack:
+            print ("RECEIVED REMOTE PREVIOUS TRACK COMMAND")
+            playPreviousTrack()
+            
+        case .togglePlayPause:
+            print ("RECEIVED REMOTE TOGGLE PLAY PAUSE")
+            playOrPauseCurrentTrack()
         }
     }
     
     
     func handleAudioSessionInterruption(notification: Notification) {
         print ("CALLED HANDLE AUDIO INTERRUPTION")
-        if isPlaying {
-            print ("AUDIO FILE FRAME POSITION IS \(audioFile.framePosition)")
-            cachedTrackProgress = audioFile.framePosition
-            cachedTrackProgress = audioPlayerNodeL1.lastRenderTime!.sampleTime
-            stopTrack()
+        guard let userInfo = notification.userInfo,
+                let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+                let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
+                    return
+            }
+        switch type {
+
+            case .began:
+            print ("INTERRUPTION BEGAN")
+            playState = .stopped 
+            if audioPlayerNodeL1.currentFrame > 0 {
+                cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+                //isInterrupted = true
+            }
+            setNowPlayingMetadata()
+
+            case .ended:
+            print ("INTERRUPTION ENDED")
+               // An interruption ended. Resume playback, if appropriate.
+
+                guard let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt else { return }
+                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+                if options.contains(.shouldResume) {
+                    playTrack()
+                } else {
+                    print ("I'm guessing after a call ends, we should not resume")
+                    return
+                }
+       //     setNowPlayingMetadata()
+
+            default: print ("WE CALLED THE DEFAULT")
+            }
+       // playState = .stopped 
+        if audioPlayerNodeL1.currentFrame > 0 {
+            cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+            //isInterrupted = true
         }
-        isInterrupted = true
+    }
+    
+    func handleRouteChangeNotification(notification: Notification) {
+        print ("CALLED HANDLE ROUTE CHANGE")
+        playState = .stopped 
+        guard let userInfo = notification.userInfo,
+               let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
+               let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
+                   return
+           }
+           
+           // Switch over the route change reason.
+           switch reason {
+
+           case .newDeviceAvailable: // New device found.
+               print ("CALLED NEW DEVICE AVAILABLE")
+               let session = AVAudioSession.sharedInstance()
+               headphonesConnected = hasHeadphones(in: session.currentRoute)
+               print ("HEAD PHONES CONNECTED = \(headphonesConnected)")
+               
+               if headphonesConnected {
+                   if audioPlayerNodeL1.currentFrame > 0 {
+                       cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+                   }
+                   setNowPlayingMetadata()
+                   playTrack()
+               } else {
+                   if audioPlayerNodeL1.currentFrame > 0 {
+                       cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+                   }
+                   setNowPlayingMetadata()
+               }
+           
+           case .oldDeviceUnavailable: // Old device removed.
+               print ("CALLED NEW DEVICE AVAILABLE")
+               if let previousRoute =
+                   userInfo[AVAudioSessionRouteChangePreviousRouteKey] as? AVAudioSessionRouteDescription {
+                   headphonesConnected = hasHeadphones(in: previousRoute)
+                   print ("HEAD PHONES CONNECTED = \(headphonesConnected)")
+                   if headphonesConnected {
+                       if audioPlayerNodeL1.currentFrame > 0 {
+                           cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+                       }
+                       setNowPlayingMetadata()
+                       playTrack()
+                   } else {
+                       if audioPlayerNodeL1.currentFrame > 0 {
+                           cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+                       }
+                       setNowPlayingMetadata()
+                   }
+               }
+           
+           default: break
+           }
+    }
+    
+    func hasHeadphones(in routeDescription: AVAudioSessionRouteDescription) -> Bool {
+        // Filter the outputs to only those with a port type of headphones.
+        return !routeDescription.outputs.filter({$0.portType == .headphones}).isEmpty
     }
     
     func printUserDefaults () {
@@ -68,6 +227,7 @@ class Model: ObservableObject {
     
     func readFromUserDefaults () {
         initialHearingTestHasBeenCompleted = userDefaults.bool(forKey: "initialHearingTestHasBeenCompleted")
+        libraryAccessIsGranted = userDefaults.bool(forKey: "libraryAccessIsGranted")
     }
     
     func setInitialVolumeToFineTuneSoundLevel () {
@@ -80,6 +240,11 @@ class Model: ObservableObject {
     
     // Music Player (Hearing Test is Below)
     var initialSoundLevelSet = false
+    @Published var libraryAccessIsGranted = false {
+        willSet {
+            userDefaults.set(newValue, forKey: "libraryAccessIsGranted")
+        }
+    }
     @Published var currentUserProfile = UserProfile()
     @Published var currentUserProfileName = ""
     @Published var currentIntensity = 0.0
@@ -87,12 +252,12 @@ class Model: ObservableObject {
     @Published var songList = [MPMediaItem] ()
     var currentURL: URL = URL(fileURLWithPath: "")
     @Published var queueIndex: Int = 0
-    @Published var isPlaying: Bool = false
-    @Published var isPaused: Bool = false
+   // @Published var isPlaying: Bool = false
+   // @Published var isPaused: Bool = false
     @Published var timer: Timer?
     @Published var fadeInTimer: Timer?
     @Published var fadeOutTimer: Timer?
-    @Published var fineTuneSoundLevel: Float = 0.70
+    @Published var fineTuneSoundLevel: Float = 0.0
     var fadeOutSoundLevel: Float = 0.0
     @Published var currentVolume: Float = 0.0
     @Published var systemVolume = AVAudioSession.sharedInstance().outputVolume
@@ -120,12 +285,12 @@ class Model: ObservableObject {
     }
     
     func fadeInAudio () {
-        print ("CALLED FADE IN AUDIO")
-        print ("Volume in progress is \(audioPlayerNodeL1.volume)")
+//        print ("CALLED FADE IN AUDIO")
+//        print ("Volume in progress is \(audioPlayerNodeL1.volume)")
       
-      if audioPlayerNodeL1.volume < fineTuneSoundLevel {
-          audioPlayerNodeL1.volume = min (audioPlayerNodeL1.volume + 0.05, fineTuneSoundLevel)
-                audioPlayerNodeR1.volume = min (audioPlayerNodeR1.volume + 0.05, fineTuneSoundLevel)
+        if audioPlayerNodeL1.volume < 0.7 + (fineTuneSoundLevel * 0.003) {
+          audioPlayerNodeL1.volume = min (audioPlayerNodeL1.volume + 0.05, 0.7 + (fineTuneSoundLevel * 0.003))
+                audioPlayerNodeR1.volume = min (audioPlayerNodeR1.volume + 0.05, 0.7 + (fineTuneSoundLevel * 0.003))
         } else {
             fadeInComplete()
         }
@@ -150,19 +315,21 @@ class Model: ObservableObject {
                 self.fadeInAudio()
             })
             fadeInTimer?.fire()
+        } else {
+            return
         }
     }
     
-    func startFadeOutTimer () {
-        fadeInTimer?.invalidate()
-        fadeInTimer = nil
-        if fadeOutTimer == nil {
-            fadeOutTimer = Timer.scheduledTimer(withTimeInterval: 0.001, repeats: true, block: { _ in
-                self.fadeOutAudio()
-            })
-            fadeOutTimer?.fire()
-        }
-    }
+//    func startFadeOutTimer () {
+//        fadeInTimer?.invalidate()
+//        fadeInTimer = nil
+//        if fadeOutTimer == nil {
+//            fadeOutTimer = Timer.scheduledTimer(withTimeInterval: 0.001, repeats: true, block: { _ in
+//                self.fadeOutAudio()
+//            })
+//            fadeOutTimer?.fire()
+//        }
+//    }
     
     func fadeInComplete () {
         print ("CALLED FADE IN COMPLETE")
@@ -173,13 +340,13 @@ class Model: ObservableObject {
     func fadeOutComplete () {
         print ("CALLED FADE OUT COMPLETE")
         pauseTrack()
-        isPlaying = false
-        isPaused = true
+        playState = .paused
         fadeOutTimer?.invalidate()
         fadeOutTimer = nil
     }
     
     func startTimer () {
+        print ("START TIMER CALLED")
         if timer == nil {
             timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
                 self.onSongEnd()
@@ -283,17 +450,24 @@ class Model: ObservableObject {
         var nowPlayingInfo = [String: Any]()
         
         // Static Metadata
-        nowPlayingInfo[MPMediaItemPropertyTitle] = currentMediaItem.title!
-        nowPlayingInfo[MPMediaItemPropertyArtist] = currentMediaItem.artist!
-        nowPlayingInfo[MPMediaItemPropertyArtwork] = currentMediaItem.artwork!
-        nowPlayingInfo[MPMediaItemPropertyAlbumArtist] = currentMediaItem.albumArtist!
-        nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = currentMediaItem.albumTitle!
+        nowPlayingInfo[MPNowPlayingInfoPropertyAssetURL] = currentMediaItem.assetURL
+        nowPlayingInfo[MPNowPlayingInfoPropertyMediaType] = currentMediaItem.mediaType.rawValue
+     //   nowPlayingInfo[MPNowPlayingInfoPropertyIsLiveStream] = currentMediaItem.isLiveStream
+        nowPlayingInfo[MPMediaItemPropertyTitle] = currentMediaItem.title ?? "Unknown title"
+        nowPlayingInfo[MPMediaItemPropertyArtist] = currentMediaItem.artist ?? "Uknown artist"
+        nowPlayingInfo[MPMediaItemPropertyArtwork] = currentMediaItem.artwork ?? UIImage(systemName: "photo")!
+        nowPlayingInfo[MPMediaItemPropertyAlbumArtist] = currentMediaItem.albumArtist ?? "Uknown artist"
+        nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = currentMediaItem.albumTitle ?? "Unknown album title"
         
         // Dynamic Metadata
         nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = audioFile.duration
         nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = audioPlayerNodeL1.current
-        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1.0
-        nowPlayingInfo[MPNowPlayingInfoPropertyDefaultPlaybackRate] = 1.0     
+        switch playState {
+        case .playing: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1.0
+        case .paused: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
+        case .stopped: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
+        }
+        nowPlayingInfo[MPNowPlayingInfoPropertyDefaultPlaybackRate] = 1.0
         
         nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
     }
@@ -306,27 +480,21 @@ class Model: ObservableObject {
     
     func playTrack () {
         print ("CALLED PLAY TRACK")
-        print ("Is Playing = \(isPlaying)")
         if playQueue.isEmpty {
             playQueue = songList
         }
         currentMediaItem = playQueue[queueIndex]
         
-        if audioPlayerNodeL1.isPlaying {
+        if playState == .playing {
             self.stopTrack()
         }
+        
         prepareAudioEngine() 
         setEQBandsForCurrentProfile()
         do {
             print ("Index = \(queueIndex)")
           //  let currentMPMediaItem = playQueue[queueIndex]
          //   currentPersistentID = currentMediaItem.persistentID
-            if isInterrupted {
-                audioFile.framePosition = cachedTrackProgress
-                print ("UPDATE FRAME POSITION TO \(cachedTrackProgress)")
-                print ("AUDIO FILE FRAME POSITION = \(audioFile.framePosition)")
-                isInterrupted = false
-            }
             if let currentURL = currentMediaItem.assetURL {
                 audioFile = try AVAudioFile(forReading: currentURL)
                 
@@ -343,23 +511,28 @@ class Model: ObservableObject {
                 let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
                 
                 // Left Ear Play
-                audioPlayerNodeL1.scheduleFile(audioFile, at: audioTime, completionHandler: nil) 
+            //    audioPlayerNodeL1.scheduleFile(audioFile, at: audioTime, completionHandler: nil) 
+                audioPlayerNodeL1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
                 audioPlayerNodeL1.pan = -1
                 audioPlayerNodeL1.play()              
                 
                 // Right Ear Play
-                audioPlayerNodeR1.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
+           //     audioPlayerNodeR1.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
+                audioPlayerNodeR1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
                 audioPlayerNodeR1.pan = 1
                 audioPlayerNodeR1.play()
                 
-                if !isPlaying {
-                  //  startFadeInTimer()
-                    isPlaying = true
-                    startTimer()
+                if playState != .playing {
+                    print ("PLAY STATE = \(playState)")
+                    playState = .playing
+                   startTimer()
                 }
                 
-                
+            
                 setNowPlayingMetadata()
+                print ("PLAY STATE 2 = \(playState)")
+                print ("AUDIO IS PLAYING = \(audioPlayerNodeL1.isPlaying)")
+                print ("NODE VOLUME = \(audioPlayerNodeL1.volume)")
                 
             }
             
@@ -372,43 +545,40 @@ class Model: ObservableObject {
         print ("CALLED STOP TRACK")
         audioPlayerNodeL1.stop()
         audioPlayerNodeR1.stop()
-        isPlaying = false
-        isPaused = false
+        playState = .stopped
+        setNowPlayingMetadata()
     }
     
     
     func playPreviousTrack () {
         print ("CALLED PLAY PREVIOUS TRACK")
-        if isInterrupted {
-            isInterrupted.toggle()
-        }
+        cachedAudioFrame = nil
+//        if isInterrupted {
+//            isInterrupted.toggle()
+//        }
         guard queueIndex > 0 else {return}
         queueIndex -= 1
-        if isPlaying {
+        currentMediaItem = playQueue[queueIndex]
+        if playState == .playing {
             playTrack()
         } else {
             stopTrack()
         }
+        setNowPlayingMetadata()
     }
     
     func playOrPauseCurrentTrack () {
         print ("CALLED PLAY OR PAUSE CURRENT TRACK")
-        print ("IS Playing = \(isPlaying)")
-        print ("Is Paused = \(isPaused)")
-        if !isPlaying && !isPaused {
+        if playState == .stopped {
             startFadeInTimer()
             playTrack()
-            isPlaying = true
-            isPaused = false
             startTimer()
             
-        } else if isPlaying && isPaused {
+        } else if playState == .paused {
             startFadeInTimer()
             unPauseTrack()
-            isPlaying = true
-            isPaused = false
         } else {
-            fadeOutAudio() // Sets the audio volume to zero and pauses playback.
+            pauseTrack()
         }
     }
     
@@ -416,20 +586,24 @@ class Model: ObservableObject {
         print ("CALLED PAUSE TRACK")
         fadeInTimer?.invalidate()
         fadeInTimer = nil
-        setVolumeToZero()
-        audioPlayerNodeL1.pause()
-        audioPlayerNodeR1.pause()
-        isPaused = true
+        audioPlayerNodeL1.volume = 0
+        audioPlayerNodeR1.volume = 0
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            self.audioPlayerNodeL1.pause()
+            self.audioPlayerNodeR1.pause()
+        } 
+       
+        playState = .paused
+        setNowPlayingMetadata()
         
     }
     
     func unPauseTrack () {
         print ("CALLED UNPAUSE TRACK")
-     
         let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
         audioPlayerNodeL1.play(at: audioTime)
         audioPlayerNodeR1.play(at: audioTime)
-        isPaused = false
+        playState = .playing
         setNowPlayingMetadata()
     }
     
@@ -437,22 +611,46 @@ class Model: ObservableObject {
     
     func playNextTrack () {
         print ("CALLED PLAY NEXT TRACK")
-        if isInterrupted {
-            isInterrupted.toggle()
-        }
+        print ("PLAY NEXT TRACK PLAY STATE = \(playState)")
+        cachedAudioFrame = nil
+//        if isInterrupted {
+//            isInterrupted.toggle()
+//        }
         guard queueIndex < playQueue.count - 1 else {return}
         queueIndex += 1
-        if isPlaying {
+        currentMediaItem = playQueue[queueIndex]
+        if playState == .playing {
             playTrack()
         } else {
             stopTrack()
         }
+        setNowPlayingMetadata()
     }
     
-    func receivedTrackFinishedPlaying () {
-        print ("Received Track Finished Playing")
-        playNextTrack()
-    }
+//    func playNextTrackFromCallBack (_ callBack: AVAudioPlayerNodeCompletionCallbackType) {
+//        
+//        DispatchQueue.main.sync {
+//            print ("CALLED PLAY NEXT TRACK")
+//            if self.isInterrupted {
+//                self.isInterrupted.toggle()
+//            }
+//            guard self.queueIndex < self.playQueue.count - 1 else {return}
+//            self.queueIndex += 1
+//            self.currentMediaItem = self.playQueue[self.queueIndex]
+//            if self.playState == .playing {
+//                self.playTrack()
+//            } else {
+//                self.stopTrack()
+//            }
+//            self.setNowPlayingMetadata()
+//        }
+//        
+//    }
+    
+//    func receivedTrackFinishedPlaying () {
+//        print ("Received Track Finished Playing")
+//        playNextTrack()
+//    }
     
    
     func toggleEqualizer () {
@@ -583,12 +781,18 @@ class Model: ObservableObject {
     // Hearing Test Variables
     
     let bandNames = ["L60", "L100", "L230", "L500", "L1100", "L2400", "L5400", "R60", "R100", "R230", "R500", "R1100", "R2400", "R5400", "L12000", "R12000"]
-
-    @Published var testStatus = "Hearing Test"
-    @Published var currentBand = "Ready"
-    @Published var testInProgress = false
+    enum TestStatus {
+        case testInProgress, testCompleted, practiceInProgress, practiceCompleted, stopped
+    }
+   // @Published var currentBand = "Ready"
+    @Published var testStatus = TestStatus.stopped
     @Published var tempURL: URL = URL(fileURLWithPath: "temp")
     @Published var initialHearingTestHasBeenCompleted = false
+    var tonePlayer: AVAudioPlayer?
+    var currentTone = ""
+    var toneIndex = 0
+    var maxUnheard: Double = -160
+    var minHeard: Double = 0.0
     
     
     var lowestAudibleDecibelBand60L = 0.0
@@ -610,12 +814,7 @@ class Model: ObservableObject {
     var lowestAudibleDecibelBands: [Double] { [lowestAudibleDecibelBand60L, lowestAudibleDecibelBand100L, lowestAudibleDecibelBand230L, lowestAudibleDecibelBand500L, lowestAudibleDecibelBand1100L, lowestAudibleDecibelBand2400L, lowestAudibleDecibelBand5400L, lowestAudibleDecibelBand12000L, lowestAudibleDecibelBand60R, lowestAudibleDecibelBand100R, lowestAudibleDecibelBand230R, lowestAudibleDecibelBand500R, lowestAudibleDecibelBand1100R, lowestAudibleDecibelBand2400R, lowestAudibleDecibelBand5400R, lowestAudibleDecibelBand12000R]
     }
     
-    var tonePlayer: AVAudioPlayer?
-    var currentTone = ""
-    var toneIndex = 15
     
-    var maxUnheard: Double = -160
-    var minHeard: Double = 0.0
     
     
     let toneArray = ["Band60L", "Band60R", "Band100L", "Band100R", "Band230L", "Band230R", "Band500L", "Band500R", "Band1100L", "Band1100R", "Band2400L", "Band2400R", "Band5400L", "Band5400R", "Band12000L", "Band12000R"]
@@ -670,32 +869,32 @@ class Model: ObservableObject {
         }
     }
     
-    func setCurrentBand () {
-        switch toneIndex {
-        case 0: currentBand = "Left 60"
-        case 1: currentBand = "Left 100"
-        case 2: currentBand = "Left 230"
-        case 3: currentBand = "Left 500"
-        case 4: currentBand = "Left 1100"
-        case 5: currentBand = "Left 2400"
-        case 6: currentBand = "Left 5400"
-        case 7: currentBand = "Left 12000"
-        case 8: currentBand = "Right 60"
-        case 9: currentBand = "Right 100"
-        case 10: currentBand = "Right 230"
-        case 11: currentBand = "Right 500"
-        case 12: currentBand = "Right 1100"
-        case 13: currentBand = "Right 2400"
-        case 14: currentBand = "Right 5400"
-        case 15: currentBand = "Right 12000"
-        default: break
-        }
-    }
+//    func setCurrentBand () {
+//        switch toneIndex {
+//        case 0: currentBand = "Left 60"
+//        case 1: currentBand = "Left 100"
+//        case 2: currentBand = "Left 230"
+//        case 3: currentBand = "Left 500"
+//        case 4: currentBand = "Left 1100"
+//        case 5: currentBand = "Left 2400"
+//        case 6: currentBand = "Left 5400"
+//        case 7: currentBand = "Left 12000"
+//        case 8: currentBand = "Right 60"
+//        case 9: currentBand = "Right 100"
+//        case 10: currentBand = "Right 230"
+//        case 11: currentBand = "Right 500"
+//        case 12: currentBand = "Right 1100"
+//        case 13: currentBand = "Right 2400"
+//        case 14: currentBand = "Right 5400"
+//        case 15: currentBand = "Right 12000"
+//        default: break
+//        }
+//    }
     
     func playTone (volume: Float){
         //  print ("Called playTone")
         setCurrentTone()
-        setCurrentBand()
+      //  setCurrentBand()
         guard let url = Bundle.main.url(forResource: currentTone, withExtension: "mp3") else { return }
         do {
             tonePlayer = try AVAudioPlayer(contentsOf: url)
@@ -716,8 +915,32 @@ class Model: ObservableObject {
         }
     }
     
+//    func resumeTone () {
+//        if let tonePlayer = tonePlayer {
+//            tonePlayer.play()
+//        }
+//    }
+    
     func resumeTone () {
+        let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
+        setCurrentTone()
+      //  setCurrentBand()
+        guard let url = Bundle.main.url(forResource: currentTone, withExtension: "mp3") else { return }
+        do {
+            tonePlayer = try AVAudioPlayer(contentsOf: url)
+        } catch let error {
+            print(error.localizedDescription)
+        }
         if let tonePlayer = tonePlayer {
+            //  print ("playTone second stage")
+            tonePlayer.volume = volume
+            tonePlayer.numberOfLoops = -1
+            if toneIndex < 8 {
+                tonePlayer.pan = -1
+            } else {
+                tonePlayer.pan = 1
+            }
+            print ("playTone currentTone = \(currentTone)")
             tonePlayer.play()
         }
     }
@@ -746,13 +969,10 @@ class Model: ObservableObject {
             playTone(volume: Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2))))
             
         } else {
-            toneIndex = 15
+            toneIndex = 0
             stopTone()
             print ("Test Complete!")
-            testStatus = "Hearing Test"
-            currentBand = "All done!"
-            testInProgress = false
-            print ("test in progress = \(testInProgress)")
+            testStatus = .testCompleted
             if !initialHearingTestHasBeenCompleted {
                 initialHearingTestHasBeenCompleted = true
                 userDefaults.set(true, forKey: "initialHearingTestHasBeenCompleted")
@@ -764,8 +984,6 @@ class Model: ObservableObject {
     func tapStartTest () {
         currentVolume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
         playTone(volume: currentVolume)
-        testStatus = "Test in Progress"
-        testInProgress = true
         print ("tapStartTest volume = \(currentVolume)")
         print ("tapStartTest maxUnheard = \(maxUnheard)")
         print ("tapStartTest minHeard = \(minHeard)")
@@ -805,7 +1023,10 @@ class Model: ObservableObject {
     
     init() {
         setInterruptionObserver()
+        setRouteChangeObserver()
         readFromUserDefaults()
+        setEnabledStatusOnRemoteCommands()
+        RemoteCommandCenter.handleRemoteCommands(using: self)
     }
     
 }

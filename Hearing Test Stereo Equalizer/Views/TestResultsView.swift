@@ -69,18 +69,25 @@ struct TestResultsView: View {
             VStack (spacing: 20) {
                 Text("Test Complete!")
                     .font(.largeTitle)
-                    .foregroundColor(.green)
                 HStack{       
-                    Text ("Based on your hearing exam, the left and right channels will be boosted by the amounts shown below.")
+                    Text ("Great job! Thank you for providing your hearing measurements.")
                     Spacer()
                 }
                 
                 HStack{
-                    Text ("A value of 0.00 means you heard that frequency the best and 6.00 is where you needed the most boost.")
+                    Text ("The next steps are:")
                     Spacer()
                 }
                 HStack {
-                    Text ("We'll use these values to build a stereo, parametric equalizer that will hopefully increase your listening enjoyment.")
+                    Text ("1) Give your profile a name.")
+                    Spacer()
+                }
+                HStack {
+                    Text ("2) Go to your music library and play one of your favorite songs.")
+                    Spacer()
+                }
+                HStack {
+                    Text ("3) While listening to the song, head over to the Spex EQ tab and then use the slider to find your ideal strength. It will start all the way to the right at max strength, which will likely be too much. Inch it back to the left until you get the best sound.")
                     Spacer()
                 }
                  
@@ -91,89 +98,89 @@ struct TestResultsView: View {
 //                .listStyle(PlainListStyle())
 //                .font(.headline)
                 
-                VStack {
-                    HStack {
-                        Text("\(model.currentUserProfile.left60.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("60 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right60.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Text("\(model.currentUserProfile.left100.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("100 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right100.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Text("\(model.currentUserProfile.left230.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("230 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right230.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Text("\(model.currentUserProfile.left500.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("500 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right500.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Text("\(model.currentUserProfile.left1100.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("1100 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right1100.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Text("\(model.currentUserProfile.left2400.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("2400 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right2400.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Text("\(model.currentUserProfile.left5400.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("5400 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right5400.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Text("\(model.currentUserProfile.left12000.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("12000 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right12000.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    
-                }
+//                VStack {
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left60.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("60 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right60.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left100.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("100 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right100.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left230.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("230 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right230.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left500.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("500 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right500.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left1100.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("1100 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right1100.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left2400.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("2400 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right2400.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left5400.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("5400 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right5400.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left12000.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("12000 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right12000.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    
+//                }
                 
                 Spacer()
                 
@@ -194,14 +201,22 @@ struct TestResultsView: View {
             .padding()
         } else {
             VStack (spacing: 20) {
-                Text ("Let's Play!")
+                Text ("Music Time!")
                     .font(.largeTitle)
+//                HStack {
+//                    Text ("Ready for some tunes?")
+//                    Spacer()
+//                }
                 HStack {
-                    Text ("Ready for some tunes?")
+                    Text ("Now for the fun part.")
                     Spacer()
                 }
                 HStack {
-                    Text ("Let's head over to your Music Library and take your personalized EQ for a spin.")
+                    Text ("Head over to your Music Libary and play one of your favorite songs.")
+                    Spacer()
+                }
+                HStack {
+                    Text ("While listening, tap the Spex tab and experiment with the strength slider until you find the optimal listening experince. It starts all the way to the right at max strength, which is probably too much. Inch it back to the left until you get the best sound.")
                     Spacer()
                 }
                 Spacer()

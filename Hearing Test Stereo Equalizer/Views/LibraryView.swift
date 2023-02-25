@@ -22,7 +22,6 @@ struct LibraryView: View {
     @Environment(\.managedObjectContext) var moc
     @State var showUserProfilesModalView = false
     @State private var isShowingAlert = false
-    @State private var libraryAccessIsGranted = true
     @State var defaultUserProfileHasBeenSet = false 
     
     func readFromUserDefaults () {
@@ -71,18 +70,22 @@ struct LibraryView: View {
     }
     
     func disableAppleMusicBasedFeatures() {
-        libraryAccessIsGranted = false
+        model.libraryAccessIsGranted = false
         isShowingAlert = true
-        
-        
     }
     
     func enableAppleMusicBasedFeatures() {
-        model.songList = allSongs
+        print ("CALLED ENABLE APPLE MUSIC BASED FEATURES")
+        model.libraryAccessIsGranted = true
         setCurrentProfile()
-        setEnabledStatusOnRemoteCommands()
-        assignRemoteCommands()
+      //  setEnabledStatusOnRemoteCommands()
+      //  assignRemoteCommands()
         model.setInitialVolumeToFineTuneSoundLevel()
+//        if !allSongs.isEmpty {
+//            model.songList = allSongs
+//            model.playQueue = allSongs
+//            model.currentMediaItem = model.playQueue[0]
+//        }
     }
     
     func createDefaultProfile () {
@@ -119,68 +122,81 @@ struct LibraryView: View {
         try? moc.save()
     }
     
-    func setEnabledStatusOnRemoteCommands () {
-        let rmc = MPRemoteCommandCenter.shared()
-        rmc.pauseCommand.isEnabled = false
-        rmc.playCommand.isEnabled = true
-        rmc.stopCommand.isEnabled = false
-        rmc.togglePlayPauseCommand.isEnabled = true
-        rmc.nextTrackCommand.isEnabled = true
-        rmc.previousTrackCommand.isEnabled = true
-        rmc.changeRepeatModeCommand.isEnabled = false
-        rmc.changeShuffleModeCommand.isEnabled = false
-        rmc.changePlaybackRateCommand.isEnabled = false
-        rmc.seekBackwardCommand.isEnabled = false
-        rmc.seekForwardCommand.isEnabled = false
-        rmc.skipBackwardCommand.isEnabled = false
-        rmc.skipForwardCommand.isEnabled = false
-        rmc.changePlaybackPositionCommand.isEnabled = false
-        rmc.ratingCommand.isEnabled = false
-        rmc.likeCommand.isEnabled = false
-        rmc.dislikeCommand.isEnabled = false
-        rmc.bookmarkCommand.isEnabled = false
-        rmc.enableLanguageOptionCommand.isEnabled = false
-        rmc.disableLanguageOptionCommand.isEnabled = false
-    }
-    
-    func assignRemoteCommands() {
-        let remoteCommandCenter = MPRemoteCommandCenter.shared()
-        
-        remoteCommandCenter.playCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
-            
-            model.playOrPauseCurrentTrack()
-            return.success
-        }
-        
-        remoteCommandCenter.togglePlayPauseCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
-            model.playOrPauseCurrentTrack()
-            return.success
-        }
-        remoteCommandCenter.nextTrackCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
-            model.playNextTrack()
-            return.success
-        }
-        remoteCommandCenter.previousTrackCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
-            model.playPreviousTrack()
-            return.success
-        }
-    }
+//    func setEnabledStatusOnRemoteCommands () {
+//        let rmc = MPRemoteCommandCenter.shared()
+//        rmc.pauseCommand.isEnabled = true
+//        rmc.playCommand.isEnabled = true
+//        rmc.stopCommand.isEnabled = false
+//        rmc.togglePlayPauseCommand.isEnabled = true
+//        rmc.nextTrackCommand.isEnabled = true
+//        rmc.previousTrackCommand.isEnabled = true
+//        rmc.changeRepeatModeCommand.isEnabled = false
+//        rmc.changeShuffleModeCommand.isEnabled = false
+//        rmc.changePlaybackRateCommand.isEnabled = false
+//        rmc.seekBackwardCommand.isEnabled = false
+//        rmc.seekForwardCommand.isEnabled = false
+//        rmc.skipBackwardCommand.isEnabled = false
+//        rmc.skipForwardCommand.isEnabled = false
+//        rmc.changePlaybackPositionCommand.isEnabled = false
+//        rmc.ratingCommand.isEnabled = false
+//        rmc.likeCommand.isEnabled = false
+//        rmc.dislikeCommand.isEnabled = false
+//        rmc.bookmarkCommand.isEnabled = false
+//        rmc.enableLanguageOptionCommand.isEnabled = false
+//        rmc.disableLanguageOptionCommand.isEnabled = false
+//    }
+//    
+//    func assignRemoteCommands() {
+//        let remoteCommandCenter = MPRemoteCommandCenter.shared()
+//        
+////        remoteCommandCenter.playCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
+////            
+////            model.playTrack()
+////            return.success
+////        }
+//        
+////        remoteCommandCenter.stopCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
+////            model.playOrPauseCurrentTrack()
+////            return.success
+////        }
+//        
+//        remoteCommandCenter.togglePlayPauseCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
+//            model.playOrPauseCurrentTrack()
+//            return.success
+//        }
+//        
+////        remoteCommandCenter.pauseCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
+////            model.pauseTrack()
+////            return.success
+////        }
+//        
+//        remoteCommandCenter.nextTrackCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
+//            model.playNextTrack()
+//            return.success
+//        }
+//        remoteCommandCenter.previousTrackCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
+//            model.playPreviousTrack()
+//            return.success
+//        }
+//        
+//        
+//    }
     
     var body: some View {
         
         
         VStack {
             
-            if libraryAccessIsGranted {
+            if model.libraryAccessIsGranted {
                 
                 UserProfileHeaderView()
-                    .onTapGesture {
-                        showUserProfilesModalView = true
-                        print ("TAPPED LIBRARY HEADER VIEW")
-                    }
-                    .sheet(isPresented: $showUserProfilesModalView) {
-                        UserProfileView(tabSelection: $tabSelection)
-                    }
+//                    .onTapGesture {
+//                        showUserProfilesModalView = true
+//                        print ("TAPPED LIBRARY HEADER VIEW")
+//                    }
+//                    .sheet(isPresented: $showUserProfilesModalView) {
+//                        UserProfileView(tabSelection: $tabSelection)
+//                    }
                 
                 NavigationStack {
                     
@@ -189,6 +205,11 @@ struct LibraryView: View {
                             PlaylistView()
                         } label: {
                             LibraryRowView(image: Image(systemName: "music.note.list"), text: "Playlists")
+                        }
+                        NavigationLink {
+                            ArtistView()
+                        } label: {
+                            LibraryRowView(image: Image(systemName: "music.mic"), text: "Artists")
                         }
                         NavigationLink {
                             SongsView().onAppear {
@@ -204,12 +225,13 @@ struct LibraryView: View {
                     
                 }
                 .onAppear{
+                    print ("LIBRARY VIEW LIST APPEARED")
                     readFromUserDefaults()
                     checkMusicLibaryAuthorization()
                     if model.equalizerL1 == nil {
                         model.prepareAudioEngine()
                     }
-                    if !model.initialHearingTestHasBeenCompleted {
+                    if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
                         self.tabSelection = 3
                     }
                     
@@ -226,6 +248,17 @@ struct LibraryView: View {
                     
                     Button ("Go to Settings") {
                         UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                    }
+                    .onAppear{
+                        readFromUserDefaults()
+                        checkMusicLibaryAuthorization()
+                        if model.equalizerL1 == nil {
+                            model.prepareAudioEngine()
+                        }
+                        if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
+                            self.tabSelection = 3
+                        }
+                        
                     }
                 }
             }

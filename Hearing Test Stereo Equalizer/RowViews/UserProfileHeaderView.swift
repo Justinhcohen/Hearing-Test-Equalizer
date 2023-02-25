@@ -35,7 +35,7 @@ struct UserProfileHeaderView: View {
             Text(model.currentUserProfileName)
             Spacer()
         }
-        .foregroundColor(.green)
+        .foregroundColor(model.equalizerIsActive ? .green : .gray)
 //        .onTapGesture {
 //            showUserProfilesModalView = true
 //        }

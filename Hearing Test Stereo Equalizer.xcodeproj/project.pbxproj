@@ -14,6 +14,9 @@
 		0D2DCFCF2972EFC300BFFAD6 /* UserProfileRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D2DCFCE2972EFC300BFFAD6 /* UserProfileRowView.swift */; };
 		0D37678F29551DC100F3FF59 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D37678E29551DC100F3FF59 /* TestView.swift */; };
 		0D37679129551E0E00F3FF59 /* EQView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D37679029551E0E00F3FF59 /* EQView.swift */; };
+		0D39F11F29A2DC8A00987C02 /* ArtistSongsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D39F11E29A2DC8A00987C02 /* ArtistSongsView.swift */; };
+		0D39F12129A5476A00987C02 /* RemoteCommandCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D39F12029A5476A00987C02 /* RemoteCommandCenter.swift */; };
+		0D6197C429A2C470003F3FE3 /* ArtistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D6197C329A2C470003F3FE3 /* ArtistView.swift */; };
 		0D65AD9A293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D65AD99293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift */; };
 		0D65AD9C293D14F10017E4F8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D65AD9B293D14F10017E4F8 /* ContentView.swift */; };
 		0D65AD9E293D14F40017E4F8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0D65AD9D293D14F40017E4F8 /* Assets.xcassets */; };
@@ -51,6 +54,9 @@
 		0D2DCFCE2972EFC300BFFAD6 /* UserProfileRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileRowView.swift; sourceTree = "<group>"; };
 		0D37678E29551DC100F3FF59 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		0D37679029551E0E00F3FF59 /* EQView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EQView.swift; sourceTree = "<group>"; };
+		0D39F11E29A2DC8A00987C02 /* ArtistSongsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistSongsView.swift; sourceTree = "<group>"; };
+		0D39F12029A5476A00987C02 /* RemoteCommandCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteCommandCenter.swift; sourceTree = "<group>"; };
+		0D6197C329A2C470003F3FE3 /* ArtistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistView.swift; sourceTree = "<group>"; };
 		0D65AD96293D14F10017E4F8 /* Hearing Test Stereo Equalizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hearing Test Stereo Equalizer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0D65AD99293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hearing_Test_Stereo_EqualizerApp.swift; sourceTree = "<group>"; };
 		0D65AD9B293D14F10017E4F8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -97,10 +103,11 @@
 			isa = PBXGroup;
 			children = (
 				0D65AD9B293D14F10017E4F8 /* ContentView.swift */,
-				0DE5DE6E298ADBB8006C8E7E /* PlayerView.swift */,
 				0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */,
 				0DCB0E32296504E000083DB4 /* SongsView.swift */,
 				0DE942D02968A5A100FFA006 /* PlaylistView.swift */,
+				0D6197C329A2C470003F3FE3 /* ArtistView.swift */,
+				0D39F11E29A2DC8A00987C02 /* ArtistSongsView.swift */,
 				0DE5DE70298D897F006C8E7E /* PlaylistSongsView.swift */,
 				0D249C8F2972447C0075FED3 /* UserProfileView.swift */,
 				0DE5DE74299595C5006C8E7E /* UserProfileEditNameView.swift */,
@@ -119,6 +126,7 @@
 				0DE942D6296A474200FFA006 /* SongsRowView.swift */,
 				0DE5DE762996C122006C8E7E /* GainRowView.swift */,
 				0DE5DE72299408AD006C8E7E /* UserProfileHeaderView.swift */,
+				0DE5DE6E298ADBB8006C8E7E /* PlayerView.swift */,
 			);
 			path = RowViews;
 			sourceTree = "<group>";
@@ -155,6 +163,7 @@
 				0DE942D8296A63DA00FFA006 /* Hearing-Test-Stereo-Equalizer-Info.plist */,
 				0D65AD99293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift */,
 				0D19B1522955F3E600D17C16 /* Model.swift */,
+				0D39F12029A5476A00987C02 /* RemoteCommandCenter.swift */,
 				0DC1213829762AAD00736FA6 /* Player.swift */,
 				0D249C8A29723C760075FED3 /* DataController.swift */,
 				0D0278572975F4BD00A5C994 /* Utility */,
@@ -289,6 +298,7 @@
 				0D19B1532955F3E600D17C16 /* Model.swift in Sources */,
 				0DE5DE772996C122006C8E7E /* GainRowView.swift in Sources */,
 				0D249C902972447C0075FED3 /* UserProfileView.swift in Sources */,
+				0D39F12129A5476A00987C02 /* RemoteCommandCenter.swift in Sources */,
 				0D37678F29551DC100F3FF59 /* TestView.swift in Sources */,
 				0D249C8E297242210075FED3 /* HearingTest.xcdatamodeld in Sources */,
 				0D65AD9C293D14F10017E4F8 /* ContentView.swift in Sources */,
@@ -297,6 +307,7 @@
 				0DCB0E33296504E000083DB4 /* SongsView.swift in Sources */,
 				0D65AD9A293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift in Sources */,
 				0DE5DE7929972D65006C8E7E /* TestResultsView.swift in Sources */,
+				0D6197C429A2C470003F3FE3 /* ArtistView.swift in Sources */,
 				0DE942D12968A5A100FFA006 /* PlaylistView.swift in Sources */,
 				0DCB0E2E2964FF8800083DB4 /* LibraryView.swift in Sources */,
 				0D37679129551E0E00F3FF59 /* EQView.swift in Sources */,
@@ -306,6 +317,7 @@
 				0DE5DE75299595C5006C8E7E /* UserProfileEditNameView.swift in Sources */,
 				0D2DCFCF2972EFC300BFFAD6 /* UserProfileRowView.swift in Sources */,
 				0DE942D32968A71F00FFA006 /* LibraryRowView.swift in Sources */,
+				0D39F11F29A2DC8A00987C02 /* ArtistSongsView.swift in Sources */,
 				0DC1213929762AAD00736FA6 /* Player.swift in Sources */,
 				0DE5DE71298D897F006C8E7E /* PlaylistSongsView.swift in Sources */,
 				0D71B327296B0C3C00C467FD /* VolumeObserver.swift in Sources */,
@@ -441,13 +453,14 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Hearing-Test-Stereo-Equalizer-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "";
-				"INFOPLIST_KEY_CFBundleDisplayName[sdk=*]" = "";
+				INFOPLIST_KEY_CFBundleDisplayName = "Spex EQ";
+				"INFOPLIST_KEY_CFBundleDisplayName[sdk=*]" = "Spex EQ";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Grant permission to play music from your music library.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -474,12 +487,13 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Hearing-Test-Stereo-Equalizer-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_CFBundleDisplayName = "Spex EQ";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Grant permission to play music from your music library.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

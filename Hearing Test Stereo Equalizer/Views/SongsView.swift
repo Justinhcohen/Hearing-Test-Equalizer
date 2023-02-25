@@ -36,46 +36,65 @@ struct SongsView: View {
     
     
     var body: some View {  
+            Button("Shuffle Play", 
+                   action: {
+                model.cachedAudioFrame = nil
+                model.songList = model.songList.shuffled()
+                model.playQueue = model.songList
+                model.queueIndex = 0
+                model.startFadeInTimer()
+                model.playTrack()
+            })
+            .font(.title)
+            .padding ()
+            .overlay(
+                Capsule(style: .continuous)
+                    .stroke(!model.songList.isEmpty ? .blue : .gray, lineWidth: 5)
+            ) 
+           .disabled(model.songList.isEmpty)
+            
+            List {
+                ForEach(searchResults, id: \.self) {item in 
+                    let size = CGSize(width: 30, height: 30)
+                    let songName = item.title
+                    let mediatImage = item.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
+                    let UIAlbumCover = mediatImage?.image(at: size)
+                    let defaultUIImage = UIImage(systemName: "photo")!
+                    let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
+                    SongsRowView(albumCover: albumCover, songName: songName ?? "Title Unknown")
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            model.cachedAudioFrame = nil
+                            model.playQueue = model.songList
+                            let index = getQueueIndex(songList: model.songList, currentMPMediaItem: item)
+                            model.queueIndex = index
+                            model.setVolumeToZero()
+                            model.startFadeInTimer()
+                            model.playTrack()
+                        } 
+                        .foregroundColor(item == model.currentMediaItem ? Color.green : colorScheme == .dark ? Color.white : Color.black)
+                }
+            }
+            .searchable(text: $searchText)
+            .listStyle(PlainListStyle())
+            .navigationTitle("Songs")
         
-        Button("Shuffle Play", 
-               action: {
-            model.songList = model.songList.shuffled()
-            model.playQueue = model.songList
-            model.queueIndex = 0
-            model.startFadeInTimer()
-            model.playTrack()
-        })    
-        .font(.title)
-        .padding ()
-        .overlay(
-            Capsule(style: .continuous)
-                .stroke(Color.blue, lineWidth: 5)
-        )        
-        
-        List {
-            ForEach(searchResults, id: \.self) {item in 
-                let size = CGSize(width: 10, height: 10)
-                let songName = item.title
-                let mediatImage = item.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
-                let UIAlbumCover = mediatImage?.image(at: size)
-                let defaultUIImage = UIImage(systemName: "photo")!
-                let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
-                SongsRowView(albumCover: albumCover, songName: songName ?? "Title Unknown")
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        model.playQueue = model.songList
-                        let index = getQueueIndex(songList: model.songList, currentMPMediaItem: item)
-                        model.queueIndex = index
-                        model.setVolumeToZero()
-                        model.startFadeInTimer()
-                        model.playTrack()
-                    } 
-                    .foregroundColor(item == model.currentMediaItem ? Color.green : colorScheme == .dark ? Color.white : Color.black)
+        if model.songList.isEmpty {
+            VStack (spacing: 20) {
+                HStack {
+                    Text ("Your music library is empty.")
+                    Spacer()
+                }
+//                HStack {
+//                    Text ("Add MP3s to Apple Music and then sync them to your phone through Finder.")
+//                    Spacer()
+//                }
+                HStack {
+                    Text ("As mentioned in the App Store description, for now, only local, unencrypted song files are supported. We hope to add support for streaming services in a future update.")
+                    Spacer()
+                }
             }
         }
-        .searchable(text: $searchText)
-        .listStyle(PlainListStyle())
-        .navigationTitle("Songs")
     }
 }
 

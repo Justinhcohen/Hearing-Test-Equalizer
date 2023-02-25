@@ -135,136 +135,139 @@ struct UserProfileView: View {
         
         VStack (spacing: 30) {
             
-            Text ("Set Active Profile")
+            Text ("Profiles")
                 .font(.largeTitle)
             
             if defaultProfileIsCreated {
-                
-                //                List (userProfilesSortedByDate, id: \.id) { userProfile in
-                //                    
-                //                    UserProfileRowView(userProfile: userProfile)
-                //                        .onTapGesture {
-                //                            setIsActiveStatus(userProfile: userProfile)
-                //                            setCurrentProfile()
-                //                            dismiss()
-                //                        }
-                //                        .onLongPressGesture {
-                //                            setIsActiveStatus(userProfile: userProfile)
-                //                            setCurrentProfile()
-                //                            showUserProfileEditNameViewModal = true
-                //                        }
-                //                        .foregroundColor(userProfile.isActive ? Color.green : colorScheme == .dark ? Color.white : Color.black)
-                //                }
-                //                .listStyle(PlainListStyle())
-                //                .navigationTitle("Profiles")
-                //                .id(refreshID)
-                
-                List  {
-                    ForEach (userProfiles, id: \.id) { userProfile in
-                        UserProfileRowView(userProfile: userProfile)
-                            .onTapGesture {
-                                setIsActiveStatus(userProfile: userProfile)
-                                setCurrentProfile()
-                                dismiss()
-                            }
-                            .onLongPressGesture {
-                                setIsActiveStatus(userProfile: userProfile)
-                                setCurrentProfile()
-                                showUserProfileEditNameViewModal = true
-                            }
-                            .foregroundColor(userProfile.isActive ? Color.green : colorScheme == .dark ? Color.white : Color.black)
+               
+                    List  {
+                        ForEach (userProfiles, id: \.id) { userProfile in
+                            UserProfileRowView(userProfile: userProfile)
+                                .onTapGesture {
+                                    setIsActiveStatus(userProfile: userProfile)
+                                    setCurrentProfile()
+                                    dismiss()
+                                }
+                                .onLongPressGesture {
+                                    setIsActiveStatus(userProfile: userProfile)
+                                    setCurrentProfile()
+                                    showUserProfileEditNameViewModal = true
+                                }
+                                .foregroundColor(userProfile.isActive ? model.equalizerIsActive ? .green : .gray : colorScheme == .dark ? Color.white : Color.black)
+                        }
+                        .onDelete(perform: delete)
+                        
                     }
-                    .onDelete(perform: delete)
-                    
+                    .listStyle(PlainListStyle())
+                    .id(refreshID)
+                    .font(.title3)
+                VStack (spacing: 30) {
+                    HStack {
+                        Text ("Take a hearing test to create a new profile.")
+                        Spacer ()
+                    }
+                    HStack {
+                        Text ("Create a new profile for each set of earphones you use and tap the name to switch between them.")
+                        Spacer ()
+                    }
+                    HStack {
+                        Text ("Longpress to rename.")
+                        Spacer ()
+                    }
+                    HStack {
+                        Text ("Swipe left to delete.")
+                        Spacer ()
+                    }
                 }
-                .listStyle(PlainListStyle())
-                .navigationTitle("Profiles")
-                .id(refreshID)
+                .padding()
                 
-                
-                VStack {
-                    HStack {
-                        Text("\(model.currentUserProfile.left60.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("60 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right60.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Text("\(model.currentUserProfile.left100.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("100 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right100.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Text("\(model.currentUserProfile.left230.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("230 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right230.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Text("\(model.currentUserProfile.left500.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("500 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right500.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Text("\(model.currentUserProfile.left1100.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("1100 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right1100.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Text("\(model.currentUserProfile.left2400.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("2400 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right2400.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Text("\(model.currentUserProfile.left5400.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("5400 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right5400.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack {
-                        Text("\(model.currentUserProfile.left12000.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                        Text("12000 Hz")
-                            .frame(maxWidth: .infinity)
-                        Text("\(model.currentUserProfile.right12000.decimals(2))")
-                            .foregroundColor(.green)
-                            .frame(maxWidth: .infinity)
-                    }
-                    
-                }
+//                VStack {
+//                    Text ("Boost at 6.0 Intensity")
+//                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                        .font(.title3)
+//                        .padding()
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left60.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("60 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right60.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left100.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("100 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right100.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left230.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("230 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right230.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left500.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("500 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right500.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left1100.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("1100 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right1100.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left2400.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("2400 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right2400.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left5400.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("5400 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right5400.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack {
+//                        Text("\(model.currentUserProfile.left12000.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                        Text("12000 Hz")
+//                            .frame(maxWidth: .infinity)
+//                        Text("\(model.currentUserProfile.right12000.decimals(2))")
+//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    
+//                }
             }
             
             
@@ -280,7 +283,7 @@ struct UserProfileView: View {
             createDefaultProfileIfNone()
             setCurrentProfile()
             defaultProfileIsCreated = true
-            if !model.initialHearingTestHasBeenCompleted {
+            if !model.initialHearingTestHasBeenCompleted && model.libraryAccessIsGranted {
                 self.tabSelection = 3
             }
         }

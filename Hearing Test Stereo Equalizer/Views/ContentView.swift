@@ -19,7 +19,7 @@ var body: some View {
                 .tabItem({ Label("Library", systemImage: "music.note.list")})
                 .tag(1)
             EQView(tabSelection: $tabSelection)
-                .tabItem({ Label("EQ", systemImage: "speaker") }) 
+                .tabItem({ Label("Spex EQ", systemImage: "speaker") }) 
                 .tag (2)
             TestView(tabSelection: $tabSelection)
                 .tabItem({ Label("Test", systemImage: "ear.and.waveform") }) 

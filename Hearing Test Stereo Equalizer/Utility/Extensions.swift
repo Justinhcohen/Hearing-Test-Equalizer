@@ -35,6 +35,13 @@ extension AVAudioPlayerNode{
         return 0
     }
     
+    var currentFrame: AVAudioFramePosition {
+        if let nodeTime = lastRenderTime,let playerTime = playerTime(forNodeTime: nodeTime) {
+            return Int64(playerTime.sampleTime) 
+        }
+        return 0
+    }
+    
     
 }
 
@@ -55,4 +62,8 @@ extension Float {
     }
 }
 
-
+extension Double {
+    func decimals(_ nbr: Int) -> String {
+        String(self.formatted(.number.precision(.fractionLength(nbr))))
+    }
+}
