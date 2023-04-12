@@ -66,122 +66,29 @@ struct TestResultsView: View {
     var body: some View {
         
         if !didRenameProfile {
-            VStack (spacing: 20) {
-                Text("Test Complete!")
-                    .font(.largeTitle)
-                HStack{       
-                    Text ("Great job! Thank you for providing your hearing measurements.")
-                    Spacer()
+            ScrollView {
+                VStack (spacing: 20) {
+                    Text("Test Complete!")
+                        .font(.largeTitle)
+                    HStack{       
+                        Text ("Great job! Thank you for providing your hearing measurements.")
+                        Spacer()
+                    }
+                    
+                    HStack{
+                        Text ("The next steps are:")
+                        Spacer()
+                    }
+                    HStack {
+                        Text ("1) Give your profile a name.")
+                        Spacer()
+                    }
+                    HStack {
+                        Text ("2) Go to Spex tab and slide the Spextometer while listening to the demo song to find your ideal setting.")
+                        Spacer()
+                    }
                 }
-                
-                HStack{
-                    Text ("The next steps are:")
-                    Spacer()
-                }
-                HStack {
-                    Text ("1) Give your profile a name.")
-                    Spacer()
-                }
-                HStack {
-                    Text ("2) Go to your music library and play one of your favorite songs.")
-                    Spacer()
-                }
-                HStack {
-                    Text ("3) While listening to the song, head over to the Spex EQ tab and then use the slider to find your ideal strength. It will start all the way to the right at max strength, which will likely be too much. Inch it back to the left until you get the best sound.")
-                    Spacer()
-                }
-                 
-                
-//                List(createGainRowsFor(model.currentUserProfile), id: \.id) {gainRowView in 
-//                    GainRowView(leftGain: gainRowView.leftGain, hertz: gainRowView.hertz, rightGain: gainRowView.rightGain)
-//                }
-//                .listStyle(PlainListStyle())
-//                .font(.headline)
-                
-//                VStack {
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left60.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("60 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right60.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left100.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("100 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right100.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left230.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("230 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right230.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left500.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("500 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right500.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left1100.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("1100 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right1100.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left2400.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("2400 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right2400.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left5400.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("5400 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right5400.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left12000.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("12000 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right12000.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    
-//                }
-                
+            
                 Spacer()
                 
                 Button ("Name Profile") {
@@ -200,27 +107,25 @@ struct TestResultsView: View {
             }
             .padding()
         } else {
-            VStack (spacing: 20) {
-                Text ("Music Time!")
-                    .font(.largeTitle)
-//                HStack {
-//                    Text ("Ready for some tunes?")
-//                    Spacer()
-//                }
-                HStack {
-                    Text ("Now for the fun part.")
-                    Spacer()
-                }
-                HStack {
-                    Text ("Head over to your Music Libary and play one of your favorite songs.")
-                    Spacer()
-                }
-                HStack {
-                    Text ("While listening, tap the Spex tab and experiment with the strength slider until you find the optimal listening experince. It starts all the way to the right at max strength, which is probably too much. Inch it back to the left until you get the best sound.")
-                    Spacer()
+            ScrollView {
+                VStack (spacing: 20) {
+                    Text ("Excellent!")
+                        .font(.largeTitle)
+                    //                HStack {
+                    //                    Text ("Ready for some tunes?")
+                    //                    Spacer()
+                    //                }
+                    HStack {
+                        Text ("Now for the fun part.")
+                        Spacer()
+                    }
+                    HStack {
+                        Text ("Head over to Spex tab and slide the Spextometer while listening to the demo song to find your ideal setting.")
+                        Spacer()
+                    }
                 }
                 Spacer()
-                Button ("Music Library") {
+                Button ("Spex tab") {
                     dismiss()
                 }
                 .font(.title)

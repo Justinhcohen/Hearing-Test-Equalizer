@@ -46,6 +46,7 @@ struct EQView: View {
     @State private var intensityIsEditing = false
     @State private var sliderDidEdit = false
     @State private var showUserProfilesModalView = false
+    @State private var isPlayingDemoSong = false
     
     let session = AVAudioSession.sharedInstance()
     
@@ -72,10 +73,41 @@ struct EQView: View {
         shouldShowText = !shouldShowText
     }
     
+    //    func setCurrentProfile () {
+    //        print ("CALLED SET CURRENT PROFILE")
+    //        print ("default user profile has been set = \(defaultUserProfileHasBeenSet)")
+    //        if defaultUserProfileHasBeenSet {
+    //            model.currentUserProfile = userProfiles.first {
+    //                $0.isActive
+    //            }!
+    //            model.currentUserProfileName = model.currentUserProfile.name ?? "Unknown Name"
+    //            model.currentIntensity = model.currentUserProfile.intensity
+    //            model.setEQBandsForCurrentProfile()
+    //        } else {
+    //            print ("CREATING DEFAULT PROFILE")
+    //            createDefaultProfile()
+    //            defaultUserProfileHasBeenSet = true
+    //            userDefaults.set(true, forKey: "defaultUserProfileHasBeenSet")
+    //            let temp = userDefaults.bool(forKey: "defaultUserProfileHasBeenSet")
+    //            print ("User defaults temp value = \(temp)")
+    //        }
+    //    }
+    
+    func setCurrentProfileV2 () {
+        print ("CALLED SET CURRENT PROFILE in EQVIEW")
+        model.currentUserProfile = userProfiles.first {
+            $0.isActive
+        }!
+        model.currentUserProfileName = model.currentUserProfile.name ?? "Unknown Name"
+        model.currentIntensity = model.currentUserProfile.intensity
+        intensity = model.currentUserProfile.intensity
+        model.setEQBandsForCurrentProfile()
+    }
+    
     var body: some View {
         ZStack {
             ScrollView {
-                VStack (spacing: 25) {
+                VStack  {
                     ZStack {
                         UserProfileHeaderView()
                         HStack {
@@ -91,60 +123,28 @@ struct EQView: View {
                         }
                     }
                     
-                    //                
-                    //                            HStack {
-                    //                                Text ("System Volume: \(volObserver.volume.decimals(2))")
-                    //                                    .onChange(of: volObserver.volume, perform: {value in
-                    //                                        fineTuneSoundLevel = 0.0
-                    //                                        model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                    //                                        model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                    //                                    })
-                    //                                Spacer()
-                    //                            }
-                    //                            .padding(.bottom, 30)
-                    //                            .font(.title3)
-                    
-                    HStack {
-                        Text ("If you're having trouble getting the ideal volume from your phone's volume keys, go one click below too loud and then slide up and release to get it just right.")
-                            .foregroundColor(shouldShowText ? colorScheme == .dark ? Color.white : Color.black : .clear)
-                            .onAppear(perform: {
-                                userDefaults.register(defaults: ["shouldShowText": true])
-                                shouldShowText = userDefaults.bool(forKey: "shouldShowText")}
-                            )
-                        Spacer()
+                    ZStack {
+                        if model.equalizerIsActive {
+                            Image("SpexOwl1024")
+                                .resizable()
+                                .frame(width: 50, height: 50, alignment: .center)
+                        } else {
+                            Image("SpexOwl1024BW")
+                                .resizable()
+                                .frame(width: 50, height: 50, alignment: .center)
+                        }
+                        Toggle("", isOn: $model.equalizerIsActive)
+                            .onChange(of: model.equalizerIsActive) { value in
+                                model.toggleEqualizer()
+                            }
+                            .padding(.trailing)
+                            .padding(.leading)
+                            .font(.title3)
+                            .foregroundColor(model.equalizerIsActive ? .blue : .gray)
                     }
-                    .padding(.leading)
-                    .padding(.trailing)
                     
                     HStack {
-                        Text ("Fine-Tune Volume Boost")
-                            .foregroundColor(soundLevelIsEditing ? .gray : .blue)
-                    }
-                    .font(.title3)
-                    .foregroundColor(.blue)
-                    
-                    Slider(value: $fineTuneSoundLevel, in: 0...100, onEditingChanged: { editing in
-                        model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                        model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                        soundLevelIsEditing = editing
-                    })
-                    .onChange(of: volObserver.volume, perform: {value in
-                        fineTuneSoundLevel = 0.0
-                        model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                        model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                    })
-                    
-                    
-                    HStack {
-                        Text ("Experiment with the strength slider to find the optimal listening experience. The far right is max strength, which is probably too much. Inch it back towards the left (letting go each time) until you get the best sound. Toggle Spex EQ on and off to hear how Spex EQ is shaping your music.")
-                            .foregroundColor(shouldShowText ? colorScheme == .dark ? Color.white : Color.black : .clear)
-                        Spacer()
-                    }
-                    .padding(.top, 30)
-                    .padding(.leading)
-                    .padding(.trailing)
-                    HStack {
-                        Text ("Strength")
+                        Text ("Spextometer")
                             .foregroundColor(intensityIsEditing ? .gray : model.equalizerIsActive ? .blue : .gray)
                     }
                     .font(.title3)
@@ -156,9 +156,9 @@ struct EQView: View {
                         intensityIsEditing = editing
                     })
                     .onAppear{
+                        setCurrentProfileV2()
                         print ("Model current intensity = \(model.currentIntensity)")
                         print ("User intensity = \(model.currentUserProfile.intensity)")
-                        intensity = model.currentIntensity
                         if model.equalizerL1 == nil {
                             model.prepareAudioEngine()
                         }
@@ -166,120 +166,73 @@ struct EQView: View {
                             self.tabSelection = 3
                         }
                     }
-                    Toggle("Spex EQ", isOn: $model.equalizerIsActive)
-                        .onChange(of: model.equalizerIsActive) { value in
-                            model.toggleEqualizer()
-                        }
-                        .padding(.trailing, 25)
-                        .font(.title3)
-                        .foregroundColor(model.equalizerIsActive ? .blue : .gray)
+                    HStack {
+                        Text ("Min")
+                        Spacer()
+                        Text ("Max")
+                    }
+                    
+                    HStack {
+                        Text ("While playing the demo song (or one of your songs from the Library tab), slide and let go of the Spextometer to find your ideal setting. Toggle Spex on and off to hear how it's shaping the sound to match your unique hearing profile.")
+                            .foregroundColor(shouldShowText ? colorScheme == .dark ? Color.white : Color.black : .clear)
+                        Spacer()
+                    }
+                    .padding(.top, 5)
+                    .padding(.leading)
+                    .padding(.trailing)
+                    
                 }
-                //            VStack (spacing: 0) {
-                //                
-                //                Text ("Stereo EQ Boost")
-                //                    .padding()
-                //                    .font(.title3)
-                //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                HStack {
-                //                    let left60 = model.currentUserProfile.left60 * (Float (intensity) / 6.0)
-                //                    Text("\(left60.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                    Text("60 Hz")
-                //                        .frame(maxWidth: .infinity)
-                //                    let right60 = model.currentUserProfile.right60 * (Float (intensity) / 6.0)
-                //                    Text("\(right60.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                }
-                //                HStack {
-                //                    let left100 = model.currentUserProfile.left100 * (Float (intensity) / 6.0)
-                //                    Text("\(left100.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                    Text("100 Hz")
-                //                        .frame(maxWidth: .infinity)
-                //                    let right100 = model.currentUserProfile.right100 * (Float (intensity) / 6.0)
-                //                    Text("\(right100.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                }
-                //                HStack {
-                //                    let left230 = model.currentUserProfile.left230 * (Float (intensity) / 6.0)
-                //                    Text("\(left230.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                    Text("230 Hz")
-                //                        .frame(maxWidth: .infinity)
-                //                    let right230 = model.currentUserProfile.right230 * (Float (intensity) / 6.0)
-                //                    Text("\(right230.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                }
-                //                HStack {
-                //                    let left500 = model.currentUserProfile.left500 * (Float (intensity) / 6.0)
-                //                    Text("\(left500.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                    Text("500 Hz")
-                //                        .frame(maxWidth: .infinity)
-                //                    let right500 = model.currentUserProfile.right500 * (Float (intensity) / 6.0)
-                //                    Text("\(right500.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                }
-                //                HStack {
-                //                    let left1100 = model.currentUserProfile.left1100 * (Float (intensity) / 6.0)
-                //                    Text("\(left1100.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                    Text("1100 Hz")
-                //                        .frame(maxWidth: .infinity)
-                //                    let right1100 = model.currentUserProfile.right1100 * (Float (intensity) / 6.0)
-                //                    Text("\(right1100.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                }
-                //                HStack {
-                //                    let left2400 = model.currentUserProfile.left2400 * (Float (intensity) / 6.0)
-                //                    Text("\(left2400.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                    Text("2400 Hz")
-                //                        .frame(maxWidth: .infinity)
-                //                    let right2400 = model.currentUserProfile.right2400 * (Float (intensity) / 6.0)
-                //                    Text("\(right2400.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                }
-                //                HStack {
-                //                    let left5400 = model.currentUserProfile.left5400 * (Float (intensity) / 6.0)
-                //                    Text("\(left5400.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                    Text("5400 Hz")
-                //                        .frame(maxWidth: .infinity)
-                //                    let right5400 = model.currentUserProfile.right5400 * (Float (intensity) / 6.0)
-                //                    Text("\(right5400.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                }
-                //                HStack {
-                //                    let left12000 = model.currentUserProfile.left12000 * (Float (intensity) / 6.0)
-                //                    Text("\(left12000.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                    Text("12000 Hz")
-                //                        .frame(maxWidth: .infinity)
-                //                    let right12000 = model.currentUserProfile.right12000 * (Float (intensity) / 6.0)
-                //                    Text("\(right12000.decimals(2))")
-                //                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                //                        .frame(maxWidth: .infinity)
-                //                }
-                //                
-                //            }
+                Button {
+                    if !isPlayingDemoSong {
+                        model.playDemoTrack()
+                    } else {
+                        model.stopDemoTrack()
+                    }
+                    isPlayingDemoSong.toggle()
+                } label: {
+                    if !isPlayingDemoSong {
+                        Text("Play Demo")
+                    } else {
+                        Text ("Stop Demo")
+                    }
+                }
+                .font(.title)
+                .foregroundColor(.blue)
+                .padding ()
+                .overlay(
+                    Capsule(style: .continuous)
+                        .stroke(.blue, lineWidth: 5)
+                )
+                .padding (.bottom, 20)
                 
-                // Spacer()
+                Spacer ()
+                
+                HStack {
+                    Text ("Subtle Volume Adjustment")
+                        .foregroundColor(soundLevelIsEditing ? .gray : .blue)
+                }
+                .font(.title3)
+                .foregroundColor(.blue)
+                .padding (.top, 50)
+                
+                Slider(value: $fineTuneSoundLevel, in: 0...100, onEditingChanged: { editing in
+                    model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
+                    model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
+                    soundLevelIsEditing = editing
+                })
+                .onChange(of: volObserver.volume, perform: {value in
+                    fineTuneSoundLevel = 0.0
+                    model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
+                    model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
+                })
+                
+                HStack {
+                    Text ("Spex Version 1.0")
+                    Spacer()
+                }
+                
+                
+                
             }
             VStack {
                 Spacer()

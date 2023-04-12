@@ -226,6 +226,7 @@ struct LibraryView: View {
                 }
                 .onAppear{
                     print ("LIBRARY VIEW LIST APPEARED")
+                    print ("Song List Count = \(model.songList.count)")
                     readFromUserDefaults()
                     checkMusicLibaryAuthorization()
                     if model.equalizerL1 == nil {

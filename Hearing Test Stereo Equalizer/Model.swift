@@ -20,6 +20,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     @Published var playState: PlayState = .stopped
+    @Published var demoIsPlaying = false
     
     let systemMusicPlayer = MPMusicPlayerController.systemMusicPlayer
     
@@ -57,7 +58,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     }	
     
     func setRouteChangeObserver() {
-        let audioSession = AVAudioSession.sharedInstance()
+      //  let audioSession = AVAudioSession.sharedInstance()
         
         // Observe route change interruptions
         
@@ -249,7 +250,11 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var currentUserProfileName = ""
     @Published var currentIntensity = 0.0
     @Published var playQueue = [MPMediaItem]()
-    @Published var songList = [MPMediaItem] ()
+    @Published var songList = [MPMediaItem]() {
+        willSet {
+            print ("songList new value count = \(newValue.count)")
+        }
+    }
     var currentURL: URL = URL(fileURLWithPath: "")
     @Published var queueIndex: Int = 0
    // @Published var isPlaying: Bool = false
@@ -455,7 +460,11 @@ class Model: ObservableObject, RemoteCommandHandler {
      //   nowPlayingInfo[MPNowPlayingInfoPropertyIsLiveStream] = currentMediaItem.isLiveStream
         nowPlayingInfo[MPMediaItemPropertyTitle] = currentMediaItem.title ?? "Unknown title"
         nowPlayingInfo[MPMediaItemPropertyArtist] = currentMediaItem.artist ?? "Uknown artist"
-        nowPlayingInfo[MPMediaItemPropertyArtwork] = currentMediaItem.artwork ?? UIImage(systemName: "photo")!
+        let defaultImage = UIImage(systemName: "photo")!
+        let defaultArtwork = MPMediaItemArtwork (boundsSize: defaultImage.size, requestHandler: { (size) -> UIImage in
+            return defaultImage
+        })
+        nowPlayingInfo[MPMediaItemPropertyArtwork] = currentMediaItem.artwork ?? defaultArtwork
         nowPlayingInfo[MPMediaItemPropertyAlbumArtist] = currentMediaItem.albumArtist ?? "Uknown artist"
         nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = currentMediaItem.albumTitle ?? "Unknown album title"
         
@@ -489,6 +498,10 @@ class Model: ObservableObject, RemoteCommandHandler {
             self.stopTrack()
         }
         
+        if demoIsPlaying {
+            demoIsPlaying = false
+        }
+        
         prepareAudioEngine() 
         setEQBandsForCurrentProfile()
         do {
@@ -514,7 +527,8 @@ class Model: ObservableObject, RemoteCommandHandler {
             //    audioPlayerNodeL1.scheduleFile(audioFile, at: audioTime, completionHandler: nil) 
                 audioPlayerNodeL1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
                 audioPlayerNodeL1.pan = -1
-                audioPlayerNodeL1.play()              
+                audioPlayerNodeL1.play()  
+                
                 
                 // Right Ear Play
            //     audioPlayerNodeR1.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
@@ -539,14 +553,86 @@ class Model: ObservableObject, RemoteCommandHandler {
         } catch _ {print ("Catching Audio Engine Error")}
     }
     
+    func playDemoTrack () {
+        print ("CALLED PLAY DEMO TRACK")
+        playQueue = [MPMediaItem]()
+        songList = [MPMediaItem]()
+        demoIsPlaying = true
+        prepareAudioEngine() 
+        setEQBandsForCurrentProfile()
+        do {
+            print ("Index = \(queueIndex)")
+          //  let currentMPMediaItem = playQueue[queueIndex]
+         //   currentPersistentID = currentMediaItem.persistentID
+             let currentURL = Bundle.main.url(forResource: "twinsmusic-dancinginthesand", withExtension: "mp3")
+           
+            audioFile = try AVAudioFile(forReading: currentURL!)
+                
+                //    Start your Engines 
+//                if !audioEngine.isRunning {
+//                    print ("PREPAING THE AUDIO ENGINE")
+                    audioEngine.prepare()
+                    try audioEngine.start()
+                    print ("AUDIO ENGINE IS RUNNING = \(audioEngine.isRunning)")
+//                }
+                
+               
+
+                let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
+                
+                // Left Ear Play
+            //    audioPlayerNodeL1.scheduleFile(audioFile, at: audioTime, completionHandler: nil) 
+                audioPlayerNodeL1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
+                audioPlayerNodeL1.pan = -1
+                audioPlayerNodeL1.play()  
+                
+                
+                // Right Ear Play
+           //     audioPlayerNodeR1.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
+                audioPlayerNodeR1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
+                audioPlayerNodeR1.pan = 1
+                audioPlayerNodeR1.play()
+                
+//                if playState != .playing {
+//                    print ("PLAY STATE = \(playState)")
+//                    playState = .playing
+//                   startTimer()
+//                }
+            
+            startFadeInTimer()
+//                
+//            
+//                setNowPlayingMetadata()
+//                print ("PLAY STATE 2 = \(playState)")
+//                print ("AUDIO IS PLAYING = \(audioPlayerNodeL1.isPlaying)")
+//                print ("NODE VOLUME = \(audioPlayerNodeL1.volume)")
+                
+            
+            
+        } catch _ {print ("Catching Audio Engine Error")}
+    }
+    
     
     
     func stopTrack () {
         print ("CALLED STOP TRACK")
+        
         audioPlayerNodeL1.stop()
         audioPlayerNodeR1.stop()
         playState = .stopped
         setNowPlayingMetadata()
+    }
+    
+    func stopDemoTrack () {
+        print ("CALLED STOP DEMO TRACK")
+        playQueue = [MPMediaItem]()
+        songList = [MPMediaItem]()
+        demoIsPlaying = false
+        fadeInComplete()
+        audioPlayerNodeL1.stop()
+        audioPlayerNodeR1.stop()
+      //  playState = .stopped
+     //   setNowPlayingMetadata()
     }
     
     
@@ -790,7 +876,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var initialHearingTestHasBeenCompleted = false
     var tonePlayer: AVAudioPlayer?
     var currentTone = ""
-    var toneIndex = 0
+    var toneIndex = 15
     var maxUnheard: Double = -160
     var minHeard: Double = 0.0
     
@@ -959,7 +1045,7 @@ class Model: ObservableObject, RemoteCommandHandler {
 
     
     func bandComplete () {
-        print ("CALLED BAND COMPLETE")
+        print ("CALLED BAND COMPLETE, tone index = \(toneIndex)")
         assignMinHeardDecibels()
         resetMinMaxValues()
         if toneIndex < toneArray.count - 1 {
@@ -969,7 +1055,7 @@ class Model: ObservableObject, RemoteCommandHandler {
             playTone(volume: Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2))))
             
         } else {
-            toneIndex = 0
+            toneIndex = 15
             stopTone()
             print ("Test Complete!")
             testStatus = .testCompleted
@@ -982,6 +1068,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     func tapStartTest () {
+        print ("Tone Index on Tap Start Test = \(toneIndex)")
         currentVolume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
         playTone(volume: currentVolume)
         print ("tapStartTest volume = \(currentVolume)")

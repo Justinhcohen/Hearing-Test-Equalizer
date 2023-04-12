@@ -59,10 +59,12 @@ struct PlaylistSongsView: View {
                 let size = CGSize(width: 30, height: 30)
                 let songName = item.title
                 let mediatImage = item.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
-                let UIAlbumCover = mediatImage?.image(at: size)
                 let defaultUIImage = UIImage(systemName: "photo")!
-                let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
+                let UIAlbumCover = mediatImage?.image(at: size) ?? defaultUIImage
+                let albumCover = Image(uiImage: UIAlbumCover)
+                let albumCover2 = Image(uiImage: defaultUIImage)
                 SongsRowView(albumCover: albumCover, songName: songName ?? "Title Unknown")
+             //   SongsRowView(songName: songName ?? "Title Unknown")
                     .contentShape(Rectangle())
                     .onTapGesture {
                         model.cachedAudioFrame = nil
@@ -81,6 +83,10 @@ struct PlaylistSongsView: View {
         .searchable(text: $searchText)
         .listStyle(PlainListStyle())
         .navigationTitle(playlistName)
+        .onAppear{
+            print ("PLAYLIST SONGS VIEW APPEARED")
+            print ("Song List Count = \(model.songList.count)")
+        }
     }
 }
 

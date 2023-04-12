@@ -31,6 +31,7 @@
 		0D8762A32947CEC50089B138 /* Band60.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629B2947CEC50089B138 /* Band60.mp3 */; };
 		0D8762A42947CEC50089B138 /* Band5400.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629C2947CEC50089B138 /* Band5400.mp3 */; };
 		0D8762A52947CEC50089B138 /* Band12000.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629D2947CEC50089B138 /* Band12000.mp3 */; };
+		0DB93CE829E48839002C5CC2 /* twinsmusic-dancinginthesand.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0DB93CE729E48839002C5CC2 /* twinsmusic-dancinginthesand.mp3 */; };
 		0DC1213929762AAD00736FA6 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC1213829762AAD00736FA6 /* Player.swift */; };
 		0DCB0E2E2964FF8800083DB4 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */; };
 		0DCB0E33296504E000083DB4 /* SongsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCB0E32296504E000083DB4 /* SongsView.swift */; };
@@ -72,6 +73,7 @@
 		0D87629B2947CEC50089B138 /* Band60.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band60.mp3; sourceTree = "<group>"; };
 		0D87629C2947CEC50089B138 /* Band5400.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band5400.mp3; sourceTree = "<group>"; };
 		0D87629D2947CEC50089B138 /* Band12000.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band12000.mp3; sourceTree = "<group>"; };
+		0DB93CE729E48839002C5CC2 /* twinsmusic-dancinginthesand.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "twinsmusic-dancinginthesand.mp3"; sourceTree = "<group>"; };
 		0DC1213829762AAD00736FA6 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		0DCB0E32296504E000083DB4 /* SongsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongsView.swift; sourceTree = "<group>"; };
@@ -212,6 +214,7 @@
 		0DD438F3293E9CAC00C9301E /* Tracks */ = {
 			isa = PBXGroup;
 			children = (
+				0DB93CE729E48839002C5CC2 /* twinsmusic-dancinginthesand.mp3 */,
 			);
 			path = Tracks;
 			sourceTree = "<group>";
@@ -283,6 +286,7 @@
 				0D8762A12947CEC50089B138 /* Band230.mp3 in Resources */,
 				0D8762A42947CEC50089B138 /* Band5400.mp3 in Resources */,
 				0D8762A02947CEC50089B138 /* Band2400.mp3 in Resources */,
+				0DB93CE829E48839002C5CC2 /* twinsmusic-dancinginthesand.mp3 in Resources */,
 				0D8762A52947CEC50089B138 /* Band12000.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -453,8 +457,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Hearing-Test-Stereo-Equalizer-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Spex EQ";
-				"INFOPLIST_KEY_CFBundleDisplayName[sdk=*]" = "Spex EQ";
+				INFOPLIST_KEY_CFBundleDisplayName = Spex;
+				"INFOPLIST_KEY_CFBundleDisplayName[sdk=*]" = Spex;
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Grant permission to play music from your music library.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -487,7 +491,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Hearing-Test-Stereo-Equalizer-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Spex EQ";
+				INFOPLIST_KEY_CFBundleDisplayName = Spex;
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Grant permission to play music from your music library.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

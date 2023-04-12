@@ -56,12 +56,13 @@ struct SongsView: View {
             List {
                 ForEach(searchResults, id: \.self) {item in 
                     let size = CGSize(width: 30, height: 30)
-                    let songName = item.title
-                    let mediatImage = item.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
-                    let UIAlbumCover = mediatImage?.image(at: size)
+                    let songName = item.title ?? "Unknown title"
+                    let mediaImage = item.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
+                    let UIAlbumCover = mediaImage?.image(at: size)
                     let defaultUIImage = UIImage(systemName: "photo")!
                     let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
-                    SongsRowView(albumCover: albumCover, songName: songName ?? "Title Unknown")
+                    SongsRowView(albumCover: albumCover, songName: songName)
+                  //  SongsRowView(songName: songName)
                         .contentShape(Rectangle())
                         .onTapGesture {
                             model.cachedAudioFrame = nil

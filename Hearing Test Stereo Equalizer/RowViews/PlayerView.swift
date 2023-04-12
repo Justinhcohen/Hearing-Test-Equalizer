@@ -17,12 +17,12 @@ struct PlayerView: View {
     @State var albumCover = Image(systemName: "photo")
     
     func updateMetadata () {
-        let size = CGSize(width: 30, height: 30)
+       let size = CGSize(width: 30, height: 30)
         songName = (model.currentMediaItem.value(forProperty: MPMediaItemPropertyTitle) as? String)!
-        let mediatImage = model.currentMediaItem.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
-        let UIAlbumCover = mediatImage?.image(at: size)
-        let defaultUIImage = UIImage(systemName: "photo")!
-        albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
+//        let mediatImage = model.currentMediaItem.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
+       // let UIAlbumCover = mediatImage?.image(at: size)
+//        let defaultUIImage = UIImage(systemName: "photo")!
+//        albumCover = Image(uiImage: defaultUIImage)
         
     }
     
@@ -39,7 +39,7 @@ struct PlayerView: View {
                 Button (action: model.playPreviousTrack) {
                     Image(systemName: "backward.fill")
                 }
-                .disabled(model.songList.isEmpty)
+                .disabled(model.songList.isEmpty || model.demoIsPlaying)
                 
                 Button (action: model.playOrPauseCurrentTrack) {
                     if model.playState == .stopped || model.playState == .paused {
@@ -48,12 +48,12 @@ struct PlayerView: View {
                         Image(systemName: "pause.fill")
                     }
                 }
-                .disabled(model.songList.isEmpty)
+                .disabled(model.songList.isEmpty || model.demoIsPlaying)
                 
                 Button (action: model.playNextTrack) {
                     Image(systemName: "forward.fill")
                 }
-                .disabled(model.songList.isEmpty)
+                .disabled(model.songList.isEmpty || model.demoIsPlaying)
                 
          //   }
         }

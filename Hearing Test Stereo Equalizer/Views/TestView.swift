@@ -90,6 +90,10 @@ struct TestView: View {
         self.tabSelection = 1
     }
     
+    private func dismissToSpexView () {
+        self.tabSelection = 2
+    }
+    
     private func saveProfileAfterTest () {
         print ("CALLED SAVE PROFILE AFTER TEST")
         let newUserProfile = UserProfile (context: moc)
@@ -145,33 +149,34 @@ struct TestView: View {
     }
     
     var body: some View {
-        
             VStack (spacing: 20) {
             
                 switch introStep {
                 case 0:
-                    VStack (spacing: 20) {
-                        Text("Welcome!")
-                            .font(.largeTitle)
-                            .sheet(isPresented: $showTestResultsView, onDismiss: dismissToLibraryView) {
-                                TestResultsView() 
+                    ScrollView {
+                        VStack (spacing: 20) {
+                            Text("Welcome!")
+                                .font(.largeTitle)
+                                .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
+                                    TestResultsView() 
+                                }
+                                .padding(.top, 20)
+                            HStack {
+                                Text ("Before we get started, please note that Spex currently only works with your local music files. In the future, we hope to support streaming services such as Apple Music, Spotify, and Tidal.")
+                                Spacer()
                             }
-                            .padding(.top, 20)
-                        HStack {
-                            Text ("Before we get started, please note that Spex EQ currently only works with your local music files. In the future, we hope to support streaming services such as Apple Music, Spotify, and Tidal.")
-                            Spacer()
-                        }
-                        HStack {
-                            Text ("If this is not a deal-breaker, let's test your hearing so that we can shape your music to fit your ears.")
-                            Spacer()
-                        }
-                        HStack {
-                            Text ("You'll need headphones, a very quiet space, and about 15-20 minutes.")
-                            Spacer()
-                        }
-                        HStack {
-                            Text ("Are you ready to begin?")
-                            Spacer()
+                            HStack {
+                                Text ("If this is not a deal-breaker, let's test your hearing so that we can shape your music to fit your ears.")
+                                Spacer()
+                            }
+                            HStack {
+                                Text ("You'll need headphones, a very quiet space, and about 15-20 minutes.")
+                                Spacer()
+                            }
+                            HStack {
+                                Text ("Are you ready to begin?")
+                                Spacer()
+                            }
                         }
                     }
                     .padding()
@@ -198,24 +203,26 @@ struct TestView: View {
                     )
                     .padding()
                 case 10:
-                    VStack (spacing: 20) {
-                        Text("Great!")
-                            .font(.largeTitle)
-                            .sheet(isPresented: $showTestResultsView, onDismiss: dismissToLibraryView) {
-                                TestResultsView() 
+                    ScrollView {
+                        VStack (spacing: 20) {
+                            Text("Great!")
+                                .font(.largeTitle)
+                                .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
+                                    TestResultsView() 
+                                }
+                                .padding(.top, 20)
+                            HStack {
+                                Text ("We're going to play a tone and ask if you can hear it.")
+                                Spacer()
                             }
-                            .padding(.top, 20)
-                        HStack {
-                            Text ("We're going to play a tone and ask if you can hear it.")
-                            Spacer()
-                        }
-                        HStack {
-                            Text ("If you can hear the tone, the next tone will be quieter. If you can't hear the tone, the next tone will be louder. We're trying to hone in on the softest tone that you're able to hear. Most of the time you won't hear the tone and that's okay! Be honest with your answers.")
-                            Spacer()
-                        }
-                        HStack {
-                            Text ("Let's start with a practice tone so that you'll know what to expect.")
-                            Spacer()
+                            HStack {
+                                Text ("If you can hear the tone, the next tone will be quieter. If you can't hear the tone, the next tone will be louder. We're trying to hone in on the softest tone that you're able to hear. Most of the time you won't hear the tone and that's okay! Be honest with your answers.")
+                                Spacer()
+                            }
+                            HStack {
+                                Text ("Let's start with a practice tone so that you'll know what to expect.")
+                                Spacer()
+                            }
                         }
                     }
                     .padding()
@@ -240,7 +247,7 @@ struct TestView: View {
                         Text("Practice")
                             .font(.largeTitle)
                             .foregroundColor(.green)
-                            .sheet(isPresented: $showTestResultsView, onDismiss: dismissToLibraryView) {
+                            .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
                                 TestResultsView() 
                             }
                             .padding(.top, 20)
@@ -259,7 +266,7 @@ struct TestView: View {
                             if toneProgress == 9 {
                                 toneProgress = 0
                                 model.testStatus = .practiceCompleted
-                                model.toneIndex = 0
+                                model.toneIndex = 15
                                 introStep = 30
                             }
                             yesIsTemporarilyDisabled = true
@@ -281,7 +288,7 @@ struct TestView: View {
                             if toneProgress == 9 {
                                 toneProgress = 0
                                 model.testStatus = .practiceCompleted
-                                model.toneIndex = 0
+                                model.toneIndex = 15
                                 introStep = 30
                             }
                             noIsTemporarilyDisabled = true
@@ -324,11 +331,12 @@ struct TestView: View {
                         )
                         .padding (.bottom, 20)
                     }
+                    .padding()
                 case 30:
                     
                             Text("Great job!")
                                 .font(.largeTitle)
-                                .sheet(isPresented: $showTestResultsView, onDismiss: dismissToLibraryView) {
+                                .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
                                     TestResultsView() 
                                 }
                                 .padding(.top, 20)
@@ -389,7 +397,7 @@ struct TestView: View {
                         Text("Testing in Progress")
                             .font(.largeTitle)
                             .foregroundColor(.green)
-                            .sheet(isPresented: $showTestResultsView, onDismiss: dismissToLibraryView) {
+                            .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
                                 TestResultsView() 
                             }
                             .padding(.top, 20)
@@ -492,123 +500,6 @@ struct TestView: View {
                     
                 }
             }
-            
-            
-//            Text("\(model.testStatus)")
-//                .font(.largeTitle)
-//                .foregroundColor(model.testInProgress ? .green : .white)
-//                .sheet(isPresented: $showTestResultsView, onDismiss: dismissToLibraryView) {
-//                    TestResultsView() 
-//                }
-//                .padding(.top, 20)
-//            
-//            ProgressView("Progress", value: toneProgress, total: 9)
-//                .opacity(model.testInProgress ? 1.0 : 0)
-//            
-//            Spacer()
-//            
-//            VStack (spacing: 40) {
-//                Text(!isShowingCompareSilence ? "Do you hear the tone?" : "")
-//                    .font(.title)
-//                    .opacity(model.testInProgress ? 1.0 : 0)
-//                Button("Yes, I hear it", 
-//                       action: {
-//                    toneProgress += 1
-//                    if toneProgress == 9 {
-//                        toneProgress = 0
-//                    }
-//                    yesIsTemporarilyDisabled = true
-//                    preventDoulbleTap (buttonToggle: yesButtonIsDisabled)
-//                    if model.testInProgress {
-//                        model.tapYesHeard()
-//                    } else {
-//                        model.testStatus = "Congrats, All Done!"
-//                    }
-//                })
-//                .onChange(of: model.testInProgress, perform: {value in
-//                    if !model.testInProgress {
-//                        saveProfileAfterTest()
-//                        print ("Should Show Modal View")
-//                        showTestResultsView = true
-//                    } else {
-//                        return
-//                    }
-//                })
-//                .font(.title)
-//                .foregroundColor(!yesButtonIsDisabled ? .green : .gray)
-//                .padding ()
-//                .overlay(
-//                    Capsule(style: .continuous)
-//                        .stroke(!yesButtonIsDisabled ? Color.green : Color.gray, lineWidth: 5)
-//                )
-//                .opacity(yesIHearIsShown ? 1.0 : 0)
-//                .disabled(yesButtonIsDisabled)
-//                Button("No, I don't hear it", 
-//                       action: {
-//                    toneProgress += 1
-//                    if toneProgress == 9 {
-//                        toneProgress = 0
-//                    }
-//                    noIsTemporarilyDisabled = true
-//                    preventDoulbleTap (buttonToggle: noButtonIsDisabled)
-//                    if model.testInProgress {
-//                        model.tapNoDidNotHear()
-//                    } else {
-//                        model.testStatus = "Congrats, All Done!"
-//                    }
-//                })
-//                .font(.title)
-//                .foregroundColor(!noButtonIsDisabled ? .red : .gray)
-//                .padding ()
-//                .overlay(
-//                    Capsule(style: .continuous)
-//                        .stroke(!noButtonIsDisabled ? Color.red : Color.gray, lineWidth: 5)
-//                )
-//                .opacity(noIDontHearIsShown ? 1.0 : 0)
-//                //       .padding(45)
-//                .disabled(noButtonIsDisabled)
-//                
-//                Text("\(model.currentBand)")
-//                    .font(.headline)
-//                    .opacity(bandIsShown ? 1.0 : 0)
-//                
-//                Button {
-//                    if !isShowingCompareSilence {
-//                        model.stopTone()
-//                    } else {
-//                        model.resumeTone()
-//                    }
-//                    isShowingCompareSilence.toggle()
-//                } label: {
-//                    if !isShowingCompareSilence {
-//                        Text("Compare Silence")
-//                    } else {
-//                        Text ("Back to Tone")
-//                    }
-//                }
-//                .font(.title)
-//                .foregroundColor(model.testInProgress ? .blue : .gray)
-//                .padding ()
-//                .overlay(
-//                    Capsule(style: .continuous)
-//                        .stroke(model.testInProgress ? Color.blue : Color.gray, lineWidth: 5)
-//                )
-//                .opacity(model.testInProgress ? 1.0 : 0)
-//                .disabled(!model.testInProgress)
-//                .padding (.bottom, 20)
-//            }
-//            .onAppear {
-//                print ("TestView onAppear CALLED")
-//            }
-//            .onChange(of: model.testInProgress, perform: {value in
-//                if !model.testInProgress {
-//                    saveProfileAfterTest()
-//                    print ("Should Show Modal View")
-//                    showTestResultsView = true
-//                } else {
-//                    return
-//                }
-//            })
         }
         
     }

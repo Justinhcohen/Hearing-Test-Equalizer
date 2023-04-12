@@ -63,6 +63,7 @@ struct ArtistSongsView: View {
                 let defaultUIImage = UIImage(systemName: "photo")!
                 let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
                 SongsRowView(albumCover: albumCover, songName: songName ?? "Title Unknown")
+         //       SongsRowView(songName: songName ?? "Title Unknown")
                     .contentShape(Rectangle())
                     .onTapGesture {
                         model.cachedAudioFrame = nil
