@@ -876,7 +876,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var initialHearingTestHasBeenCompleted = false
     var tonePlayer: AVAudioPlayer?
     var currentTone = ""
-    var toneIndex = 15
+    var toneIndex = 0
     var maxUnheard: Double = -160
     var minHeard: Double = 0.0
     
@@ -1055,7 +1055,7 @@ class Model: ObservableObject, RemoteCommandHandler {
             playTone(volume: Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2))))
             
         } else {
-            toneIndex = 15
+            toneIndex = 0
             stopTone()
             print ("Test Complete!")
             testStatus = .testCompleted
