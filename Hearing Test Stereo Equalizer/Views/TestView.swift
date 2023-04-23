@@ -134,7 +134,7 @@ struct TestView: View {
         newUserProfile.right12000 = workingBandsGain[15]
         
         newUserProfile.name = "Name me"
-        newUserProfile.intensity = 14.0
+        newUserProfile.intensity = 16.0
         newUserProfile.isActive = true
         newUserProfile.iD = UUID()
         newUserProfile.dateCreated = Date.now
@@ -266,7 +266,7 @@ struct TestView: View {
                             if toneProgress == 9 {
                                 toneProgress = 0
                                 model.testStatus = .practiceCompleted
-                                model.toneIndex = 15
+                                model.toneIndex = 0
                                 introStep = 30
                             }
                             yesIsTemporarilyDisabled = true
@@ -288,13 +288,13 @@ struct TestView: View {
                             if toneProgress == 9 {
                                 toneProgress = 0
                                 model.testStatus = .practiceCompleted
-                                model.toneIndex = 15
+                                model.toneIndex = 0
                                 introStep = 30
                             }
                             noIsTemporarilyDisabled = true
                             preventDoulbleTap (buttonToggle: noButtonIsDisabled)
                             model.tapNoDidNotHear()
-                        })
+                        }) 
                         .font(.title)
                         .foregroundColor(!noButtonIsDisabled ? .red : .gray)
                         .padding ()

@@ -29,9 +29,7 @@ struct UserProfileView: View {
     
     
     func setCurrentProfile () {
-        model.currentUserProfile = userProfiles.first {
-            $0.isActive
-        }!
+        model.currentUserProfile = userProfiles.first {$0.isActive} ?? userProfiles.first!
         model.currentUserProfileName = model.currentUserProfile.name ?? "Unknown Name"
         model.currentIntensity = model.currentUserProfile.intensity
         model.setEQBandsForCurrentProfile()
@@ -52,13 +50,14 @@ struct UserProfileView: View {
             let profile = userProfiles[index]
             if userProfiles.count > 1 {
                 moc.delete(profile)
-                try? moc.save()
+                
             }
             for profile in userProfiles {
                 profile.isActive = false
             }
             userProfiles[0].isActive = true
             model.currentUserProfile = userProfiles[0]
+            try? moc.save()
         }
     }
     
@@ -157,6 +156,9 @@ struct UserProfileView: View {
                         }
                         .onDelete(perform: delete)
                         
+                    }
+                    .sheet(isPresented: $showUserProfileEditNameViewModal, onDismiss: didDismiss) {
+                        UserProfileEditNameView()
                     }
                     .listStyle(PlainListStyle())
                     .id(refreshID)
@@ -271,12 +273,12 @@ struct UserProfileView: View {
             }
             
             
-            Button 	("Add Justin XM5") {
-                addJustinXM5()
-            }
-            .sheet(isPresented: $showUserProfileEditNameViewModal, onDismiss: didDismiss) {
-                UserProfileEditNameView()
-            }
+//            Button 	("Add Justin XM5") {
+//                addJustinXM5()
+//            }
+//            .sheet(isPresented: $showUserProfileEditNameViewModal, onDismiss: didDismiss) {
+//                UserProfileEditNameView()
+//            }
             
         }
         .onAppear {

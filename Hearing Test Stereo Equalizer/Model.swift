@@ -21,6 +21,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     @Published var playState: PlayState = .stopped
     @Published var demoIsPlaying = false
+    @Published var didViewMusicLibrary = false
     
     let systemMusicPlayer = MPMusicPlayerController.systemMusicPlayer
     
@@ -102,7 +103,7 @@ class Model: ObservableObject, RemoteCommandHandler {
             
         case .play:
             print ("RECEIVED REMOTE PLAY COMMAND")
-            playTrack()
+            playOrPauseCurrentTrack()
             
         case .nextTrack:
             print ("RECIEVED REMOTE NEXT TRACK COMMAND")
@@ -120,7 +121,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     
     func handleAudioSessionInterruption(notification: Notification) {
-        print ("CALLED HANDLE AUDIO INTERRUPTION")
+        print ("HANDLE AUDIO INTERRUPTION")
         guard let userInfo = notification.userInfo,
                 let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
                 let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
@@ -161,7 +162,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     func handleRouteChangeNotification(notification: Notification) {
-        print ("CALLED HANDLE ROUTE CHANGE")
+        print ("HANDLE ROUTE CHANGE")
         playState = .stopped 
         guard let userInfo = notification.userInfo,
                let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
@@ -178,21 +179,28 @@ class Model: ObservableObject, RemoteCommandHandler {
                headphonesConnected = hasHeadphones(in: session.currentRoute)
                print ("HEAD PHONES CONNECTED = \(headphonesConnected)")
                
-               if headphonesConnected {
+//               if headphonesConnected {
+//                   if audioPlayerNodeL1.currentFrame > 0 {
+//                       cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+//                   }
+//                   setNowPlayingMetadata()
+//                   playTrack()
+//               } else {
+//                   if audioPlayerNodeL1.currentFrame > 0 {
+//                       cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+//                   }
+//                   setNowPlayingMetadata()
+//               }
+               
+         
                    if audioPlayerNodeL1.currentFrame > 0 {
                        cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
                    }
                    setNowPlayingMetadata()
                    playTrack()
-               } else {
-                   if audioPlayerNodeL1.currentFrame > 0 {
-                       cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
-                   }
-                   setNowPlayingMetadata()
-               }
            
            case .oldDeviceUnavailable: // Old device removed.
-               print ("CALLED NEW DEVICE AVAILABLE")
+               print ("CALLED OLD DEVEICE UNAVAILABLE")
                if let previousRoute =
                    userInfo[AVAudioSessionRouteChangePreviousRouteKey] as? AVAudioSessionRouteDescription {
                    headphonesConnected = hasHeadphones(in: previousRoute)
@@ -453,6 +461,7 @@ class Model: ObservableObject, RemoteCommandHandler {
        print ("CALLED SET NOW PLAYING METADATA")
         let nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
         var nowPlayingInfo = [String: Any]()
+        var mpNowPlayingPlaybackState = MPNowPlayingPlaybackState(rawValue: 1)
         
         // Static Metadata
         nowPlayingInfo[MPNowPlayingInfoPropertyAssetURL] = currentMediaItem.assetURL
@@ -473,9 +482,19 @@ class Model: ObservableObject, RemoteCommandHandler {
         nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = audioPlayerNodeL1.current
         switch playState {
         case .playing: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1.0
+//            nowPlayingInfoCenter.playbackState = .playing
+//            mpNowPlayingPlaybackState = .playing
+//            print ("mpNowPlayingPlaybackState = \(mpNowPlayingPlaybackState)")
         case .paused: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
+//            nowPlayingInfoCenter.playbackState = .paused
+//            mpNowPlayingPlaybackState = .paused
+//            print ("PlayState should be paused = \(playState)")
+//            print ("mpNowPlayingPlaybackState = \(mpNowPlayingPlaybackState)")
         case .stopped: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
+//            nowPlayingInfoCenter.playbackState = .stopped
+//            mpNowPlayingPlaybackState = .stopped
         }
+        
         nowPlayingInfo[MPNowPlayingInfoPropertyDefaultPlaybackRate] = 1.0
         
         nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
@@ -486,6 +505,8 @@ class Model: ObservableObject, RemoteCommandHandler {
         audioPlayerNodeL1.volume = 0.0
         audioPlayerNodeR1.volume = 0.0
     }
+    
+    
     
     func playTrack () {
         print ("CALLED PLAY TRACK")
@@ -536,11 +557,21 @@ class Model: ObservableObject, RemoteCommandHandler {
                 audioPlayerNodeR1.pan = 1
                 audioPlayerNodeR1.play()
                 
-                if playState != .playing {
-                    print ("PLAY STATE = \(playState)")
+                switch playState {
+                case .stopped:
                     playState = .playing
-                   startTimer()
+                    startTimer()
+                case .paused:
+                    playState = .playing
+                case .playing: 
+                    playState = .paused
                 }
+                
+//                if playState != .playing {
+//                    print ("PLAY STATE = \(playState)")
+//                    playState = .playing 
+//                   startTimer()
+//                }
                 
             
                 setNowPlayingMetadata()
@@ -653,8 +684,14 @@ class Model: ObservableObject, RemoteCommandHandler {
         setNowPlayingMetadata()
     }
     
+    func togglePlayPauseRemote () {
+        let togglePlayPauseRemoteCommand = RemoteCommand.togglePlayPause
+        performRemoteCommand(togglePlayPauseRemoteCommand)
+    }
+    
     func playOrPauseCurrentTrack () {
         print ("CALLED PLAY OR PAUSE CURRENT TRACK")
+        guard !songList.isEmpty else {return}
         if playState == .stopped {
             startFadeInTimer()
             playTrack()

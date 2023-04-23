@@ -12,6 +12,7 @@
 		0D249C8E297242210075FED3 /* HearingTest.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0D249C8C297242210075FED3 /* HearingTest.xcdatamodeld */; };
 		0D249C902972447C0075FED3 /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D249C8F2972447C0075FED3 /* UserProfileView.swift */; };
 		0D2DCFCF2972EFC300BFFAD6 /* UserProfileRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D2DCFCE2972EFC300BFFAD6 /* UserProfileRowView.swift */; };
+		0D32338F29F57A0F00A3C4AE /* ManualEQView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D32338E29F57A0F00A3C4AE /* ManualEQView.swift */; };
 		0D37678F29551DC100F3FF59 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D37678E29551DC100F3FF59 /* TestView.swift */; };
 		0D37679129551E0E00F3FF59 /* EQView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D37679029551E0E00F3FF59 /* EQView.swift */; };
 		0D39F11F29A2DC8A00987C02 /* ArtistSongsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D39F11E29A2DC8A00987C02 /* ArtistSongsView.swift */; };
@@ -53,6 +54,7 @@
 		0D249C8D297242210075FED3 /* HearingTest.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = HearingTest.xcdatamodel; sourceTree = "<group>"; };
 		0D249C8F2972447C0075FED3 /* UserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileView.swift; sourceTree = "<group>"; };
 		0D2DCFCE2972EFC300BFFAD6 /* UserProfileRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileRowView.swift; sourceTree = "<group>"; };
+		0D32338E29F57A0F00A3C4AE /* ManualEQView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualEQView.swift; sourceTree = "<group>"; };
 		0D37678E29551DC100F3FF59 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		0D37679029551E0E00F3FF59 /* EQView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EQView.swift; sourceTree = "<group>"; };
 		0D39F11E29A2DC8A00987C02 /* ArtistSongsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistSongsView.swift; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 				0D249C8F2972447C0075FED3 /* UserProfileView.swift */,
 				0DE5DE74299595C5006C8E7E /* UserProfileEditNameView.swift */,
 				0D37679029551E0E00F3FF59 /* EQView.swift */,
+				0D32338E29F57A0F00A3C4AE /* ManualEQView.swift */,
 				0D37678E29551DC100F3FF59 /* TestView.swift */,
 				0DE5DE7829972D65006C8E7E /* TestResultsView.swift */,
 			);
@@ -143,11 +146,19 @@
 			path = Utility;
 			sourceTree = "<group>";
 		};
+		0D5D9D6E29E99380008CAB2C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		0D65AD8D293D14F10017E4F8 = {
 			isa = PBXGroup;
 			children = (
 				0D65AD98293D14F10017E4F8 /* Hearing Test Stereo Equalizer */,
 				0D65AD97293D14F10017E4F8 /* Products */,
+				0D5D9D6E29E99380008CAB2C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -298,6 +309,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D32338F29F57A0F00A3C4AE /* ManualEQView.swift in Sources */,
 				0DE5DE73299408AD006C8E7E /* UserProfileHeaderView.swift in Sources */,
 				0D19B1532955F3E600D17C16 /* Model.swift in Sources */,
 				0DE5DE772996C122006C8E7E /* GainRowView.swift in Sources */,
@@ -451,7 +463,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;
@@ -460,6 +472,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Spex;
 				"INFOPLIST_KEY_CFBundleDisplayName[sdk=*]" = Spex;
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Grant permission to play music from your music library.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
@@ -471,11 +484,14 @@
 				);
 				MARKETING_VERSION = 1.0;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.JCohenMusic.Hearing-Test-Stereo-Equalizer";
+				PRODUCT_BUNDLE_IDENTIFIER = com.jcohenmusic.Spex;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -485,7 +501,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;
@@ -493,6 +509,7 @@
 				INFOPLIST_FILE = "Hearing-Test-Stereo-Equalizer-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Spex;
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Grant permission to play music from your music library.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
@@ -504,11 +521,14 @@
 				);
 				MARKETING_VERSION = 1.0;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.JCohenMusic.Hearing-Test-Stereo-Equalizer";
+				PRODUCT_BUNDLE_IDENTIFIER = com.jcohenmusic.Spex;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

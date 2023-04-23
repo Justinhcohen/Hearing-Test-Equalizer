@@ -17,7 +17,7 @@ struct PlayerView: View {
     @State var albumCover = Image(systemName: "photo")
     
     func updateMetadata () {
-       let size = CGSize(width: 30, height: 30)
+  //     let size = CGSize(width: 30, height: 30)
         songName = (model.currentMediaItem.value(forProperty: MPMediaItemPropertyTitle) as? String)!
 //        let mediatImage = model.currentMediaItem.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
        // let UIAlbumCover = mediatImage?.image(at: size)

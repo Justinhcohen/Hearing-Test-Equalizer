@@ -35,9 +35,7 @@ struct LibraryView: View {
         print ("CALLED SET CURRENT PROFILE")
         print ("default user profile has been set = \(defaultUserProfileHasBeenSet)")
         if defaultUserProfileHasBeenSet {
-            model.currentUserProfile = userProfiles.first {
-                $0.isActive
-            }!
+            model.currentUserProfile = userProfiles.first {$0.isActive} ?? userProfiles.first!
             model.currentUserProfileName = model.currentUserProfile.name ?? "Unknown Name"
             model.currentIntensity = model.currentUserProfile.intensity
             model.setEQBandsForCurrentProfile()
@@ -227,6 +225,7 @@ struct LibraryView: View {
                 .onAppear{
                     print ("LIBRARY VIEW LIST APPEARED")
                     print ("Song List Count = \(model.songList.count)")
+                    model.didViewMusicLibrary = true
                     readFromUserDefaults()
                     checkMusicLibaryAuthorization()
                     if model.equalizerL1 == nil {
