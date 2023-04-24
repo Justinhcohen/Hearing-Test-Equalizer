@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@main
+		@main
 struct Hearing_Test_Stereo_EqualizerApp: App {
     
     @StateObject private var model = Model()

@@ -46,6 +46,7 @@ struct EQView: View {
     @State private var intensityIsEditing = false
     @State private var sliderDidEdit = false
     @State private var showUserProfilesModalView = false
+    @State private var showManualControlsView = false
     @State private var isPlayingDemoSong = false
     
     let session = AVAudioSession.sharedInstance()
@@ -102,7 +103,12 @@ struct EQView: View {
         model.currentUserProfileName = model.currentUserProfile.name ?? "Unknown Name"
         model.currentIntensity = model.currentUserProfile.intensity
         intensity = model.currentUserProfile.intensity
-        model.setEQBandsForCurrentProfile()
+        if model.manualAdjustmentsAreActive {
+            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+        } else {
+            model.setEQBandsGainForSlider(for: model.currentUserProfile)
+        }
+        
     }
     
     var body: some View {
@@ -210,10 +216,19 @@ struct EQView: View {
                 .disabled(!shouldShowText)
                 
                 Group {
-                    Text ("Spex Stereo EQ Boost")
-                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                        .font(.title3)
-                        .padding()
+                    ZStack {
+                        Text ("Spex Stereo EQ Boost")
+                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
+                            .font(.title3)
+                            .padding()
+                        HStack {
+                            Spacer ()
+                            Text ("+M")
+                                .foregroundColor((model.manualAdjustmentsAreActive && model.equalizerIsActive) ? .green : .gray)
+                                .font(.title3)
+                                .padding()
+                        }
+                    }
                     HStack {
                         let left60 = model.currentUserProfile.left60 * Float(intensity / 6.0)
                         Text("\(left60.decimals(2))")
@@ -317,6 +332,21 @@ struct EQView: View {
       
             VStack {
                 Spacer ()
+                Button("Manual Adjustments", 
+                       action: {
+                    showManualControlsView = true
+                })
+                .font(.title)
+                .foregroundColor(model.equalizerIsActive ? .blue : .gray)
+                .padding ()
+                .overlay(
+                    Capsule(style: .continuous)
+                        .stroke( model.equalizerIsActive ? .blue : .gray, lineWidth: 5)
+                ) 
+                .sheet(isPresented: $showManualControlsView, onDismiss: didDismiss) {
+                    ManualEQView()
+                }
+                .disabled(!model.equalizerIsActive)
                 PlayerView()
 //                Spacer()
 //                HStack {

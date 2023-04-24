@@ -237,6 +237,8 @@ class Model: ObservableObject, RemoteCommandHandler {
     func readFromUserDefaults () {
         initialHearingTestHasBeenCompleted = userDefaults.bool(forKey: "initialHearingTestHasBeenCompleted")
         libraryAccessIsGranted = userDefaults.bool(forKey: "libraryAccessIsGranted")
+        equalizerIsActive = userDefaults.bool(forKey: "equalizerIsActive")
+        manualAdjustmentsAreActive = userDefaults.bool(forKey: "manualAdjustmentsAreActive")
     }
     
     func setInitialVolumeToFineTuneSoundLevel () {
@@ -287,6 +289,11 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var equalizerIsActive = true {
         willSet {
             userDefaults.set(newValue, forKey: "equalizerIsActive")
+        }
+    }
+    @Published var manualAdjustmentsAreActive = false {
+        willSet {
+            userDefaults.set(newValue, forKey: "manualAdjustmentsAreActive")
         }
     }
     
@@ -524,7 +531,12 @@ class Model: ObservableObject, RemoteCommandHandler {
         }
         
         prepareAudioEngine() 
-        setEQBandsForCurrentProfile()
+        if manualAdjustmentsAreActive {
+            setEQBandsGainForSliderPlusManual(for: currentUserProfile)
+        } else {
+            setEQBandsGainForSlider(for: currentUserProfile)
+        }
+      
         do {
             print ("Index = \(queueIndex)")
           //  let currentMPMediaItem = playQueue[queueIndex]
@@ -786,7 +798,27 @@ class Model: ObservableObject, RemoteCommandHandler {
             userDefaults.set(true, forKey: "equalizerIsActive")
             print ("Equalizer is active")
         }
-        setEQBasedOnEQActive(EQIsActive: equalizerIsActive)
+        if manualAdjustmentsAreActive {
+            setEQBandsGainForSliderPlusManual(for: currentUserProfile)
+        } else {
+            setEQBandsGainForSlider(for: currentUserProfile)
+        }
+        
+    }
+    
+    func toggleManualAdjustments () {
+        if manualAdjustmentsAreActive {
+            manualAdjustmentsAreActive = false
+            userDefaults.set(false, forKey: "manualAdjustmentsAreActive")
+            print ("Manual Adjustments are off")
+            setEQBasedOnEQActive(EQIsActive: equalizerIsActive)
+        } else {
+            manualAdjustmentsAreActive = true
+            userDefaults.set(true, forKey: "manualAdjustmentsAreActive")
+            print ("Manual Adjustment are on")
+            setEQBandsGainForSliderPlusManual(for: currentUserProfile)
+        }
+       
     }
 
     
@@ -830,10 +862,10 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     func setEQBandsGainForSlider (for currentUserProfile: UserProfile) {
+        let multiplier = Float (currentUserProfile.intensity / 6.0)
+        let bandsL = equalizerL1.bands
+        let bandsR = equalizerR1.bands
         if equalizerIsActive {
-            let multiplier = Float (currentUserProfile.intensity / 6.0)
-            let bandsL = equalizerL1.bands
-            let bandsR = equalizerR1.bands
             bandsL[0].gain = currentUserProfile.left60 * multiplier
             bandsL[1].gain = currentUserProfile.left100 * multiplier
             bandsL[2].gain = currentUserProfile.left230 * multiplier
@@ -850,6 +882,64 @@ class Model: ObservableObject, RemoteCommandHandler {
             bandsR[5].gain = currentUserProfile.right2400 * multiplier
             bandsR[6].gain = currentUserProfile.right5400 * multiplier
             bandsR[7].gain = currentUserProfile.right12000 * multiplier
+        } else {
+            bandsL[0].gain = 0.0
+            bandsL[1].gain = 0.0
+            bandsL[2].gain = 0.0
+            bandsL[3].gain = 0.0
+            bandsL[4].gain = 0.0
+            bandsL[5].gain = 0.0
+            bandsL[6].gain = 0.0
+            bandsL[7].gain = 0.0
+            bandsR[0].gain = 0.0
+            bandsR[1].gain = 0.0
+            bandsR[2].gain = 0.0
+            bandsR[3].gain = 0.0
+            bandsR[4].gain = 0.0
+            bandsR[5].gain = 0.0
+            bandsR[6].gain = 0.0
+            bandsR[7].gain = 0.0
+        }
+    }
+    
+    func setEQBandsGainForSliderPlusManual (for currentUserProfile: UserProfile) {
+        let multiplier = Float (currentUserProfile.intensity / 6.0)
+        let bandsL = equalizerL1.bands
+        let bandsR = equalizerR1.bands
+        if equalizerIsActive {
+            bandsL[0].gain = (currentUserProfile.left60 * multiplier) + currentUserProfile.left60M
+            bandsL[1].gain = (currentUserProfile.left100 * multiplier) + currentUserProfile.left100M
+            bandsL[2].gain = (currentUserProfile.left230 * multiplier) + currentUserProfile.left230M
+            bandsL[3].gain = (currentUserProfile.left500 * multiplier) + currentUserProfile.left500M
+            bandsL[4].gain = (currentUserProfile.left1100 * multiplier) + currentUserProfile.left1100M
+            bandsL[5].gain = (currentUserProfile.left2400 * multiplier) + currentUserProfile.left2400M
+            bandsL[6].gain = (currentUserProfile.left5400 * multiplier) + currentUserProfile.left5400M
+            bandsL[7].gain = (currentUserProfile.left12000 * multiplier) + currentUserProfile.left12000M
+            bandsR[0].gain = (currentUserProfile.right60 * multiplier) + currentUserProfile.right60M
+            bandsR[1].gain = (currentUserProfile.right100 * multiplier) + currentUserProfile.right100M
+            bandsR[2].gain = (currentUserProfile.right230 * multiplier) + currentUserProfile.right230M
+            bandsR[3].gain = (currentUserProfile.right500 * multiplier) + currentUserProfile.right500M
+            bandsR[4].gain = (currentUserProfile.right1100 * multiplier) + currentUserProfile.right1100M
+            bandsR[5].gain = (currentUserProfile.right2400 * multiplier) + currentUserProfile.right2400M
+            bandsR[6].gain = (currentUserProfile.right5400 * multiplier) + currentUserProfile.right5400M
+            bandsR[7].gain = (currentUserProfile.right12000 * multiplier) + currentUserProfile.right12000M
+        } else {
+            bandsL[0].gain = 0.0
+            bandsL[1].gain = 0.0
+            bandsL[2].gain = 0.0
+            bandsL[3].gain = 0.0
+            bandsL[4].gain = 0.0
+            bandsL[5].gain = 0.0
+            bandsL[6].gain = 0.0
+            bandsL[7].gain = 0.0
+            bandsR[0].gain = 0.0
+            bandsR[1].gain = 0.0
+            bandsR[2].gain = 0.0
+            bandsR[3].gain = 0.0
+            bandsR[4].gain = 0.0
+            bandsR[5].gain = 0.0
+            bandsR[6].gain = 0.0
+            bandsR[7].gain = 0.0
         }
     }
     

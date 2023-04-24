@@ -52,7 +52,9 @@ struct LibraryView: View {
     var allSongs: [MPMediaItem] {
         let query = MPMediaQuery.songs()
         let filterOnDownloaded: MPMediaPropertyPredicate = MPMediaPropertyPredicate(value: false, forProperty: "isCloudItem")
+        let filterEncrypted: MPMediaPropertyPredicate = MPMediaPropertyPredicate(value: false, forProperty: "hasProtectedAsset")
         query.addFilterPredicate(filterOnDownloaded)
+        query.addFilterPredicate(filterEncrypted)
         return query.items!
     }
     
@@ -110,6 +112,25 @@ struct LibraryView: View {
         userProfile.right5400 = 0
         userProfile.left12000 = 0
         userProfile.right12000 = 0
+        
+        userProfile.left60M = 0
+        userProfile.right60M = 0
+        userProfile.left100M = 0
+        userProfile.right100M = 0
+        userProfile.left230M = 0
+        userProfile.right230M = 0
+        userProfile.left500M = 0
+        userProfile.right500M = 0
+        userProfile.left1100M = 0
+        userProfile.right1100M = 0
+        userProfile.left2400M = 0
+        userProfile.right2400M = 0
+        userProfile.left5400M = 0 
+        userProfile.right5400M = 0
+        userProfile.left12000M = 0
+        userProfile.right12000M = 0 
+
+        
         
         model.currentUserProfile = userProfile
         model.currentUserProfileName = userProfile.name!

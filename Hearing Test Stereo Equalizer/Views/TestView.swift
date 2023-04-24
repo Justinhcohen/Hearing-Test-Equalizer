@@ -133,6 +133,23 @@ struct TestView: View {
         newUserProfile.right5400 = workingBandsGain[14]
         newUserProfile.right12000 = workingBandsGain[15]
         
+        newUserProfile.left60M = 0
+        newUserProfile.left100M = 0
+        newUserProfile.left230M = 0
+        newUserProfile.left500M = 0
+        newUserProfile.left1100M = 0
+        newUserProfile.left2400M = 0
+        newUserProfile.left5400M = 0
+        newUserProfile.left12000M = 0
+        newUserProfile.right60M = 0
+        newUserProfile.right100M = 0
+        newUserProfile.right230M = 0
+        newUserProfile.right500M = 0
+        newUserProfile.right1100M = 0
+        newUserProfile.right2400M = 0
+        newUserProfile.right5400M = 0
+        newUserProfile.right12000M = 0
+        
         newUserProfile.name = "Name me"
         newUserProfile.intensity = 16.0
         newUserProfile.isActive = true
