@@ -32,7 +32,7 @@ struct UserProfileView: View {
         model.currentUserProfile = userProfiles.first {$0.isActive} ?? userProfiles.first!
         model.currentUserProfileName = model.currentUserProfile.name ?? "Unknown Name"
         model.currentIntensity = model.currentUserProfile.intensity
-        model.setEQBandsForCurrentProfile()
+        model.setEQBands(for: model.currentUserProfile)
     }
     
     func didDismiss () {

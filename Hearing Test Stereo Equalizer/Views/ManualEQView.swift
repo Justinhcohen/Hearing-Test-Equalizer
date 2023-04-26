@@ -33,6 +33,9 @@ struct ManualEQView: View {
     @State private var right12000M = 0.0
     
     func saveManualAdjustments () {
+        if !model.manualAdjustmentsAreActive {
+            model.manualAdjustmentsAreActive = true
+        }
         let activeUser = userProfiles.first {
             $0.isActive
         }!
@@ -114,7 +117,7 @@ struct ManualEQView: View {
         activeUser.right12000M = 0
         try? moc.save()
         
-        model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+        model.setEQBands(for: model.currentUserProfile)
     }
     
     
@@ -133,26 +136,26 @@ struct ManualEQView: View {
                     .padding(.trailing)
                     .padding(.leading)
             }
-            HStack {
-                Text ("Left")
-                    .frame(maxWidth: .infinity)
-                    .foregroundColor(.blue)
-                Text ("")
-                    .frame(maxWidth: .infinity)
-                Text ("Right")
-                    .frame(maxWidth: .infinity)
-                    .foregroundColor(.blue)
-            }
+//            HStack {
+//                Text ("Left")
+//                    .frame(maxWidth: .infinity)
+//                    .foregroundColor(.blue)
+//                Text ("")
+//                    .frame(maxWidth: .infinity)
+//                Text ("Right")
+//                    .frame(maxWidth: .infinity)
+//                    .foregroundColor(.blue)
+//            }
             
             
             ScrollView {
                 HStack {
                     VStack {
-                        Text("\(left60M.decimals(2))")
+                        Text("Left 60 Hz: \(left60M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $left60M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $left60M, in: -10.0...10.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left60M = Float(left60M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
@@ -161,15 +164,15 @@ struct ManualEQView: View {
                         }
                     }
                     
-                    Text("60 Hz")
-                        .frame(maxWidth: .infinity)
+//                    Text("60 Hz")
+//                        .frame(maxWidth: .infinity)
                     
                     VStack {
-                        Text("\(right60M.decimals(2))")
+                        Text("Right 60 Hz: \(right60M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $right60M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $right60M, in: -10.0...10.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right60M = Float(right60M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
@@ -177,25 +180,25 @@ struct ManualEQView: View {
                 }
                 HStack {
                     VStack {
-                        Text("\(left100M.decimals(2))")
+                        Text("Left 100 Hz: \(left100M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $left100M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $left100M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left100M = Float(left100M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
                     }
                     
-                    Text("100 Hz")
-                        .frame(maxWidth: .infinity)
+//                    Text("100 Hz")
+//                        .frame(maxWidth: .infinity)
                     
                     VStack {
-                        Text("\(right100M.decimals(2))")
+                        Text("Right 100 Hz: \(right100M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $right100M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $right100M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right100M = Float(right100M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
@@ -203,25 +206,25 @@ struct ManualEQView: View {
                 }
                 HStack {
                     VStack {
-                        Text("\(left230M.decimals(2))")
+                        Text("Left 230 Hz: \(left230M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $left230M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $left230M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left230M = Float(left230M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
                     }
                     
-                    Text("230 Hz")
-                        .frame(maxWidth: .infinity)
+//                    Text("230 Hz")
+//                        .frame(maxWidth: .infinity)
                     
                     VStack {
-                        Text("\(right230M.decimals(2))")
+                        Text("Right 230 Hz: \(right230M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $right230M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $right230M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right230M = Float(right230M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
@@ -229,25 +232,25 @@ struct ManualEQView: View {
                 }
                 HStack {
                     VStack {
-                        Text("\(left500M.decimals(2))")
+                        Text("Left 500 Hz: \(left500M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $left500M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $left500M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left500M = Float(left500M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
                     }
                     
-                    Text("500 Hz")
-                        .frame(maxWidth: .infinity)
-                    
+//                    Text("500 Hz")
+//                        .frame(maxWidth: .infinity)
+//                    
                     VStack {
-                        Text("\(right500M.decimals(2))")
+                        Text("Right 500 Hz: \(right500M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $right500M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $right500M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right500M = Float(right500M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
@@ -255,25 +258,25 @@ struct ManualEQView: View {
                 }
                 HStack {
                     VStack {
-                        Text("\(left1100M.decimals(2))")
+                        Text("Left 1100 Hz: \(left1100M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $left1100M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $left1100M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left1100M = Float(left1100M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
                     }
                     
-                    Text("1100 Hz")
-                        .frame(maxWidth: .infinity)
+//                    Text("1100 Hz")
+//                        .frame(maxWidth: .infinity)
                     
                     VStack {
-                        Text("\(right1100M.decimals(2))")
+                        Text("Right 1100 Hz: \(right1100M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $right1100M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $right1100M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right1100M = Float(right1100M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
@@ -281,25 +284,25 @@ struct ManualEQView: View {
                 }
                 HStack {
                     VStack {
-                        Text("\(left2400M.decimals(2))")
+                        Text("Left 2400 Hz: \(left2400M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $left2400M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $left2400M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left2400M = Float(left2400M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
                     }
                     
-                    Text("2400 Hz")
-                        .frame(maxWidth: .infinity)
+//                    Text("2400 Hz")
+//                        .frame(maxWidth: .infinity)
                     
                     VStack {
-                        Text("\(right2400M.decimals(2))")
+                        Text("Right 2400 Hz: \(right2400M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $right2400M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $right2400M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right2400M = Float(right2400M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
@@ -307,25 +310,25 @@ struct ManualEQView: View {
                 }
                 HStack {
                     VStack {
-                        Text("\(left5400M.decimals(2))")
+                        Text("Left 5400 Hz: \(left5400M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $left5400M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $left5400M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left5400M = Float(left5400M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
                     }
                     
-                    Text("5400 Hz")
-                        .frame(maxWidth: .infinity)
+//                    Text("5400 Hz")
+//                        .frame(maxWidth: .infinity)
                     
                     VStack {
-                        Text("\(right5400M.decimals(2))")
+                        Text("Right 5400 Hz: \(right5400M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $right5400M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $right5400M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right5400M = Float(right5400M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
@@ -333,25 +336,25 @@ struct ManualEQView: View {
                 }
                 HStack {
                     VStack {
-                        Text("\(left12000M.decimals(2))")
+                        Text("Left 12000 Hz: \(left12000M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $left12000M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $left12000M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left12000M = Float(left12000M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
                     }
                     
-                    Text("12000 Hz")
-                        .frame(maxWidth: .infinity)
+//                    Text("12000 Hz")
+//                        .frame(maxWidth: .infinity)
                     
                     VStack {
-                        Text("\(right12000M.decimals(2))")
+                        Text("Right 12000 Hz: \(right12000M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
-                        Slider (value: $right12000M, in: -5.0...5.0, onEditingChanged: { editing in
+                        Slider (value: $right12000M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right12000M = Float(right12000M)
-                            model.setEQBandsGainForSliderPlusManual(for: model.currentUserProfile)
+                            model.setEQBands(for: model.currentUserProfile)
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
@@ -375,92 +378,8 @@ struct ManualEQView: View {
                 Button ("I'm sure", role: .destructive) {
                     resetAllToZero()
                 }
-                        Button("Cancel", role: .cancel) { }
-                    }
-            //            HStack {
-            //         
-            //                Text("\(left100.decimals(2))")
-            //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-            //                    .frame(maxWidth: .infinity)
-            //                Text("100 Hz")
-            //                    .frame(maxWidth: .infinity)
-            //             
-            //                Text("\(right100.decimals(2))")
-            //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-            //                    .frame(maxWidth: .infinity)
-            //            }
-            //            HStack {
-            //           
-            //                Text("\(left230.decimals(2))")
-            //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-            //                    .frame(maxWidth: .infinity)
-            //                Text("230 Hz")
-            //                    .frame(maxWidth: .infinity)
-            //               
-            //                Text("\(right230.decimals(2))")
-            //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-            //                    .frame(maxWidth: .infinity)
-            //            }
-            //            HStack {
-            //            
-            //                Text("\(left500.decimals(2))")
-            //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-            //                    .frame(maxWidth: .infinity)
-            //                Text("500 Hz")
-            //                    .frame(maxWidth: .infinity)
-            //              
-            //                Text("\(right500.decimals(2))")
-            //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-            //                    .frame(maxWidth: .infinity)
-            //            }
-            //            HStack {
-            //            
-            //                Text("\(left1100.decimals(2))")
-            //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-            //                    .frame(maxWidth: .infinity)
-            //                Text("1100 Hz")
-            //                    .frame(maxWidth: .infinity)
-            //             
-            //                Text("\(right1100.decimals(2))")
-            //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-            //                    .frame(maxWidth: .infinity)
-            //            }
-            //            HStack {
-            //             
-            //                Text("\(left2400.decimals(2))")
-            //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-            //                    .frame(maxWidth: .infinity)
-            //                Text("2400 Hz")
-            //                    .frame(maxWidth: .infinity)
-            //             
-            //                Text("\(right2400.decimals(2))")
-            //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-            //                    .frame(maxWidth: .infinity)
-            //            }
-            //            HStack {
-            //              
-            //                Text("\(left5400.decimals(2))")
-            //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-            //                    .frame(maxWidth: .infinity)
-            //                Text("5400 Hz")
-            //                    .frame(maxWidth: .infinity)
-            //            
-            //                Text("\(right5400.decimals(2))")
-            //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-            //                    .frame(maxWidth: .infinity)
-            //            }
-            //            HStack {
-            //             
-            //                Text("\(left12000.decimals(2))")
-            //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-            //                    .frame(maxWidth: .infinity)
-            //                Text("12000 Hz")
-            //                    .frame(maxWidth: .infinity)
-            //           
-            //                Text("\(right12000.decimals(2))")
-            //                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-            //                    .frame(maxWidth: .infinity)
-            //            }
+                Button("Cancel", role: .cancel) { }
+            }
         }
     }
 }

@@ -151,7 +151,7 @@ struct TestView: View {
         newUserProfile.right12000M = 0
         
         newUserProfile.name = "Name me"
-        newUserProfile.intensity = 16.0
+        newUserProfile.intensity = 8.0
         newUserProfile.isActive = true
         newUserProfile.iD = UUID()
         newUserProfile.dateCreated = Date.now
