@@ -81,7 +81,7 @@ struct EQView: View {
         model.currentUserProfile = userProfiles.first {
             $0.isActive
         }!
-        model.currentUserProfileName = model.currentUserProfile.name ?? "Unknown Name"
+        model.currentUserProfileName = model.currentUserProfile.name ?? "Strawberries"
         model.currentIntensity = model.currentUserProfile.intensity
         intensity = model.currentUserProfile.intensity
         model.setEQBands(for: model.currentUserProfile)
@@ -107,7 +107,7 @@ struct EQView: View {
                     }
                     Toggle("", isOn: $model.equalizerIsActive)
                         .onChange(of: model.equalizerIsActive) { value in
-                            model.toggleEqualizer()
+                            model.setEQBands(for: model.currentUserProfile)
                         }
                         .padding(.trailing)
                         .padding(.leading)

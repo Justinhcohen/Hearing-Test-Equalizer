@@ -8,6 +8,7 @@
 import Foundation
 import AVKit
 import MediaPlayer
+import MusicKit
 
 class Model: ObservableObject, RemoteCommandHandler {
     
@@ -178,21 +179,7 @@ class Model: ObservableObject, RemoteCommandHandler {
                let session = AVAudioSession.sharedInstance()
                headphonesConnected = hasHeadphones(in: session.currentRoute)
                print ("HEAD PHONES CONNECTED = \(headphonesConnected)")
-               
-//               if headphonesConnected {
-//                   if audioPlayerNodeL1.currentFrame > 0 {
-//                       cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
-//                   }
-//                   setNowPlayingMetadata()
-//                   playTrack()
-//               } else {
-//                   if audioPlayerNodeL1.currentFrame > 0 {
-//                       cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
-//                   }
-//                   setNowPlayingMetadata()
-//               }
-               
-         
+ 
                    if audioPlayerNodeL1.currentFrame > 0 {
                        cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
                    }
@@ -235,10 +222,13 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     func readFromUserDefaults () {
+        print ("CALLED READ FROM USER DEFAULTS")
         initialHearingTestHasBeenCompleted = userDefaults.bool(forKey: "initialHearingTestHasBeenCompleted")
         libraryAccessIsGranted = userDefaults.bool(forKey: "libraryAccessIsGranted")
         equalizerIsActive = userDefaults.bool(forKey: "equalizerIsActive")
         manualAdjustmentsAreActive = userDefaults.bool(forKey: "manualAdjustmentsAreActive")
+        currentUserProfileName = userDefaults.string(forKey: "currentUserProfileName") ?? "There is no name"
+        print ("Equalizer is active = \(equalizerIsActive)")
     }
     
     func setInitialVolumeToFineTuneSoundLevel () {
@@ -256,8 +246,14 @@ class Model: ObservableObject, RemoteCommandHandler {
             userDefaults.set(newValue, forKey: "libraryAccessIsGranted")
         }
     }
+    
     @Published var currentUserProfile = UserProfile()
-    @Published var currentUserProfileName = ""
+    @Published var currentUserProfileName = "" {
+        willSet {
+            userDefaults.set(newValue, forKey: "currentUserProfileName")
+            print ("Setting currentUserProfileName to \(newValue)")
+        }
+    }
     @Published var currentIntensity = 0.0
     @Published var playQueue = [MPMediaItem]()
     @Published var songList = [MPMediaItem]() {
@@ -265,8 +261,15 @@ class Model: ObservableObject, RemoteCommandHandler {
             print ("songList new value count = \(newValue.count)")
         }
     }
+    @Published var appleMusicTrackList = MusicItemCollection<Track>() {
+        willSet {
+            print ("appleMusicTrackList new value count = \(newValue.count)")
+        }
+    }
+    
     var currentURL: URL = URL(fileURLWithPath: "")
     @Published var queueIndex: Int = 0
+    @Published var appleMusicQueueIndex: Int = 0
    // @Published var isPlaying: Bool = false
    // @Published var isPaused: Bool = false
     @Published var timer: Timer?
@@ -277,6 +280,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var currentVolume: Float = 0.0
     @Published var systemVolume = AVAudioSession.sharedInstance().outputVolume
     var currentMediaItem = MPMediaItem()
+   // var currentAppleMusicTrack = Track.song(<#Song#>)
     let audioEngine: AVAudioEngine = AVAudioEngine()
     var mixerL1 = AVAudioMixerNode()
     var mixerR1 = AVAudioMixerNode()
@@ -289,6 +293,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var equalizerIsActive = true {
         willSet {
             userDefaults.set(newValue, forKey: "equalizerIsActive")
+            print ("Setting Equalizer is active to \(newValue)")
         }
     }
     @Published var manualAdjustmentsAreActive = false {
@@ -594,6 +599,8 @@ class Model: ObservableObject, RemoteCommandHandler {
         } catch _ {print ("Catching Audio Engine Error")}
     }
     
+  
+    
     func playDemoTrack () {
         print ("CALLED PLAY DEMO TRACK")
         playQueue = [MPMediaItem]()
@@ -786,31 +793,35 @@ class Model: ObservableObject, RemoteCommandHandler {
 //    }
     
    
-    func toggleEqualizer () {
-        if equalizerIsActive {
-            equalizerIsActive = false
-            userDefaults.set(false, forKey: "equalizerIsActive")
-            print ("Equalizer is off")
-        } else {
-            equalizerIsActive = true
-            userDefaults.set(true, forKey: "equalizerIsActive")
-            print ("Equalizer is active")
-        }
-        setEQBands(for: currentUserProfile)
-    }
+//    func toggleEqualizer () {
+//        if equalizerIsActive {
+//            equalizerIsActive = false
+//            userDefaults.set(false, forKey: "equalizerIsActive")
+//            print ("Equalizer is off")
+//        } else {
+//            equalizerIsActive = true
+//            userDefaults.set(true, forKey: "equalizerIsActive")
+//            print ("Equalizer is active")
+//        }
+//        setEQBands(for: currentUserProfile)
+//    }
     
-    func toggleManualAdjustments () {
-        if manualAdjustmentsAreActive {
-            manualAdjustmentsAreActive = false
-            userDefaults.set(false, forKey: "manualAdjustmentsAreActive")
-            print ("Manual Adjustments are off")
-        } else {
-            manualAdjustmentsAreActive = true
-            userDefaults.set(true, forKey: "manualAdjustmentsAreActive")
-            print ("Manual Adjustment are on")
-        }
-       setEQBands(for: currentUserProfile)
-    }
+//    func toggleEqualizer () {
+//        setEQBands(for: currentUserProfile)
+//    }
+    
+//    func toggleManualAdjustments () {
+//        if manualAdjustmentsAreActive {
+//            manualAdjustmentsAreActive = false
+//            userDefaults.set(false, forKey: "manualAdjustmentsAreActive")
+//            print ("Manual Adjustments are off")
+//        } else {
+//            manualAdjustmentsAreActive = true
+//            userDefaults.set(true, forKey: "manualAdjustmentsAreActive")
+//            print ("Manual Adjustment are on")
+//        }
+//       setEQBands(for: currentUserProfile)
+//    }
 
     
     func setEQBandsGainForNewProfile () {
@@ -1053,7 +1064,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var initialHearingTestHasBeenCompleted = false
     var tonePlayer: AVAudioPlayer?
     var currentTone = ""
-    var toneIndex = 0
+    var toneIndex = 15
     var maxUnheard: Double = -160
     var minHeard: Double = 0.0
     
@@ -1232,7 +1243,7 @@ class Model: ObservableObject, RemoteCommandHandler {
             playTone(volume: Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2))))
             
         } else {
-            toneIndex = 0
+            toneIndex = 15
             stopTone()
             print ("Test Complete!")
             testStatus = .testCompleted

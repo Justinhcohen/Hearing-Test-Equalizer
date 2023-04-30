@@ -7,6 +7,7 @@
 
 import SwiftUI
 import MediaPlayer
+import MusicKit
 
 struct PlaylistView: View {
     
@@ -17,12 +18,41 @@ struct PlaylistView: View {
         return query.collections!
     }
     
+    var allPlaylistsFiltered: [MPMediaItemCollection] {
+        var filteredMPMediaItemCollection = [MPMediaItemCollection]()
+        let query = MPMediaQuery.playlists()
+        let playlistsArray = query.collections! 
+        var playlistCounts = [Int]()
+        for playlist in playlistsArray {
+            var filteredPlaylistItems = playlist.items
+            filteredPlaylistItems.removeAll(where: {$0.hasProtectedAsset == true})
+            filteredPlaylistItems.removeAll(where: {$0.isCloudItem == true})
+            playlistCounts.append (filteredPlaylistItems.count)
+            if filteredPlaylistItems.count > 0 {
+                filteredMPMediaItemCollection.append (playlist)
+            }
+        } 
+        print (playlistCounts)
+        return filteredMPMediaItemCollection
+    }
+       
+    
+//    func loadLibraryPlaylists () async throws {
+//        let request = MusicLibraryRequest<Playlist>()
+//        let response = try await request.response()
+//        self.response = response
+//    }
+    
+ 
+    
     var body: some View {
         
-        List (allPlaylists, id: \.self) { playlist in
+        List (allPlaylistsFiltered, id: \.self) { playlist in
             let playlistName = playlist.value(forProperty: MPMediaPlaylistPropertyName) as? String
             NavigationLink {
+                
                 PlaylistSongsView(playlistName: playlistName ?? "No Name").onAppear {
+                   
                     model.songList = playlist.items
                 }
             } label: {
@@ -35,6 +65,7 @@ struct PlaylistView: View {
         }
         .listStyle(PlainListStyle())
         .navigationTitle("Playlists")
+            
         
         if allPlaylists.isEmpty {
             HStack {

@@ -29,14 +29,16 @@ struct UserProfileView: View {
     
     
     func setCurrentProfile () {
+        print ("CALLED SET CURRENT PROFILE IN USER PROFILE VIEW")
         model.currentUserProfile = userProfiles.first {$0.isActive} ?? userProfiles.first!
-        model.currentUserProfileName = model.currentUserProfile.name ?? "Unknown Name"
+        model.currentUserProfileName = model.currentUserProfile.name ?? "Taco"
         model.currentIntensity = model.currentUserProfile.intensity
         model.setEQBands(for: model.currentUserProfile)
     }
     
-    func didDismiss () {
+    func refreshState () {
         refreshID = UUID()
+        print ("CALLED DID DISMISS ON USER PROFILE VIEW")
     }
     
     func createDefaultProfileIfNone () {
@@ -166,9 +168,12 @@ struct UserProfileView: View {
                         ForEach (userProfiles, id: \.id) { userProfile in
                             UserProfileRowView(userProfile: userProfile)
                                 .onTapGesture {
+                                    if !model.equalizerIsActive {
+                                        model.equalizerIsActive = true
+                                    }
                                     setIsActiveStatus(userProfile: userProfile)
-                                    setCurrentProfile()
-                                    dismiss()
+                               //     setCurrentProfile()
+                                    refreshState()
                                 }
                                 .onLongPressGesture {
                                     setIsActiveStatus(userProfile: userProfile)
@@ -180,13 +185,17 @@ struct UserProfileView: View {
                         .onDelete(perform: delete)
                         
                     }
-                    .sheet(isPresented: $showUserProfileEditNameViewModal, onDismiss: didDismiss) {
+                    .sheet(isPresented: $showUserProfileEditNameViewModal, onDismiss: refreshState) {
                         UserProfileEditNameView()
                     }
                     .listStyle(PlainListStyle())
                     .id(refreshID)
                     .font(.title3)
-                VStack (spacing: 30) {
+                    .onAppear {
+                        refreshState()
+                    }
+                
+                VStack (spacing: 10) {
                     HStack {
                         Text ("Take a hearing test to create a new profile.")
                         Spacer ()
@@ -203,6 +212,7 @@ struct UserProfileView: View {
                         Text ("Swipe left to delete.")
                         Spacer ()
                     }
+               
                 }
                 .padding()
                 
@@ -296,12 +306,12 @@ struct UserProfileView: View {
             }
             
             
-//            Button 	("Add Justin XM5") {
-//                addJustinXM5()
-//            }
-//            .sheet(isPresented: $showUserProfileEditNameViewModal, onDismiss: didDismiss) {
-//                UserProfileEditNameView()
-//            }
+            Button 	("Add Justin XM5") {
+                addJustinXM5()
+            }
+            .sheet(isPresented: $showUserProfileEditNameViewModal, onDismiss: refreshState) {
+                UserProfileEditNameView()
+            }
             
         }
         .onAppear {

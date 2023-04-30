@@ -66,29 +66,30 @@ struct TestResultsView: View {
     var body: some View {
         
         if !didRenameProfile {
-            ScrollView {
-                VStack (spacing: 20) {
-                    Text("Test Complete!")
-                        .font(.largeTitle)
-                    HStack{       
-                        Text ("Great job! Thank you for providing your hearing measurements.")
-                        Spacer()
-                    }
-                    
-                    HStack{
-                        Text ("The next steps are:")
-                        Spacer()
-                    }
-                    HStack {
-                        Text ("1) Give your profile a name.")
-                        Spacer()
-                    }
-                    HStack {
-                        Text ("2) Go to Spex tab and slide the Spextometer while listening to the demo song to find your ideal setting.")
-                        Spacer()
+            VStack {
+                Text("Test Complete!")
+                    .font(.largeTitle)
+                ScrollView {
+                    VStack (spacing: 30) {
+                        HStack{       
+                            Text ("Great job! Thank you for providing your hearing measurements.")
+                            Spacer()
+                        }
+                        
+                        HStack{
+                            Text ("The next steps are:")
+                            Spacer()
+                        }
+                        HStack {
+                            Text ("1) Give your profile a name.")
+                            Spacer()
+                        }
+                        HStack {
+                            Text ("2) Go to the Spex Tab and adjust the Intesnity slider while listening to the demo song to find your sweet spot.")
+                            Spacer()
+                        }
                     }
                 }
-            
                 Spacer()
                 
                 Button ("Name Profile") {
@@ -107,25 +108,30 @@ struct TestResultsView: View {
             }
             .padding()
         } else {
-            ScrollView {
-                VStack (spacing: 20) {
-                    Text ("Excellent!")
-                        .font(.largeTitle)
-                    //                HStack {
-                    //                    Text ("Ready for some tunes?")
-                    //                    Spacer()
-                    //                }
-                    HStack {
-                        Text ("Now for the fun part.")
-                        Spacer()
+            VStack {
+                Text ("Excellent!")
+                    .font(.largeTitle)
+                ScrollView {
+                    VStack (spacing: 30) {
+                        
+                        //                HStack {
+                        //                    Text ("Ready for some tunes?")
+                        //                    Spacer()
+                        //                }
+                        HStack {
+                            Text ("Now for the fun part.")
+                            Spacer()
+                        }
+                        HStack {
+                            Text ("Head over to Spex Tab and slide the Intensity slider while listening to the demo song to find your sweet spot.")
+                            Spacer()
+                        }
                     }
-                    HStack {
-                        Text ("Head over to Spex tab and slide the Intensity slider while listening to the demo song to find your ideal setting.")
-                        Spacer()
-                    }
+                    
                 }
+                .padding()
                 Spacer()
-                Button ("Spex tab") {
+                Button ("Spex Tab") {
                     dismiss()
                 }
                 .font(.title)
@@ -136,7 +142,6 @@ struct TestResultsView: View {
                         .stroke(Color.blue, lineWidth: 5)
                 )
             }
-            .padding()
              
         }
     }

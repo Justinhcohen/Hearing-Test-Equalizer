@@ -23,10 +23,16 @@ struct LibraryView: View {
     @State var showUserProfilesModalView = false
     @State private var isShowingAlert = false
     @State var defaultUserProfileHasBeenSet = false 
+    @State var shouldShowUnlockLibraryAlert = false
+    @State var libraryAccessIsPurchased = false 
     
-    func readFromUserDefaults () {
+    func runStartupItems () {
+        print ("CALLED RUN STARTUP ITEMS")
         let temp = userDefaults.bool(forKey: "defaultUserProfileHasBeenSet")
         defaultUserProfileHasBeenSet = temp
+        libraryAccessIsPurchased = userDefaults.bool(forKey: "libraryAccessIsPurchased")
+        setCurrentProfile()
+        model.setInitialVolumeToFineTuneSoundLevel()
         print ("After reading from user defaults, default user profile has been set = \(defaultUserProfileHasBeenSet)")
         print ("temp = \(temp)")
     }
@@ -36,7 +42,7 @@ struct LibraryView: View {
         print ("default user profile has been set = \(defaultUserProfileHasBeenSet)")
         if defaultUserProfileHasBeenSet {
             model.currentUserProfile = userProfiles.first {$0.isActive} ?? userProfiles.first!
-            model.currentUserProfileName = model.currentUserProfile.name ?? "Unknown Name"
+            model.currentUserProfileName = model.currentUserProfile.name ?? "Peaches"
             model.currentIntensity = model.currentUserProfile.intensity
             model.setEQBands(for: model.currentUserProfile)
         } else {
@@ -78,14 +84,14 @@ struct LibraryView: View {
         print ("CALLED ENABLE APPLE MUSIC BASED FEATURES")
         model.libraryAccessIsGranted = true
         setCurrentProfile()
-      //  setEnabledStatusOnRemoteCommands()
-      //  assignRemoteCommands()
+        //  setEnabledStatusOnRemoteCommands()
+        //  assignRemoteCommands()
         model.setInitialVolumeToFineTuneSoundLevel()
-//        if !allSongs.isEmpty {
-//            model.songList = allSongs
-//            model.playQueue = allSongs
-//            model.currentMediaItem = model.playQueue[0]
-//        }
+        //        if !allSongs.isEmpty {
+        //            model.songList = allSongs
+        //            model.playQueue = allSongs
+        //            model.currentMediaItem = model.playQueue[0]
+        //        }
     }
     
     func createDefaultProfile () {
@@ -129,7 +135,7 @@ struct LibraryView: View {
         userProfile.right5400M = 0
         userProfile.left12000M = 0
         userProfile.right12000M = 0 
-
+        
         
         
         model.currentUserProfile = userProfile
@@ -141,67 +147,14 @@ struct LibraryView: View {
         try? moc.save()
     }
     
-//    func setEnabledStatusOnRemoteCommands () {
-//        let rmc = MPRemoteCommandCenter.shared()
-//        rmc.pauseCommand.isEnabled = true
-//        rmc.playCommand.isEnabled = true
-//        rmc.stopCommand.isEnabled = false
-//        rmc.togglePlayPauseCommand.isEnabled = true
-//        rmc.nextTrackCommand.isEnabled = true
-//        rmc.previousTrackCommand.isEnabled = true
-//        rmc.changeRepeatModeCommand.isEnabled = false
-//        rmc.changeShuffleModeCommand.isEnabled = false
-//        rmc.changePlaybackRateCommand.isEnabled = false
-//        rmc.seekBackwardCommand.isEnabled = false
-//        rmc.seekForwardCommand.isEnabled = false
-//        rmc.skipBackwardCommand.isEnabled = false
-//        rmc.skipForwardCommand.isEnabled = false
-//        rmc.changePlaybackPositionCommand.isEnabled = false
-//        rmc.ratingCommand.isEnabled = false
-//        rmc.likeCommand.isEnabled = false
-//        rmc.dislikeCommand.isEnabled = false
-//        rmc.bookmarkCommand.isEnabled = false
-//        rmc.enableLanguageOptionCommand.isEnabled = false
-//        rmc.disableLanguageOptionCommand.isEnabled = false
-//    }
-//    
-//    func assignRemoteCommands() {
-//        let remoteCommandCenter = MPRemoteCommandCenter.shared()
-//        
-////        remoteCommandCenter.playCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
-////            
-////            model.playTrack()
-////            return.success
-////        }
-//        
-////        remoteCommandCenter.stopCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
-////            model.playOrPauseCurrentTrack()
-////            return.success
-////        }
-//        
-//        remoteCommandCenter.togglePlayPauseCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
-//            model.playOrPauseCurrentTrack()
-//            return.success
-//        }
-//        
-////        remoteCommandCenter.pauseCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
-////            model.pauseTrack()
-////            return.success
-////        }
-//        
-//        remoteCommandCenter.nextTrackCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
-//            model.playNextTrack()
-//            return.success
-//        }
-//        remoteCommandCenter.previousTrackCommand.addTarget{ _ -> MPRemoteCommandHandlerStatus in 
-//            model.playPreviousTrack()
-//            return.success
-//        }
-//        
-//        
-//    }
+    func provideLibraryAccess () {
+        libraryAccessIsPurchased = true
+        userDefaults.set(true, forKey: "libraryAccessIsPurchased")
+    }
+    
     
     var body: some View {
+        
         
         
         VStack {
@@ -209,58 +162,138 @@ struct LibraryView: View {
             if model.libraryAccessIsGranted {
                 
                 UserProfileHeaderView()
-//                    .onTapGesture {
-//                        showUserProfilesModalView = true
-//                        print ("TAPPED LIBRARY HEADER VIEW")
-//                    }
-//                    .sheet(isPresented: $showUserProfilesModalView) {
-//                        UserProfileView(tabSelection: $tabSelection)
-//                    }
                 
-                NavigationStack {
-                    
-                    List {
-                        NavigationLink {
-                            PlaylistView()
-                        } label: {
-                            LibraryRowView(image: Image(systemName: "music.note.list"), text: "Playlists")
-                        }
-                        NavigationLink {
-                            ArtistView()
-                        } label: {
-                            LibraryRowView(image: Image(systemName: "music.mic"), text: "Artists")
-                        }
-                        NavigationLink {
-                            SongsView().onAppear {
-                                model.songList = allSongs
+                    .onAppear {
+                        runStartupItems()
+                    }
+                
+                if !libraryAccessIsPurchased {
+                    VStack (spacing: 30)  {
+                        Text ("Time to Reflect")
+                            .font(.title)
+                        ScrollView {
+                            VStack (spacing: 30) {
+                                HStack {
+                                    Text ("Were you able to find the sweet spot on the Intensity slider that increased your enjoyment of the demo song?")
+                                    Spacer ()
+                                }
+                                HStack {
+                                    Text ("If you didn't notice an improvement when toggling Spex on and off while listening to the demo, Spex may not be for you.")
+                                    Spacer ()
+                                }
+                                HStack {
+                                    Text ("If you did notice an improvement, Spex may still not be for you because it only works with DRM-free, compressed song files, such as MP3 and M4a. It DOES NOT play tracks from paid subscription servcies such as Apple Music, Spotify and Tidal.")
+                                    Spacer ()
+                                }
+                                HStack {
+                                    Text ("Spex will recognize playlists you create in the Music app on your Mac and sync to your iPhone through the Finder, subject to the restrictions mentioned above.")
+                                    Spacer ()
+                                }
+                                HStack {
+                                    Text ("If you would like to try Spex with your music, click the button below to make a one-time purchase of Music Library Access for $3.99. No subscription required.")
+                                    Spacer ()
+                                }
                             }
-                        } label: {
-                            LibraryRowView(image: Image(systemName: "music.note"), text: "Songs")
                         }
-             	           
+                        
+                        Spacer ()
+                        Button("Music Library Access", 
+                               action: {
+                            //resetAllToZero()
+                            shouldShowUnlockLibraryAlert = true
+                        })
+                        .font(.title)
+                        .foregroundColor(.blue)
+                        .padding ()
+                        .overlay(
+                            Capsule(style: .continuous)
+                                .stroke( .blue, lineWidth: 5)
+                        )
+                        .onAppear {
+                            if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
+                                self.tabSelection = 3
+                            }
+                            checkMusicLibaryAuthorization()
+                            if model.equalizerL1 == nil {
+                                model.prepareAudioEngine()
+                            }
+                        }
+                        .alert("Do you want to access your song library for $3.99? (Temp text, no purchase required)", isPresented: $shouldShowUnlockLibraryAlert) {
+                            Button ("Yes!") {
+                                provideLibraryAccess()
+                            }
+                            Button("Cancel", role: .cancel) { }
+                        }
                     }
-                    .listStyle(PlainListStyle())
-                    .navigationTitle("Library")
+                    .padding()
+                } else {
                     
-                }
-                .onAppear{
-                    print ("LIBRARY VIEW LIST APPEARED")
-                    print ("Song List Count = \(model.songList.count)")
-                    model.didViewMusicLibrary = true
-                    readFromUserDefaults()
-                    checkMusicLibaryAuthorization()
-                    if model.equalizerL1 == nil {
-                        model.prepareAudioEngine()
-                    }
-                    if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
-                        self.tabSelection = 3
-                    }
+                  //  UserProfileHeaderView()
                     
+                    NavigationStack {
+                        
+                        List {
+                            NavigationLink {
+                                PlaylistView()
+                            } label: {
+                                LibraryRowView(image: Image(systemName: "music.note.list"), text: "Playlists")
+                            }
+                            NavigationLink {
+                                ArtistView()
+                            } label: {
+                                LibraryRowView(image: Image(systemName: "music.mic"), text: "Artists")
+                            }
+                            NavigationLink {
+                                SongsView().onAppear {
+                                    model.songList = allSongs
+                                }
+                            } label: {
+                                LibraryRowView(image: Image(systemName: "music.note"), text: "Songs")
+                            }
+                            //                            NavigationLink {
+                            //                                AppleMusicPlaylistView().onAppear {
+                            //                                    model.songList = allSongs
+                            //                                }
+                            //                            } label: {
+                            //                                LibraryRowView(image: Image(systemName: "music.note.list"), text: "Apple Music Playlists")
+                            //                            }
+                            
+                        }
+                        .listStyle(PlainListStyle())
+                        .navigationTitle("Library")
+                        
+                    }
+                    .onAppear{
+                        print ("LIBRARY VIEW LIST APPEARED")
+                        print ("Song List Count = \(model.songList.count)")
+                        model.didViewMusicLibrary = true
+                        checkMusicLibaryAuthorization()
+                        if model.equalizerL1 == nil {
+                            model.prepareAudioEngine()
+                        }
+                        if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
+                            self.tabSelection = 3
+                        }
+                        runStartupItems()
+                        
+                    }
+//                    Button("Temp Reset", 
+//                           action: {
+//                        //resetAllToZero()
+//                        libraryAccessIsPurchased = false
+//                    })
+//                    .font(.title)
+//                    .foregroundColor(.blue)
+//                    .padding ()
+//                    .overlay(
+//                        Capsule(style: .continuous)
+//                            .stroke( .blue, lineWidth: 5)
+//                    )
+                    
+                    Spacer()
+                    
+                    PlayerView()
                 }
-                
-                Spacer()
-                
-                PlayerView()
             } else {
                 VStack (spacing: 30) {
                     Text ("Music Library access is required.")
@@ -271,7 +304,7 @@ struct LibraryView: View {
                         UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
                     }
                     .onAppear{
-                        readFromUserDefaults()
+                        runStartupItems()
                         checkMusicLibaryAuthorization()
                         if model.equalizerL1 == nil {
                             model.prepareAudioEngine()
@@ -285,8 +318,6 @@ struct LibraryView: View {
             }
             
         }
-        //        .sheet(isPresented: $showUserProfilesModalView) {
-        //          UserProfileView() 
         
         .alert(isPresented: $isShowingAlert) {
             Alert (title: Text("Music Library access is required."),
@@ -297,11 +328,7 @@ struct LibraryView: View {
                    secondaryButton: .default(Text("Cancel")))
         }
     }
-//    init () {
-//        readFromUserDefaults()
-//        print ("CALLED LIBRARY VIEW INIT")
-//        print ("default user profile has been set = \(defaultUserProfileHasBeenSet)")
-//    }
+    
 }
 
 

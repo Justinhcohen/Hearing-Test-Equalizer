@@ -34,7 +34,7 @@ struct TestView: View {
     }
     
     var doYouHearIsShown: Bool {
-      if isShowingCompareSilence {
+        if isShowingCompareSilence {
             return false
         } else {
             return true
@@ -48,7 +48,7 @@ struct TestView: View {
         }
     }
     var noIDontHearIsShown: Bool {
-       if isShowingCompareSilence {
+        if isShowingCompareSilence {
             return false
         } else {
             return true
@@ -56,14 +56,14 @@ struct TestView: View {
     }
     
     var noButtonIsDisabled : Bool {
-     if noIsTemporarilyDisabled {
+        if noIsTemporarilyDisabled {
             return true
         } else {
             return false
         }
     }
     var yesButtonIsDisabled : Bool {
-       if yesIsTemporarilyDisabled {
+        if yesIsTemporarilyDisabled {
             return true
         } else {
             return false
@@ -95,6 +95,9 @@ struct TestView: View {
     }
     
     private func saveProfileAfterTest () {
+        for userProfile in userProfiles {
+            userProfile.isActive = false
+        }
         print ("CALLED SAVE PROFILE AFTER TEST")
         let newUserProfile = UserProfile (context: moc)
         var minValue = 0.0
@@ -150,15 +153,11 @@ struct TestView: View {
         newUserProfile.right5400M = 0
         newUserProfile.right12000M = 0
         
-        newUserProfile.name = "Name me"
+        newUserProfile.name = "TBD"
         newUserProfile.intensity = 8.0
         newUserProfile.isActive = true
         newUserProfile.iD = UUID()
         newUserProfile.dateCreated = Date.now
-        
-        for userProfile in userProfiles {
-            userProfile.isActive = false
-        }
         
         model.currentUserProfile = newUserProfile
         
@@ -166,28 +165,38 @@ struct TestView: View {
     }
     
     var body: some View {
-            VStack (spacing: 20) {
+        VStack (spacing: 20) {
             
-                switch introStep {
-                case 0:
+            switch introStep {
+            case 0:
+                VStack () {
+                    Text("Welcome!")
+                        .font(.largeTitle)
+                        .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
+                            TestResultsView() 
+                        }
+                        .padding()
                     ScrollView {
-                        VStack (spacing: 20) {
-                            Text("Welcome!")
-                                .font(.largeTitle)
-                                .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
-                                    TestResultsView() 
-                                }
-                                .padding(.top, 20)
+                        VStack (spacing: 30) {
+                            
                             HStack {
-                                Text ("Before we get started, please note that Spex currently only works with your local music files. In the future, we hope to support streaming services such as Apple Music, Spotify, and Tidal.")
+                                Text ("Spex will give you a hearing test and use the results to tune your music to perfection. If you have perfect hearing, Spex will do nothing. It's like if you have perfect vision, glasses won't help. If you have less than perfect hearing, Spex will boost the frequencies where you need it. Think of Spex as spectacles for your ears.")
                                 Spacer()
                             }
                             HStack {
-                                Text ("If this is not a deal-breaker, let's test your hearing so that we can shape your music to fit your ears.")
+                                Text ("Before we get started, please note that Spex only works with DRM-free, compressed song files, such as MP3 and M4a. It DOES NOT play tracks from paid subscription servcies such as Apple Music, Spotify and Tidal.")
                                 Spacer()
                             }
                             HStack {
-                                Text ("You'll need headphones, a very quiet space, and about 15-20 minutes.")
+                                Text ("After the hearing test, you'll get to hear how Spex uses your results to tune the demo song. If you don't hear an improvement when toggling Spex on and off while listening, you can try tweaking the sound with the manual EQ controls. If you still don't hear an improvement, Spex may not be for you.")
+                                Spacer()
+                            }
+                            HStack {
+                                Text ("If you hear a noticeable improvement when applying Spex EQ to the demo song, it's likely you'll enjoy what it does for your music. You'll have the option to make a one-time purchase of $3.99 to use Spex with your Music Library. No subscription required.")
+                                Spacer()
+                            }
+                            HStack {
+                                Text ("For the hearing test, you'll need headphones, a very quiet space, and about 15-20 minutes.")
                                 Spacer()
                             }
                             HStack {
@@ -219,15 +228,18 @@ struct TestView: View {
                             .stroke(.blue, lineWidth: 5)
                     )
                     .padding()
-                case 10:
+                }
+            case 10:
+                VStack {
+                    Text("Great!")
+                        .font(.largeTitle)
+                        .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
+                            TestResultsView() 
+                        }
+                        .padding()
                     ScrollView {
-                        VStack (spacing: 20) {
-                            Text("Great!")
-                                .font(.largeTitle)
-                                .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
-                                    TestResultsView() 
-                                }
-                                .padding(.top, 20)
+                        VStack (spacing: 30) {
+                            
                             HStack {
                                 Text ("We're going to play a tone and ask if you can hear it.")
                                 Spacer()
@@ -259,116 +271,278 @@ struct TestView: View {
                             .stroke(.blue, lineWidth: 5)
                     )
                     .padding()
-                case 20:
-                    VStack (spacing: 40) {
-                        Text("Practice")
-                            .font(.largeTitle)
-                            .foregroundColor(.green)
-                            .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
-                                TestResultsView() 
-                            }
-                            .padding(.top, 20)
-                        
-                        ProgressView("Progress", value: toneProgress, total: 9)
+                }
+            case 20:
+                VStack (spacing: 40) {
+                    Text("Practice")
+                        .font(.largeTitle)
+                        .foregroundColor(.green)
+                        .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
+                            TestResultsView() 
+                        }
+                        .padding(.top, 20)
+                    
+                    ProgressView("Progress", value: toneProgress, total: 9)
+                    HStack {
+                        Text ("Tones completed: 0 / 1")
+                        Spacer()
+                    }
+                    
+                    Text(!isShowingCompareSilence ? "Do you hear the tone?" : "")
+                        .font(.title)
+                    Button("Yes, I hear it", 
+                           action: {
+                        toneProgress += 1
+                        if toneProgress == 9 {
+                            toneProgress = 0
+                            model.testStatus = .practiceCompleted
+                            model.toneIndex = 15
+                            introStep = 30
+                        }
+                        yesIsTemporarilyDisabled = true
+                        preventDoulbleTap (buttonToggle: yesButtonIsDisabled)
+                        model.tapYesHeard()
+                    })
+                    .font(.title)
+                    .foregroundColor(!yesButtonIsDisabled ? .green : .gray)
+                    .padding ()
+                    .overlay(
+                        Capsule(style: .continuous)
+                            .stroke(!yesButtonIsDisabled ? Color.green : Color.gray, lineWidth: 5)
+                    )
+                    .opacity(yesIHearIsShown ? 1.0 : 0)
+                    .disabled(yesButtonIsDisabled)
+                    Button("No, I don't hear it", 
+                           action: {
+                        toneProgress += 1
+                        if toneProgress == 9 {
+                            toneProgress = 0
+                            model.testStatus = .practiceCompleted
+                            model.toneIndex = 15
+                            introStep = 30
+                        }
+                        noIsTemporarilyDisabled = true
+                        preventDoulbleTap (buttonToggle: noButtonIsDisabled)
+                        model.tapNoDidNotHear()
+                    }) 
+                    .font(.title)
+                    .foregroundColor(!noButtonIsDisabled ? .red : .gray)
+                    .padding ()
+                    .overlay(
+                        Capsule(style: .continuous)
+                            .stroke(!noButtonIsDisabled ? Color.red : Color.gray, lineWidth: 5)
+                    )
+                    .opacity(noIDontHearIsShown ? 1.0 : 0)
+                    //       .padding(45)
+                    .disabled(noButtonIsDisabled)
+                    
+                    Spacer ()
+                    
+                    Button {
+                        if !isShowingCompareSilence {
+                            model.stopTone()
+                        } else {
+                            model.resumeTone()
+                        }
+                        isShowingCompareSilence.toggle()
+                    } label: {
+                        if !isShowingCompareSilence {
+                            Text("Compare Silence")
+                        } else {
+                            Text ("Back to Tone")
+                        }
+                    }
+                    .font(.title)
+                    .foregroundColor(.blue)
+                    .padding ()
+                    .overlay(
+                        Capsule(style: .continuous)
+                            .stroke(.blue, lineWidth: 5)
+                    )
+                    .padding (.bottom, 20)
+                }
+                .padding()
+            case 30:
+                
+                Text("Great job!")
+                    .font(.largeTitle)
+                    .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
+                        TestResultsView() 
+                    }
+                    .padding(.top, 20)
+                ScrollView {
+                    VStack (spacing: 20) {
                         HStack {
-                            Text ("Tones completed: 0 / 1")
+                            Text ("You did it!")
                             Spacer()
                         }
-                        
-                        Text(!isShowingCompareSilence ? "Do you hear the tone?" : "")
-                            .font(.title)
-                        Button("Yes, I hear it", 
-                               action: {
-                            toneProgress += 1
-                            if toneProgress == 9 {
-                                toneProgress = 0
-                                model.testStatus = .practiceCompleted
-                                model.toneIndex = 0
-                                introStep = 30
-                            }
-                            yesIsTemporarilyDisabled = true
-                            preventDoulbleTap (buttonToggle: yesButtonIsDisabled)
-                            model.tapYesHeard()
-                        })
-                        .font(.title)
-                        .foregroundColor(!yesButtonIsDisabled ? .green : .gray)
-                        .padding ()
-                        .overlay(
-                            Capsule(style: .continuous)
-                                .stroke(!yesButtonIsDisabled ? Color.green : Color.gray, lineWidth: 5)
-                        )
-                        .opacity(yesIHearIsShown ? 1.0 : 0)
-                        .disabled(yesButtonIsDisabled)
-                        Button("No, I don't hear it", 
-                               action: {
-                            toneProgress += 1
-                            if toneProgress == 9 {
-                                toneProgress = 0
-                                model.testStatus = .practiceCompleted
-                                model.toneIndex = 0
-                                introStep = 30
-                            }
-                            noIsTemporarilyDisabled = true
-                            preventDoulbleTap (buttonToggle: noButtonIsDisabled)
-                            model.tapNoDidNotHear()
-                        }) 
-                        .font(.title)
-                        .foregroundColor(!noButtonIsDisabled ? .red : .gray)
-                        .padding ()
-                        .overlay(
-                            Capsule(style: .continuous)
-                                .stroke(!noButtonIsDisabled ? Color.red : Color.gray, lineWidth: 5)
-                        )
-                        .opacity(noIDontHearIsShown ? 1.0 : 0)
-                        //       .padding(45)
-                        .disabled(noButtonIsDisabled)
-                        
-                        Spacer ()
-                        
-                        Button {
-                            if !isShowingCompareSilence {
-                                model.stopTone()
-                            } else {
-                                model.resumeTone()
-                            }
-                            isShowingCompareSilence.toggle()
-                        } label: {
-                            if !isShowingCompareSilence {
-                                Text("Compare Silence")
-                            } else {
-                                Text ("Back to Tone")
-                            }
+                        HStack {
+                            Text ("We were able to measure the sensitivity of your hearing in your left ear for that tone.")
+                            Spacer()
                         }
-                        .font(.title)
-                        .foregroundColor(.blue)
-                        .padding ()
-                        .overlay(
-                            Capsule(style: .continuous)
-                                .stroke(.blue, lineWidth: 5)
-                        )
-                        .padding (.bottom, 20)
+                        HStack {
+                            Text ("If you're ready to move forward, we're going to do the same thing with 8 tones in your left ear and 8 tones in your right ear.")
+                            Spacer()
+                        }
+                        HStack {
+                            Text ("The first tone will be deep like bass and play in your left ear. Each tone will get progressively higher in pitch and after 8 tones we'll start over with a deep tone in your right ear.")
+                            Spacer()
+                        }
+                        HStack {
+                            Text ("As a reminder, if you can't hear a tone, it doesn't mean you have bad hearing. It's important to provide accurate responses so that we can provide you with the best experience.")
+                            Spacer()
+                        }
+                        HStack {
+                            Text ("You can repeat this process as many times as you want and save unlimited hearing profiles so just relax and do your best.")
+                            Spacer()
+                        }
+                        HStack {
+                            Text ("One last thing. Please don't change your phone's volume during the test as this will throw off the measurements.")
+                            Spacer()
+                        }
+                        HStack {
+                            Text ("Are you ready?")
+                            Spacer()
+                        }
                     }
                     .padding()
-                case 30:
+                }
+                Spacer()
+                Button("Let's Go!", 
+                       action: {
+                    introStep = 40
+                    tutorialCompleted = true
+                    model.testStatus = .testInProgress
+                })
+                .font(.title)
+                .foregroundColor(.blue)
+                .padding ()
+                .overlay(
+                    Capsule(style: .continuous)
+                        .stroke(.blue, lineWidth: 5)
+                )
+                .padding()
+            case 40:
+                VStack (spacing: 40) {
+                    Text("Testing in Progress")
+                        .font(.largeTitle)
+                        .foregroundColor(.green)
+                        .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
+                            TestResultsView() 
+                        }
+                        .padding(.top, 20)
                     
-                            Text("Great job!")
-                                .font(.largeTitle)
-                                .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
-                                    TestResultsView() 
-                                }
-                                .padding(.top, 20)
+                    ProgressView("Progress", value: toneProgress, total: 9)
+                    HStack {
+                        Text ("Tones completed: \(tonesCompleted) / 16")
+                        Spacer()
+                    }
+                    
+                    Text(!isShowingCompareSilence ? "Do you hear the tone?" : "")
+                        .font(.title)
+                    Button("Yes, I hear it", 
+                           action: {
+                        toneProgress += 1
+                        if toneProgress == 9 {
+                            toneProgress = 0
+                            tonesCompleted += 1
+                        }
+                        yesIsTemporarilyDisabled = true
+                        preventDoulbleTap (buttonToggle: yesButtonIsDisabled)
+                        if model.testStatus == .testInProgress {
+                            model.tapYesHeard()
+                        } else {
+                            return
+                        }
+                    })
+                    .onChange(of: model.testStatus, perform: {value in
+                        if model.testStatus == .testCompleted {
+                            saveProfileAfterTest()
+                            print ("Should Show Modal View")
+                            showTestResultsView = true
+                            introStep = 50
+                            tonesCompleted = 0
+                        } else {
+                            return
+                        }
+                    })
+                    .font(.title)
+                    .foregroundColor(!yesButtonIsDisabled ? .green : .gray)
+                    .padding ()
+                    .overlay(
+                        Capsule(style: .continuous)
+                            .stroke(!yesButtonIsDisabled ? Color.green : Color.gray, lineWidth: 5)
+                    )
+                    .opacity(yesIHearIsShown ? 1.0 : 0)
+                    .disabled(yesButtonIsDisabled)
+                    Button("No, I don't hear it", 
+                           action: {
+                        toneProgress += 1
+                        if toneProgress == 9 {
+                            toneProgress = 0
+                            tonesCompleted += 1
+                        }
+                        noIsTemporarilyDisabled = true
+                        preventDoulbleTap (buttonToggle: noButtonIsDisabled)
+                        if model.testStatus == .testInProgress {
+                            model.tapNoDidNotHear()
+                        } else {
+                            return
+                        }
+                    })
+                    .font(.title)
+                    .foregroundColor(!noButtonIsDisabled ? .red : .gray)
+                    .padding ()
+                    .overlay(
+                        Capsule(style: .continuous)
+                            .stroke(!noButtonIsDisabled ? Color.red : Color.gray, lineWidth: 5)
+                    )
+                    .opacity(noIDontHearIsShown ? 1.0 : 0)
+                    //       .padding(45)
+                    .disabled(noButtonIsDisabled)
+                    
+                    Spacer ()
+                    
+                    Button {
+                        if !isShowingCompareSilence {
+                            model.stopTone()
+                        } else {
+                            model.resumeTone()
+                        }
+                        isShowingCompareSilence.toggle()
+                    } label: {
+                        if !isShowingCompareSilence {
+                            Text("Compare Silence")
+                        } else {
+                            Text ("Back to Tone")
+                        }
+                    }
+                    .font(.title)
+                    .foregroundColor(.blue)
+                    .padding ()
+                    .overlay(
+                        Capsule(style: .continuous)
+                            .stroke(.blue, lineWidth: 5)
+                    )
+                    .padding (.bottom, 20)
+                }
+            case 50: 
+                VStack () {
+                    Text("Create Profile")
+                        .font(.largeTitle)
+                        .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
+                            TestResultsView() 
+                        }
+                        .padding()
                     ScrollView {
-                        VStack (spacing: 20) {
+                        VStack (spacing: 30) {
+                            
                             HStack {
-                                Text ("You did it!")
+                                Text ("Every new profile begins with a new hearing test.")
                                 Spacer()
                             }
                             HStack {
-                                Text ("We were able to measure the sensitivity of your hearing in your left ear for that tone.")
-                                Spacer()
-                            }
-                            HStack {
-                                Text ("If you're ready to move forward, we're going to do the same thing with 8 tones in your left ear and 8 tones in your right ear.")
+                                Text ("We're going to measure 8 tones in your left ear and 8 tones in your right ear.")
                                 Spacer()
                             }
                             HStack {
@@ -376,29 +550,23 @@ struct TestView: View {
                                 Spacer()
                             }
                             HStack {
-                                Text ("As a reminder, if you can't hear a tone, it doesn't mean you have bad hearing. It's important to provide accurate responses so that we can provide you with the best experience.")
+                                Text ("As a reminder, please don't change your phone's volume during the test as this will throw off the measurements.")
                                 Spacer()
                             }
                             HStack {
-                                Text ("You can repeat this process as many times as you want and save unlimited hearing profiles so just relax and do your best.")
-                                Spacer()
-                            }
-                            HStack {
-                                Text ("One last thing. Please don't change your phone's volume during the test as this will throw off the measurements.")
-                                Spacer()
-                            }
-                            HStack {
-                                Text ("Are you ready?")
+                                Text ("Are you ready to begin?")
                                 Spacer()
                             }
                         }
-                        .padding()
                     }
+                    .padding()
                     Spacer()
-                    Button("Let's Go!", 
+                    Button("I'm ready!", 
                            action: {
+                        if model.audioPlayerNodeL1.isPlaying {
+                            model.stopTrack()
+                        }
                         introStep = 40
-                        tutorialCompleted = true
                         model.testStatus = .testInProgress
                     })
                     .font(.title)
@@ -409,118 +577,15 @@ struct TestView: View {
                             .stroke(.blue, lineWidth: 5)
                     )
                     .padding()
-                case 40:
-                    VStack (spacing: 40) {
-                        Text("Testing in Progress")
-                            .font(.largeTitle)
-                            .foregroundColor(.green)
-                            .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
-                                TestResultsView() 
-                            }
-                            .padding(.top, 20)
-                        
-                        ProgressView("Progress", value: toneProgress, total: 9)
-                        HStack {
-                            Text ("Tones completed: \(tonesCompleted) / 16")
-                            Spacer()
-                        }
-                        
-                        Text(!isShowingCompareSilence ? "Do you hear the tone?" : "")
-                            .font(.title)
-                        Button("Yes, I hear it", 
-                               action: {
-                            toneProgress += 1
-                            if toneProgress == 9 {
-                                toneProgress = 0
-                                tonesCompleted += 1
-                            }
-                            yesIsTemporarilyDisabled = true
-                            preventDoulbleTap (buttonToggle: yesButtonIsDisabled)
-                            if model.testStatus == .testInProgress {
-                                model.tapYesHeard()
-                            } else {
-                                return
-                            }
-                        })
-                        .onChange(of: model.testStatus, perform: {value in
-                            if model.testStatus == .testCompleted {
-                                saveProfileAfterTest()
-                                print ("Should Show Modal View")
-                                showTestResultsView = true
-                                introStep = 0
-                                tonesCompleted = 0
-                            } else {
-                                return
-                            }
-                        })
-                        .font(.title)
-                        .foregroundColor(!yesButtonIsDisabled ? .green : .gray)
-                        .padding ()
-                        .overlay(
-                            Capsule(style: .continuous)
-                                .stroke(!yesButtonIsDisabled ? Color.green : Color.gray, lineWidth: 5)
-                        )
-                        .opacity(yesIHearIsShown ? 1.0 : 0)
-                        .disabled(yesButtonIsDisabled)
-                        Button("No, I don't hear it", 
-                               action: {
-                            toneProgress += 1
-                            if toneProgress == 9 {
-                                toneProgress = 0
-                                tonesCompleted += 1
-                            }
-                            noIsTemporarilyDisabled = true
-                            preventDoulbleTap (buttonToggle: noButtonIsDisabled)
-                            if model.testStatus == .testInProgress {
-                                model.tapNoDidNotHear()
-                            } else {
-                               return
-                            }
-                        })
-                        .font(.title)
-                        .foregroundColor(!noButtonIsDisabled ? .red : .gray)
-                        .padding ()
-                        .overlay(
-                            Capsule(style: .continuous)
-                                .stroke(!noButtonIsDisabled ? Color.red : Color.gray, lineWidth: 5)
-                        )
-                        .opacity(noIDontHearIsShown ? 1.0 : 0)
-                        //       .padding(45)
-                        .disabled(noButtonIsDisabled)
-                        
-                        Spacer ()
-                        
-                        Button {
-                            if !isShowingCompareSilence {
-                                model.stopTone()
-                            } else {
-                                model.resumeTone()
-                            }
-                            isShowingCompareSilence.toggle()
-                        } label: {
-                            if !isShowingCompareSilence {
-                                Text("Compare Silence")
-                            } else {
-                                Text ("Back to Tone")
-                            }
-                        }
-                        .font(.title)
-                        .foregroundColor(.blue)
-                        .padding ()
-                        .overlay(
-                            Capsule(style: .continuous)
-                                .stroke(.blue, lineWidth: 5)
-                        )
-                        .padding (.bottom, 20)
-                    }
-                default: VStack {}
-                    
                 }
+            default: VStack {}
+                
             }
         }
-        
     }
     
+}
+
 
 
 

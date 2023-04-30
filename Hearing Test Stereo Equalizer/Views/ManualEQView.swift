@@ -131,7 +131,7 @@ struct ManualEQView: View {
                     .padding()
                 Toggle("", isOn: $model.manualAdjustmentsAreActive)
                     .onChange(of: model.manualAdjustmentsAreActive) { value in
-                        model.toggleManualAdjustments()
+                        model.setEQBands(for: model.currentUserProfile)
                     }
                     .padding(.trailing)
                     .padding(.leading)

@@ -13,7 +13,7 @@ struct UserProfileRowView: View {
     
     var body: some View {
         HStack {
-            Text(userProfile.name ?? "Unknown Name")
+            Text(userProfile.name ?? "Trees")
             Spacer()
             Text (userProfile.dateCreated ??  Date(), style: .date)
             

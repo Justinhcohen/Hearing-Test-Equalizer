@@ -27,11 +27,22 @@ struct PlaylistSongsView: View {
         return 0
     }
     
+//    var searchResults: [MPMediaItem] {
+//        if searchText.isEmpty {
+//            return model.songList
+//        } else {
+//            return model.songList.filter { $0.title!.contains(searchText) }
+//        }
+//    }
+    
     var searchResults: [MPMediaItem] {
+        var filteredItems = model.songList
+        filteredItems.removeAll(where: {$0.hasProtectedAsset == true})
+        filteredItems.removeAll (where: {$0.isCloudItem == true})
         if searchText.isEmpty {
-            return model.songList
+            return filteredItems
         } else {
-            return model.songList.filter { $0.title!.contains(searchText) }
+            return filteredItems.filter { $0.title!.contains(searchText) }
         }
     }
     
@@ -74,6 +85,8 @@ struct PlaylistSongsView: View {
                         model.setVolumeToZero()
                         model.startFadeInTimer()
                         model.playTrack()
+                        print (item.description)
+                        print (item.assetURL as Any)
                     } 
                     .foregroundColor(item == model.currentMediaItem ? Color.green : colorScheme == .dark ? Color.white : Color.black) 
                

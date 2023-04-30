@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D0FD6C929FDE9FC008C4490 /* AppleMusicPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0FD6C829FDE9FC008C4490 /* AppleMusicPlaylistView.swift */; };
+		0D0FD6CB29FE0601008C4490 /* AppleMusicPlaylistSongsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0FD6CA29FE0601008C4490 /* AppleMusicPlaylistSongsView.swift */; };
+		0D0FD6CD29FEA383008C4490 /* PurchaseLibraryAccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0FD6CC29FEA383008C4490 /* PurchaseLibraryAccessView.swift */; };
 		0D19B1532955F3E600D17C16 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D19B1522955F3E600D17C16 /* Model.swift */; };
 		0D249C8B29723C760075FED3 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D249C8A29723C760075FED3 /* DataController.swift */; };
 		0D249C8E297242210075FED3 /* HearingTest.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0D249C8C297242210075FED3 /* HearingTest.xcdatamodeld */; };
@@ -49,6 +52,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0D0FD6C829FDE9FC008C4490 /* AppleMusicPlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicPlaylistView.swift; sourceTree = "<group>"; };
+		0D0FD6CA29FE0601008C4490 /* AppleMusicPlaylistSongsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicPlaylistSongsView.swift; sourceTree = "<group>"; };
+		0D0FD6CC29FEA383008C4490 /* PurchaseLibraryAccessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseLibraryAccessView.swift; sourceTree = "<group>"; };
 		0D19B1522955F3E600D17C16 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		0D249C8A29723C760075FED3 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		0D249C8D297242210075FED3 /* HearingTest.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = HearingTest.xcdatamodel; sourceTree = "<group>"; };
@@ -108,11 +114,14 @@
 			children = (
 				0D65AD9B293D14F10017E4F8 /* ContentView.swift */,
 				0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */,
+				0D0FD6CC29FEA383008C4490 /* PurchaseLibraryAccessView.swift */,
 				0DCB0E32296504E000083DB4 /* SongsView.swift */,
 				0DE942D02968A5A100FFA006 /* PlaylistView.swift */,
+				0D0FD6C829FDE9FC008C4490 /* AppleMusicPlaylistView.swift */,
 				0D6197C329A2C470003F3FE3 /* ArtistView.swift */,
 				0D39F11E29A2DC8A00987C02 /* ArtistSongsView.swift */,
 				0DE5DE70298D897F006C8E7E /* PlaylistSongsView.swift */,
+				0D0FD6CA29FE0601008C4490 /* AppleMusicPlaylistSongsView.swift */,
 				0D249C8F2972447C0075FED3 /* UserProfileView.swift */,
 				0DE5DE74299595C5006C8E7E /* UserProfileEditNameView.swift */,
 				0D37679029551E0E00F3FF59 /* EQView.swift */,
@@ -312,6 +321,9 @@
 				0D32338F29F57A0F00A3C4AE /* ManualEQView.swift in Sources */,
 				0DE5DE73299408AD006C8E7E /* UserProfileHeaderView.swift in Sources */,
 				0D19B1532955F3E600D17C16 /* Model.swift in Sources */,
+				0D0FD6CD29FEA383008C4490 /* PurchaseLibraryAccessView.swift in Sources */,
+				0D0FD6C929FDE9FC008C4490 /* AppleMusicPlaylistView.swift in Sources */,
+				0D0FD6CB29FE0601008C4490 /* AppleMusicPlaylistSongsView.swift in Sources */,
 				0DE5DE772996C122006C8E7E /* GainRowView.swift in Sources */,
 				0D249C902972447C0075FED3 /* UserProfileView.swift in Sources */,
 				0D39F12129A5476A00987C02 /* RemoteCommandCenter.swift in Sources */,
@@ -463,7 +475,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;
@@ -501,7 +513,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;
