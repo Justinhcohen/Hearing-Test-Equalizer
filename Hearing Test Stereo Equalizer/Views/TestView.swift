@@ -24,7 +24,11 @@ struct TestView: View {
     @State private var yesIsTemporarilyDisabled = false
     @State private var toneProgress = 0.0
     @State private var showTestResultsView = false
-    @State private var introStep = 0
+    @State private var introStep = 0 {
+        willSet {
+            userDefaults.setValue(newValue, forKey: "introStep")  
+        }
+    }
     @State private var tonesCompleted = 0
     let userDefaults = UserDefaults.standard
     @State private var tutorialCompleted = false {
@@ -68,6 +72,10 @@ struct TestView: View {
         } else {
             return false
         }
+    }
+    
+    func readFromUserDefaults () {
+        introStep = userDefaults.integer(forKey: "introStep")
     }
     
     private func preventDoubleTapAsync(buttonToggle: Bool) async {
@@ -222,6 +230,9 @@ struct TestView: View {
                     })
                     .font(.title)
                     .foregroundColor(.blue)
+                    .onAppear {
+                        readFromUserDefaults()
+                    }
                     .padding ()
                     .overlay(
                         Capsule(style: .continuous)
@@ -296,7 +307,7 @@ struct TestView: View {
                         if toneProgress == 9 {
                             toneProgress = 0
                             model.testStatus = .practiceCompleted
-                            model.toneIndex = 15
+                            model.toneIndex = 0
                             introStep = 30
                         }
                         yesIsTemporarilyDisabled = true
@@ -318,7 +329,7 @@ struct TestView: View {
                         if toneProgress == 9 {
                             toneProgress = 0
                             model.testStatus = .practiceCompleted
-                            model.toneIndex = 15
+                            model.toneIndex = 0
                             introStep = 30
                         }
                         noIsTemporarilyDisabled = true

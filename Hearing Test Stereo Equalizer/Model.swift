@@ -221,6 +221,15 @@ class Model: ObservableObject, RemoteCommandHandler {
         print ("equalizerIsActive = \(equalizerIsActive)")
     }
     
+    func registerUserDefaults () {
+        userDefaults.register(
+            defaults: [
+                "equalizerIsActive": true,
+                "manualAdjustmentsAreActive": true
+            ]
+        )
+    }
+    
     func readFromUserDefaults () {
         print ("CALLED READ FROM USER DEFAULTS")
         initialHearingTestHasBeenCompleted = userDefaults.bool(forKey: "initialHearingTestHasBeenCompleted")
@@ -1064,7 +1073,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var initialHearingTestHasBeenCompleted = false
     var tonePlayer: AVAudioPlayer?
     var currentTone = ""
-    var toneIndex = 15
+    var toneIndex = 0
     var maxUnheard: Double = -160
     var minHeard: Double = 0.0
     
@@ -1243,7 +1252,7 @@ class Model: ObservableObject, RemoteCommandHandler {
             playTone(volume: Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2))))
             
         } else {
-            toneIndex = 15
+            toneIndex = 0
             stopTone()
             print ("Test Complete!")
             testStatus = .testCompleted
@@ -1297,6 +1306,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     init() {
+        registerUserDefaults()
         setInterruptionObserver()
         setRouteChangeObserver()
         readFromUserDefaults()

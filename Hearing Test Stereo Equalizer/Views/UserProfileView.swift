@@ -306,12 +306,12 @@ struct UserProfileView: View {
             }
             
             
-            Button 	("Add Justin XM5") {
-                addJustinXM5()
-            }
-            .sheet(isPresented: $showUserProfileEditNameViewModal, onDismiss: refreshState) {
-                UserProfileEditNameView()
-            }
+//            Button 	("Add Justin XM5") {
+//                addJustinXM5()
+//            }
+//            .sheet(isPresented: $showUserProfileEditNameViewModal, onDismiss: refreshState) {
+//                UserProfileEditNameView()
+//            }
             
         }
         .onAppear {
