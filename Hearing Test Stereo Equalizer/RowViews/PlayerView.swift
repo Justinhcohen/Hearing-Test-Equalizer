@@ -25,7 +25,7 @@ struct PlayerView: View {
     
     func updateMetadata () {
         //     let size = CGSize(width: 30, height: 30)
-        songName = (model.currentMediaItem.value(forProperty: MPMediaItemPropertyTitle) as? String)!
+     //   songName = (model.currentMediaItem.value(forProperty: MPMediaItemPropertyTitle) as? String)!
         //        let mediatImage = model.currentMediaItem.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
         // let UIAlbumCover = mediatImage?.image(at: size)
         //        let defaultUIImage = UIImage(systemName: "photo")!

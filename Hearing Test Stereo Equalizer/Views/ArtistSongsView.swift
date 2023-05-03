@@ -35,6 +35,8 @@ struct ArtistSongsView: View {
         }
     }
     
+   // @State var refreshState = UUID()
+    
     
     var body: some View {  
         
@@ -81,6 +83,9 @@ struct ArtistSongsView: View {
         }
         .searchable(text: $searchText)
         .listStyle(PlainListStyle())
+//        .refreshable {
+//            refreshState = UUID()
+//        }
         .navigationTitle(artistName)
     }
 }

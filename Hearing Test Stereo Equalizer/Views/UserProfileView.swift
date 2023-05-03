@@ -154,13 +154,27 @@ struct UserProfileView: View {
         try? moc.save()
     }
     
+    func goToTestTab () {
+        self.tabSelection = 3
+    }
+    
     var body: some View {
         
         
         VStack (spacing: 30) {
-            
-            Text ("Profiles")
-                .font(.largeTitle)
+            ZStack {
+                Text ("Profiles")
+                    .font(.largeTitle)
+                HStack {
+                    Spacer ()
+                    Button ("+") {
+                        goToTestTab()
+                    }
+                    .font(.largeTitle)
+                    
+                }
+                .padding()
+            }
             
             if defaultProfileIsCreated {
                
@@ -195,26 +209,26 @@ struct UserProfileView: View {
                         refreshState()
                     }
                 
-                VStack (spacing: 10) {
-                    HStack {
-                        Text ("Take a hearing test to create a new profile.")
-                        Spacer ()
-                    }
-                    HStack {
-                        Text ("Create a new profile for each set of earphones you use and tap the name to switch between them.")
-                        Spacer ()
-                    }
-                    HStack {
-                        Text ("Longpress to rename.")
-                        Spacer ()
-                    }
-                    HStack {
-                        Text ("Swipe left to delete.")
-                        Spacer ()
-                    }
-               
-                }
-                .padding()
+//                VStack (spacing: 10) {
+//                    HStack {
+//                        Text ("Take a hearing test to create a new profile.")
+//                        Spacer ()
+//                    }
+//                    HStack {
+//                        Text ("Create a new profile for each set of earphones you use and tap the name to switch between them.")
+//                        Spacer ()
+//                    }
+//                    HStack {
+//                        Text ("Longpress to rename.")
+//                        Spacer ()
+//                    }
+//                    HStack {
+//                        Text ("Swipe left to delete.")
+//                        Spacer ()
+//                    }
+//               
+//                }
+//                .padding()
                 
 //                VStack {
 //                    Text ("Boost at 6.0 Intensity")
@@ -306,12 +320,10 @@ struct UserProfileView: View {
             }
             
             
-//            Button 	("Add Justin XM5") {
-//                addJustinXM5()
-//            }
-//            .sheet(isPresented: $showUserProfileEditNameViewModal, onDismiss: refreshState) {
-//                UserProfileEditNameView()
-//            }
+            Button 	("Add Justin XM5") {
+                addJustinXM5()
+            }
+
             
         }
         .onAppear {
@@ -320,6 +332,9 @@ struct UserProfileView: View {
             defaultProfileIsCreated = true
             if !model.initialHearingTestHasBeenCompleted && model.libraryAccessIsGranted {
                 self.tabSelection = 3
+            }
+            if model.testStatus != .stopped {
+                model.stopAndResetTest()
             }
         }
     }

@@ -34,6 +34,7 @@ struct SongsView: View {
         }
     }
     
+  //  @State var refreshState = UUID()
     
     var body: some View {  
             Button("Shuffle Play", 
@@ -78,10 +79,13 @@ struct SongsView: View {
             }
             .searchable(text: $searchText)
             .listStyle(PlainListStyle())
+//            .refreshable {
+//                refreshState = UUID()
+//            }
             .navigationTitle("Songs")
         
         if model.songList.isEmpty {
-            VStack (spacing: 20) {
+            VStack (spacing: 30) {
                 HStack {
                     Text ("Your music library is empty.")
                     Spacer()

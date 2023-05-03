@@ -163,6 +163,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     func handleRouteChangeNotification(notification: Notification) {
+        guard !songList.isEmpty else {return}
         print ("HANDLE ROUTE CHANGE")
         playState = .stopped 
         guard let userInfo = notification.userInfo,
@@ -482,7 +483,7 @@ class Model: ObservableObject, RemoteCommandHandler {
        print ("CALLED SET NOW PLAYING METADATA")
         let nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
         var nowPlayingInfo = [String: Any]()
-        var mpNowPlayingPlaybackState = MPNowPlayingPlaybackState(rawValue: 1)
+      //  var mpNowPlayingPlaybackState = MPNowPlayingPlaybackState(rawValue: 1)
         
         // Static Metadata
         nowPlayingInfo[MPNowPlayingInfoPropertyAssetURL] = currentMediaItem.assetURL
@@ -531,6 +532,8 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     func playTrack () {
         print ("CALLED PLAY TRACK")
+        isPlayingDemoOne = false
+        isPlayingDemoTwo = false
         if playQueue.isEmpty {
             playQueue = songList
         }
@@ -546,6 +549,10 @@ class Model: ObservableObject, RemoteCommandHandler {
         
         prepareAudioEngine() 
         
+        print ("PREPARE AUDIO ENGINE WAS CALLED")
+        print ("AFTER PREPARING, AUDIO ENGINE IS RUNNING = \(audioEngine.isRunning)")
+        
+        
         setEQBands(for: currentUserProfile)
         
       
@@ -555,13 +562,15 @@ class Model: ObservableObject, RemoteCommandHandler {
          //   currentPersistentID = currentMediaItem.persistentID
             if let currentURL = currentMediaItem.assetURL {
                 audioFile = try AVAudioFile(forReading: currentURL)
-                
+                 
                 //    Start your Engines 
 //                if !audioEngine.isRunning {
 //                    print ("PREPAING THE AUDIO ENGINE")
                     audioEngine.prepare()
+                print ("I PREPARED THE AUDIO ENGINE")
                     try audioEngine.start()
-                    print ("AUDIO ENGINE IS RUNNING = \(audioEngine.isRunning)")
+                print ("I TRIED TO START THE AUDIO ENGINE.")
+                    print ("AFTER STARTING, AUDIO ENGINE IS RUNNING = \(audioEngine.isRunning)")
 //                }
                 
                
@@ -609,9 +618,25 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
   
+    enum DemoTrack {
+        case trackOne, trackTwo
+    }
+    var demoTrack = DemoTrack.trackOne
+    @Published var isPlayingDemoOne = false
+    @Published var isPlayingDemoTwo = false
     
     func playDemoTrack () {
         print ("CALLED PLAY DEMO TRACK")
+        stopDemoTrack()
+        var demoTrackName = ""
+        switch demoTrack {
+        case .trackOne:
+            demoTrackName = "Evert Zeevalkink - On The Roads"
+            isPlayingDemoOne = true
+        case .trackTwo:
+            demoTrackName = "indiebox-funkhouse"
+            isPlayingDemoTwo = true
+        }
         playQueue = [MPMediaItem]()
         songList = [MPMediaItem]()
         demoIsPlaying = true
@@ -619,54 +644,43 @@ class Model: ObservableObject, RemoteCommandHandler {
         setEQBandsForCurrentProfile()
         do {
             print ("Index = \(queueIndex)")
-          //  let currentMPMediaItem = playQueue[queueIndex]
-         //   currentPersistentID = currentMediaItem.persistentID
-             let currentURL = Bundle.main.url(forResource: "twinsmusic-dancinginthesand", withExtension: "mp3")
+             let currentURL = Bundle.main.url(forResource: demoTrackName, withExtension: "mp3")
            
             audioFile = try AVAudioFile(forReading: currentURL!)
-                
-                //    Start your Engines 
-//                if !audioEngine.isRunning {
-//                    print ("PREPAING THE AUDIO ENGINE")
+
                     audioEngine.prepare()
                     try audioEngine.start()
                     print ("AUDIO ENGINE IS RUNNING = \(audioEngine.isRunning)")
-//                }
+
                 
                
 
                 let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
                 
-                // Left Ear Play
-            //    audioPlayerNodeL1.scheduleFile(audioFile, at: audioTime, completionHandler: nil) 
+
                 audioPlayerNodeL1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
                 audioPlayerNodeL1.pan = -1
                 audioPlayerNodeL1.play()  
                 
-                
-                // Right Ear Play
-           //     audioPlayerNodeR1.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
+
                 audioPlayerNodeR1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
                 audioPlayerNodeR1.pan = 1
                 audioPlayerNodeR1.play()
-                
-//                if playState != .playing {
-//                    print ("PLAY STATE = \(playState)")
-//                    playState = .playing
-//                   startTimer()
-//                }
             
             startFadeInTimer()
-//                
-//            
-//                setNowPlayingMetadata()
-//                print ("PLAY STATE 2 = \(playState)")
-//                print ("AUDIO IS PLAYING = \(audioPlayerNodeL1.isPlaying)")
-//                print ("NODE VOLUME = \(audioPlayerNodeL1.volume)")
-                
-            
-            
         } catch _ {print ("Catching Audio Engine Error")}
+    }
+    
+    func stopDemoTrack () {
+        print ("CALLED STOP DEMO TRACK")
+        isPlayingDemoOne = false
+        isPlayingDemoTwo = false
+        playQueue = [MPMediaItem]()
+        songList = [MPMediaItem]()
+        demoIsPlaying = false
+        fadeInComplete()
+        audioPlayerNodeL1.stop()
+        audioPlayerNodeR1.stop()
     }
     
     
@@ -680,17 +694,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         setNowPlayingMetadata()
     }
     
-    func stopDemoTrack () {
-        print ("CALLED STOP DEMO TRACK")
-        playQueue = [MPMediaItem]()
-        songList = [MPMediaItem]()
-        demoIsPlaying = false
-        fadeInComplete()
-        audioPlayerNodeL1.stop()
-        audioPlayerNodeR1.stop()
-      //  playState = .stopped
-     //   setNowPlayingMetadata()
-    }
+    
     
     
     func playPreviousTrack () {
@@ -833,47 +837,50 @@ class Model: ObservableObject, RemoteCommandHandler {
 //    }
 
     
-    func setEQBandsGainForNewProfile () {
-       // var currentLowestAudibleDecibelBands = [Double]()
-        var minValue = 0.0
-        var maxValue = -160.0
-        for i in 0...lowestAudibleDecibelBands.count - 1 {
-            if lowestAudibleDecibelBands[i] < minValue {
-                minValue = lowestAudibleDecibelBands[i]
-            }
-            if lowestAudibleDecibelBands[i] > maxValue {
-                maxValue = lowestAudibleDecibelBands[i]
-            }
-        }
-        if abs (minValue - maxValue) < 1 {
-            minValue = maxValue - 1 // Avoiding dividing by zero.
-        }
-        let multiplier: Double = min(6.0 / abs(minValue - maxValue), 1.0)
-        
-        var workingBandsGain = [Float]()
-        for i in 0...lowestAudibleDecibelBands.count - 1 {
-            workingBandsGain.insert(Float(multiplier * abs(minValue - lowestAudibleDecibelBands[i]) ), at: i)
-        }
-        currentUserProfile.left60 = workingBandsGain[0]
-        currentUserProfile.left100 = workingBandsGain[1]
-        currentUserProfile.left230 = workingBandsGain[2]
-        currentUserProfile.left500 = workingBandsGain[3]
-        currentUserProfile.left1100 = workingBandsGain[4]
-        currentUserProfile.left2400 = workingBandsGain[5]
-        currentUserProfile.left5400 = workingBandsGain[6]
-        currentUserProfile.left12000 = workingBandsGain[7]
-        currentUserProfile.right60 = workingBandsGain[8]
-        currentUserProfile.right100 = workingBandsGain[9]
-        currentUserProfile.right230 = workingBandsGain[10]
-        currentUserProfile.right500 = workingBandsGain[11]
-        currentUserProfile.right1100 = workingBandsGain[12]
-        currentUserProfile.right2400 = workingBandsGain[13]
-        currentUserProfile.right5400 = workingBandsGain[14]
-        currentUserProfile.right12000 = workingBandsGain[15]
-    }
+//    func setEQBandsGainForNewProfile () {
+//       // var currentLowestAudibleDecibelBands = [Double]()
+//        var minValue = 0.0
+//        var maxValue = -160.0
+//        for i in 0...lowestAudibleDecibelBands.count - 1 {
+//            if lowestAudibleDecibelBands[i] < minValue {
+//                minValue = lowestAudibleDecibelBands[i]
+//            }
+//            if lowestAudibleDecibelBands[i] > maxValue {
+//                maxValue = lowestAudibleDecibelBands[i]
+//            }
+//        }
+//        if abs (minValue - maxValue) < 1 {
+//            minValue = maxValue - 1 // Avoiding dividing by zero.
+//        }
+//        let multiplier: Double = min(6.0 / abs(minValue - maxValue), 1.0)
+//        
+//        var workingBandsGain = [Float]()
+//        for i in 0...lowestAudibleDecibelBands.count - 1 {
+//            workingBandsGain.insert(Float(multiplier * abs(minValue - lowestAudibleDecibelBands[i]) ), at: i)
+//        }
+//        currentUserProfile.left60 = workingBandsGain[0]
+//        currentUserProfile.left100 = workingBandsGain[1]
+//        currentUserProfile.left230 = workingBandsGain[2]
+//        currentUserProfile.left500 = workingBandsGain[3]
+//        currentUserProfile.left1100 = workingBandsGain[4]
+//        currentUserProfile.left2400 = workingBandsGain[5]
+//        currentUserProfile.left5400 = workingBandsGain[6]
+//        currentUserProfile.left12000 = workingBandsGain[7]
+//        currentUserProfile.right60 = workingBandsGain[8]
+//        currentUserProfile.right100 = workingBandsGain[9]
+//        currentUserProfile.right230 = workingBandsGain[10]
+//        currentUserProfile.right500 = workingBandsGain[11]
+//        currentUserProfile.right1100 = workingBandsGain[12]
+//        currentUserProfile.right2400 = workingBandsGain[13]
+//        currentUserProfile.right5400 = workingBandsGain[14]
+//        currentUserProfile.right12000 = workingBandsGain[15]
+//    }
     
     func setEQBands (for currentUserProfile: UserProfile) {
         let multiplier = Float (currentUserProfile.intensity / 6.0)
+        if equalizerL1 == nil {
+            prepareAudioEngine()
+        }
         let bandsL = equalizerL1.bands
         let bandsR = equalizerR1.bands
         if equalizerIsActive && manualAdjustmentsAreActive {
@@ -1073,34 +1080,38 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var initialHearingTestHasBeenCompleted = false
     var tonePlayer: AVAudioPlayer?
     var currentTone = ""
-    var toneIndex = 0
+    var toneIndex = 0 {
+        willSet {
+            print ("toneIndex new value = \(newValue)")
+        }
+    }
     var maxUnheard: Double = -160
     var minHeard: Double = 0.0
     
     
-    var lowestAudibleDecibelBand60L = 0.0
-    var lowestAudibleDecibelBand100L = 0.0 
-    var lowestAudibleDecibelBand230L = 0.0
-    var lowestAudibleDecibelBand500L = 0.0
-    var lowestAudibleDecibelBand1100L = 0.0
-    var lowestAudibleDecibelBand2400L = 0.0
-    var lowestAudibleDecibelBand5400L = 0.0
-    var lowestAudibleDecibelBand12000L = 0.0
-    var lowestAudibleDecibelBand60R = 0.0 
-    var lowestAudibleDecibelBand100R = 0.0
-    var lowestAudibleDecibelBand230R = 0.0
-    var lowestAudibleDecibelBand500R = 0.0
-    var lowestAudibleDecibelBand1100R = 0.0
-    var lowestAudibleDecibelBand2400R = 0.0
-    var lowestAudibleDecibelBand5400R = 0.0
-    var lowestAudibleDecibelBand12000R = 0.0
+    var lowestAudibleDecibelBand60L = -120.0
+    var lowestAudibleDecibelBand100L = -120.0
+    var lowestAudibleDecibelBand230L = -120.0
+    var lowestAudibleDecibelBand500L = -120.0
+    var lowestAudibleDecibelBand1100L = -120.0
+    var lowestAudibleDecibelBand2400L = -120.0
+    var lowestAudibleDecibelBand5400L = -120.0
+    var lowestAudibleDecibelBand12000L = -120.0
+    var lowestAudibleDecibelBand60R = -120.0 
+    var lowestAudibleDecibelBand100R = -120.0
+    var lowestAudibleDecibelBand230R = -120.0
+    var lowestAudibleDecibelBand500R = -120.0
+    var lowestAudibleDecibelBand1100R = -120.0
+    var lowestAudibleDecibelBand2400R = -120.0
+    var lowestAudibleDecibelBand5400R = -120.0
+    var lowestAudibleDecibelBand12000R = -120.0
     var lowestAudibleDecibelBands: [Double] { [lowestAudibleDecibelBand60L, lowestAudibleDecibelBand100L, lowestAudibleDecibelBand230L, lowestAudibleDecibelBand500L, lowestAudibleDecibelBand1100L, lowestAudibleDecibelBand2400L, lowestAudibleDecibelBand5400L, lowestAudibleDecibelBand12000L, lowestAudibleDecibelBand60R, lowestAudibleDecibelBand100R, lowestAudibleDecibelBand230R, lowestAudibleDecibelBand500R, lowestAudibleDecibelBand1100R, lowestAudibleDecibelBand2400R, lowestAudibleDecibelBand5400R, lowestAudibleDecibelBand12000R]
     }
     
     
     
     
-    let toneArray = ["Band60L", "Band60R", "Band100L", "Band100R", "Band230L", "Band230R", "Band500L", "Band500R", "Band1100L", "Band1100R", "Band2400L", "Band2400R", "Band5400L", "Band5400R", "Band12000L", "Band12000R"]
+    let toneArray = ["Band60L", "Band100L", "Band230L", "Band500L", "Band1100L", "Band2400L", "Band5400L", "Band12000L", "Band60R", "Band100R", "Band230R", "Band500R", "Band1100R", "Band2400R", "Band5400R", "Band12000R"]
     
     func getVolume (decibelReduction: Double) -> Double {
         
@@ -1252,7 +1263,6 @@ class Model: ObservableObject, RemoteCommandHandler {
             playTone(volume: Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2))))
             
         } else {
-            toneIndex = 0
             stopTone()
             print ("Test Complete!")
             testStatus = .testCompleted
@@ -1264,14 +1274,45 @@ class Model: ObservableObject, RemoteCommandHandler {
         
     }
     
-    func tapStartTest () {
+    func practiceBandComplete () {
+        print ("CALLED PRACTICE BAND COMPLETE, tone index = \(toneIndex)")
+        resetMinMaxValues()
+        stopTone()
+        print ("Practice Test Complete!")
+        testStatus = .practiceCompleted
+        }
+    
+    
+    func tapStartPracticeTest () {
         print ("Tone Index on Tap Start Test = \(toneIndex)")
+        testStatus = .practiceInProgress
+        toneIndex = 3
         currentVolume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
         playTone(volume: currentVolume)
         print ("tapStartTest volume = \(currentVolume)")
         print ("tapStartTest maxUnheard = \(maxUnheard)")
         print ("tapStartTest minHeard = \(minHeard)")
     }
+    
+    func tapStartTest () {
+        print ("Tone Index on Tap Start Test = \(toneIndex)")
+        testStatus = .testInProgress
+        toneIndex = 0
+        currentVolume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
+        playTone(volume: currentVolume)
+        print ("tapStartTest volume = \(currentVolume)")
+        print ("tapStartTest maxUnheard = \(maxUnheard)")
+        print ("tapStartTest minHeard = \(minHeard)")
+    }
+    
+    func stopAndResetTest () {
+        testStatus = .stopped
+        stopTone()
+        resetMinMaxValues()
+        toneIndex = 0
+    }
+    
+    
     
     func tapYesHeard () {
         stopTone()
@@ -1289,12 +1330,44 @@ class Model: ObservableObject, RemoteCommandHandler {
         
     }
     
+    func tapPracticeYesHeard () {
+        stopTone()
+        minHeard = (maxUnheard + minHeard) / 2
+        if abs (maxUnheard - minHeard) < 0.5 {
+            print ("tapYesHeard bandComplete")
+           practiceBandComplete()
+        } else {
+            let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
+            print ("tapYesHeard volume = \(volume)")
+            print ("tapYesHeard maxUnheard = \(maxUnheard)")
+            print ("tapYesHeard minHeard = \(minHeard)")
+            playTone(volume: volume)
+        }
+        
+    }
+    
     func tapNoDidNotHear () {
         stopTone()
         maxUnheard = (maxUnheard + minHeard) / 2
         if abs(maxUnheard - minHeard) < 0.5 {
             print ("tapNoDidNotHear bandComplete")
             bandComplete()
+        } else {
+            let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
+            print ("tapNoDidNotHear volume = \(volume)")
+            print ("tapNoDidNotHear tone = \(toneArray[toneIndex])")
+            print ("tapNoDidNotHear maxUnheard = \(maxUnheard)")
+            print ("tapNoDidNotHear minHeard = \(minHeard)")
+            playTone(volume: volume)
+        }
+    }
+    
+    func tapPracticeNoDidNotHear () {
+        stopTone()
+        maxUnheard = (maxUnheard + minHeard) / 2
+        if abs(maxUnheard - minHeard) < 0.5 {
+            print ("tapNoDidNotHear bandComplete")
+            practiceBandComplete()
         } else {
             let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
             print ("tapNoDidNotHear volume = \(volume)")

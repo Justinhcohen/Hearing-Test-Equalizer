@@ -47,7 +47,8 @@ struct EQView: View {
     @State private var sliderDidEdit = false
     @State private var showUserProfilesModalView = false
     @State private var showManualControlsView = false
-    @State private var isPlayingDemoSong = false
+    @State private var isPlayingDemoOne = false
+    @State private var isPlayingDemoTwo = false
     
     let session = AVAudioSession.sharedInstance()
     
@@ -138,33 +139,66 @@ struct EQView: View {
                     if !model.initialHearingTestHasBeenCompleted && model.libraryAccessIsGranted {
                         self.tabSelection = 3
                     }
+                    if model.testStatus != .stopped {
+                        model.stopAndResetTest()
+                    }
                 }
                 
                 // The play demo button just below the slider
-                Button {
-                    if !isPlayingDemoSong {
-                        model.playDemoTrack()
-                    } else {
-                        model.stopDemoTrack()
+               
+                HStack (spacing: 30) {
+                    
+                    Button {
+                        model.demoTrack = .trackOne
+                        if !model.isPlayingDemoOne {
+                            model.playDemoTrack()
+                            model.isPlayingDemoTwo = false
+                        } else {
+                            model.stopDemoTrack()
+                        }
+                    } label: {
+                        if !model.isPlayingDemoOne {
+                            Text("Play Demo 1")
+                        } else {
+                            Text ("Stop Demo 1")
+                        }
                     }
-                    isPlayingDemoSong.toggle()
-                } label: {
-                    if !isPlayingDemoSong {
-                        Text("Play Demo")
-                    } else {
-                        Text ("Stop Demo")
+                    .font(.title)
+                    .padding ()
+                    .overlay(
+                        Capsule(style: .continuous)
+                        //  .stroke(.blue, lineWidth: 5)
+                            .stroke(model.isPlayingDemoOne ? Color.green : Color.blue, lineWidth: 5)
+                    )
+                    .foregroundColor(model.isPlayingDemoOne ? Color.green : Color.blue)
+                    .padding (.bottom, 20)
+                    
+                    Button {
+                        model.demoTrack = .trackTwo
+                        if !model.isPlayingDemoTwo {
+                            model.playDemoTrack()
+                            model.isPlayingDemoOne = false
+                        } else {
+                            model.stopDemoTrack()
+                        }
+                    } label: {
+                        if !model.isPlayingDemoTwo {
+                            Text("Play Demo 2")
+                        } else {
+                            Text ("Stop Demo 2")
+                        }
                     }
+                    .font(.title)
+                    .padding ()
+                    .overlay(
+                        Capsule(style: .continuous)
+                        //  .stroke(.blue, lineWidth: 5)
+                            .stroke(model.isPlayingDemoTwo ? Color.green : Color.blue, lineWidth: 5)
+                    )
+                    .foregroundColor(model.isPlayingDemoTwo ? Color.green : Color.blue)
+                    .padding (.bottom, 20)
                 }
-                .font(.title)
-                .padding ()
-                .overlay(
-                    Capsule(style: .continuous)
-                    //  .stroke(.blue, lineWidth: 5)
-                        .stroke(shouldShowText ? Color.blue : Color.clear, lineWidth: 5)
-                )
-                .foregroundColor(shouldShowText ? Color.blue : Color.clear)
-                .padding (.bottom, 20)
-                .disabled(!shouldShowText)
+              
                 
                 
                 // The listing of EQ Boosts

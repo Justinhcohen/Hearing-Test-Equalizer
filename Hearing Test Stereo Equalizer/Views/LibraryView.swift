@@ -33,6 +33,8 @@ struct LibraryView: View {
         libraryAccessIsPurchased = userDefaults.bool(forKey: "libraryAccessIsPurchased")
         setCurrentProfile()
         model.setInitialVolumeToFineTuneSoundLevel()
+//        model.songList = allSongs
+//        model.playQueue = allSongs
         print ("After reading from user defaults, default user profile has been set = \(defaultUserProfileHasBeenSet)")
         print ("temp = \(temp)")
     }
@@ -169,7 +171,7 @@ struct LibraryView: View {
                 
                 if !libraryAccessIsPurchased {
                     VStack (spacing: 30)  {
-                        Text ("Time to Reflect")
+                        Text ("Spex Lifetime")
                             .font(.title)
                         ScrollView {
                             VStack (spacing: 30) {
@@ -182,7 +184,7 @@ struct LibraryView: View {
                                     Spacer ()
                                 }
                                 HStack {
-                                    Text ("If you did notice an improvement, Spex may still not be for you because it only works with DRM-free, compressed song files, such as MP3 and M4a. It DOES NOT play tracks from paid subscription servcies such as Apple Music, Spotify and Tidal.")
+                                    Text ("If you did notice an improvement, Spex may still not be for you because Spex only works with DRM-free audio files (MP3, AAC, ALAC, WAV and AIFF). It DOES NOT currently play tracks from paid subscription servcies such as Apple Music, Spotify and Tidal. If these services release compatible, public APIs, we will work to integrate them.")
                                     Spacer ()
                                 }
                                 HStack {
@@ -190,14 +192,14 @@ struct LibraryView: View {
                                     Spacer ()
                                 }
                                 HStack {
-                                    Text ("If you would like to try Spex with your music, click the button below to make a one-time purchase of Music Library Access for $3.99. No subscription required.")
+                                    Text ("If you would like to use Spex with your owned Music Library, you can make a one-time purchase of Spex Lifetime. Spex Lifetime will provide you with a lifetime of full access and free upgrades. No subscription required.")
                                     Spacer ()
                                 }
                             }
                         }
                         
                         Spacer ()
-                        Button("Music Library Access", 
+                        Button("Spex Lifetime", 
                                action: {
                             //resetAllToZero()
                             shouldShowUnlockLibraryAlert = true
@@ -210,15 +212,15 @@ struct LibraryView: View {
                                 .stroke( .blue, lineWidth: 5)
                         )
                         .onAppear {
+                            checkMusicLibaryAuthorization()
                             if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
                                 self.tabSelection = 3
                             }
-                            checkMusicLibaryAuthorization()
                             if model.equalizerL1 == nil {
                                 model.prepareAudioEngine()
                             }
                         }
-                        .alert("Do you want to access your song library for $3.99? (Temp text, no purchase required)", isPresented: $shouldShowUnlockLibraryAlert) {
+                        .alert("Purchase Spex Lifetime for $9.99? (Temp text, no purchase required)", isPresented: $shouldShowUnlockLibraryAlert) {
                             Button ("Yes!") {
                                 provideLibraryAccess()
                             }
@@ -275,6 +277,9 @@ struct LibraryView: View {
                             self.tabSelection = 3
                         }
                         runStartupItems()
+                        if model.testStatus != .stopped {
+                            model.stopAndResetTest()
+                        }
                         
                     }
 //                    Button("Temp Reset", 

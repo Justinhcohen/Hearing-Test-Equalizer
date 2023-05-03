@@ -26,7 +26,8 @@ struct UserProfileEditNameView: View {
             shouldShowNamingAlert = true
             return
         }
-        userProfiles[0].name = newProfileName
+        let activeProfile = userProfiles.first {$0.isActive} ?? userProfiles.first!
+        activeProfile.name = newProfileName
         model.currentUserProfileName = newProfileName
         try? moc.save()
         dismiss()
@@ -39,25 +40,25 @@ struct UserProfileEditNameView: View {
     }
     
     var body: some View {
-        VStack () {
-            Text ("Profile Name")
+        VStack (spacing: 30) {
+            Text ("Update Name")
                 .font(.largeTitle)
             //            HStack {
             //                Text ("Every time you provide a fresh set of hearing measurements, you will associate them with a hearing profile.")
             //                Spacer()
             //            }
-            ScrollView {
-                VStack (spacing: 30) {
-                    HStack {
-                        Text ("If you want to create profiles for more than one set of headphones, you may want to include the name of the headphones in the profile name.")
-                        Spacer()
-                    }
-                    HStack {
-                        Text ("You can always change it later so no pressure.")
-                        Spacer()
-                    }
-                }
-            }
+//            ScrollView {
+//                VStack (spacing: 30) {
+//                    HStack {
+//                        Text ("If you want to create profiles for more than one set of headphones, you may want to include the name of the headphones in the profile name.")
+//                        Spacer()
+//                    }
+//                    HStack {
+//                        Text ("You can always change it later so no pressure.")
+//                        Spacer()
+//                    }
+//                }
+//            }
             
             //            HStack {
             //                Text ("You can always long-press the name in the Profile Manager to change it so no need to get hung up on it now.")
@@ -68,10 +69,13 @@ struct UserProfileEditNameView: View {
             //                Text ("You can also slide to delete unwanted profiles in the Profile Manager but you must always have at least one.")
             //                Spacer()
             //            }
-            
+            HStack {
+                Text ("Current Name: \(model.currentUserProfileName)")
+                Spacer()
+            }
             HStack {
                 TextField(
-                    "Profile name goes here",
+                    "New name",
                     text: $newProfileName,
                     onCommit: saveNewProfileName
                 )

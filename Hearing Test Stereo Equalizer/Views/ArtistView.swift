@@ -26,6 +26,8 @@ struct ArtistView: View {
         }
     }
     
+ //   @State var refreshState = UUID()
+    
     var body: some View {
         
         List {
@@ -47,6 +49,9 @@ struct ArtistView: View {
         }
         .searchable(text: $searchText)
         .listStyle(PlainListStyle())
+//        .refreshable {
+//            refreshState = UUID()
+//        }
         .navigationTitle("Artists")
         
         if allArtists.isEmpty {

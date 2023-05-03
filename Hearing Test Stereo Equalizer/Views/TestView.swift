@@ -111,21 +111,31 @@ struct TestView: View {
         var minValue = 0.0
         var maxValue = -160.0
         for i in 0...model.lowestAudibleDecibelBands.count - 1 {
+            if model.lowestAudibleDecibelBands[i] == 0 {
+                print ("Round \(i): Couldn't hear - should continue")
+                continue
+            }
             if model.lowestAudibleDecibelBands[i] < minValue {
                 minValue = model.lowestAudibleDecibelBands[i]
+                print ("Round \(i): The new minValue = \(minValue)")
             }
             if model.lowestAudibleDecibelBands[i] > maxValue {
                 maxValue = model.lowestAudibleDecibelBands[i]
+                print ("Round \(i): The new maxValue = \(maxValue)")
             }
         }
         if abs (minValue - maxValue) < 1 {
             minValue = maxValue - 1 // Avoiding dividing by zero.
         }
         let multiplier: Double = min(6.0 / abs(minValue - maxValue), 1.0)
+        print ("The multipler = \(multiplier)")
         
         var workingBandsGain = [Float]()
         for i in 0...model.lowestAudibleDecibelBands.count - 1 {
-            workingBandsGain.insert(Float(multiplier * abs(minValue - model.lowestAudibleDecibelBands[i]) ), at: i)
+            let eqBoost = min (multiplier * abs(minValue - model.lowestAudibleDecibelBands[i]), 6)
+            print ("The eqBoost for \(model.lowestAudibleDecibelBands[i]) = \(eqBoost)")
+            workingBandsGain.insert (Float(eqBoost), at: i)
+          //  workingBandsGain.insert(Float(multiplier * abs(minValue - model.lowestAudibleDecibelBands[i]) ), at: i)
         }
         newUserProfile.left60 = workingBandsGain[0]
         newUserProfile.left100 = workingBandsGain[1]
@@ -161,13 +171,14 @@ struct TestView: View {
         newUserProfile.right5400M = 0
         newUserProfile.right12000M = 0
         
-        newUserProfile.name = "TBD"
-        newUserProfile.intensity = 8.0
+        newUserProfile.name = "My Profile"
+        newUserProfile.intensity = 11.0
         newUserProfile.isActive = true
         newUserProfile.iD = UUID()
         newUserProfile.dateCreated = Date.now
         
         model.currentUserProfile = newUserProfile
+        model.currentUserProfileName = "My Profile"
         
         try? moc.save()
     }
@@ -188,19 +199,19 @@ struct TestView: View {
                         VStack (spacing: 30) {
                             
                             HStack {
-                                Text ("Spex will give you a hearing test and use the results to tune your music to perfection. If you have perfect hearing, Spex will do nothing. It's like if you have perfect vision, glasses won't help. If you have less than perfect hearing, Spex will boost the frequencies where you need it. Think of Spex as spectacles for your ears.")
+                                Text ("Spex will give you a hearing test and use the results to tune your music to your ears. If you have perfect hearing, Spex won't have anything to do. It's like if you have perfect vision, eye glasses won't help you. If you have less than perfect hearing, Spex will bring your music into focus. You can think of Spex as spectacles for your ears.")
                                 Spacer()
                             }
                             HStack {
-                                Text ("Before we get started, please note that Spex only works with DRM-free, compressed song files, such as MP3 and M4a. It DOES NOT play tracks from paid subscription servcies such as Apple Music, Spotify and Tidal.")
+                                Text ("Before we get started, please note that Spex only works with DRM-free audio files (MP3, AAC, ALAC, WAV and AIFF). It DOES NOT currently play tracks from paid subscription servcies such as Apple Music, Spotify and Tidal. If these services release compatible, public APIs, we will work to integrate them.")
                                 Spacer()
                             }
                             HStack {
-                                Text ("After the hearing test, you'll get to hear how Spex uses your results to tune the demo song. If you don't hear an improvement when toggling Spex on and off while listening, you can try tweaking the sound with the manual EQ controls. If you still don't hear an improvement, Spex may not be for you.")
+                                Text ("After the hearing test, you'll see which frequencies Spex is boosting and by how much. It will apply zero boost to the frequency you hear the best, max boost to the frequency you hear ther worst, and relative boosts to all the frequencies inbetween. In addition to seeing the boosts, you'll hear how these boosts focus the demo song. Toggle Spex on and off while listening to determine if Spex is for you.")
                                 Spacer()
                             }
                             HStack {
-                                Text ("If you hear a noticeable improvement when applying Spex EQ to the demo song, it's likely you'll enjoy what it does for your music. You'll have the option to make a one-time purchase of $3.99 to use Spex with your Music Library. No subscription required.")
+                                Text ("If you discover that Spex helps you, you'll have the option to make a one-time purchase that will unlock all features, including access to your owned Music Library.")
                                 Spacer()
                             }
                             HStack {
@@ -270,9 +281,9 @@ struct TestView: View {
                     Button("Let's Go!", 
                            action: {
                         introStep = 20
-                        model.toneIndex = 3
-                        model.testStatus = .practiceInProgress
-                        model.tapStartTest()
+                        toneProgress = 0
+                        tonesCompleted = 0
+                        model.tapStartPracticeTest()
                     })
                     .font(.title)
                     .foregroundColor(.blue)
@@ -291,6 +302,11 @@ struct TestView: View {
                         .sheet(isPresented: $showTestResultsView, onDismiss: dismissToSpexView) {
                             TestResultsView() 
                         }
+                        .onAppear {
+                            if model.testStatus != .practiceInProgress {
+                                introStep = 10
+                            }
+                        }
                         .padding(.top, 20)
                     
                     ProgressView("Progress", value: toneProgress, total: 9)
@@ -305,14 +321,13 @@ struct TestView: View {
                            action: {
                         toneProgress += 1
                         if toneProgress == 9 {
-                            toneProgress = 0
-                            model.testStatus = .practiceCompleted
-                            model.toneIndex = 0
+//                            toneProgress = 0
+//                            model.testStatus = .practiceCompleted
                             introStep = 30
                         }
                         yesIsTemporarilyDisabled = true
                         preventDoulbleTap (buttonToggle: yesButtonIsDisabled)
-                        model.tapYesHeard()
+                        model.tapPracticeYesHeard()
                     })
                     .font(.title)
                     .foregroundColor(!yesButtonIsDisabled ? .green : .gray)
@@ -327,14 +342,13 @@ struct TestView: View {
                            action: {
                         toneProgress += 1
                         if toneProgress == 9 {
-                            toneProgress = 0
-                            model.testStatus = .practiceCompleted
-                            model.toneIndex = 0
+//                            toneProgress = 0
+//                            model.testStatus = .practiceCompleted
                             introStep = 30
                         }
                         noIsTemporarilyDisabled = true
                         preventDoulbleTap (buttonToggle: noButtonIsDisabled)
-                        model.tapNoDidNotHear()
+                        model.tapPracticeNoDidNotHear()
                     }) 
                     .font(.title)
                     .foregroundColor(!noButtonIsDisabled ? .red : .gray)
@@ -408,7 +422,7 @@ struct TestView: View {
                             Spacer()
                         }
                         HStack {
-                            Text ("One last thing. Please don't change your phone's volume during the test as this will throw off the measurements.")
+                            Text ("One last thing. Please don't change your phone's volume or navigate to a different tab during the test or you will need to start over.")
                             Spacer()
                         }
                         HStack {
@@ -423,7 +437,9 @@ struct TestView: View {
                        action: {
                     introStep = 40
                     tutorialCompleted = true
-                    model.testStatus = .testInProgress
+                    toneProgress = 0
+                    tonesCompleted = 0
+                    model.tapStartTest()
                 })
                 .font(.title)
                 .foregroundColor(.blue)
@@ -442,6 +458,11 @@ struct TestView: View {
                             TestResultsView() 
                         }
                         .padding(.top, 20)
+                        .onAppear {
+                            if model.testStatus != .testInProgress {
+                                introStep = 50
+                            }
+                        }
                     
                     ProgressView("Progress", value: toneProgress, total: 9)
                     HStack {
@@ -549,7 +570,7 @@ struct TestView: View {
                         VStack (spacing: 30) {
                             
                             HStack {
-                                Text ("Every new profile begins with a new hearing test.")
+                                Text ("Every new profile begins with a hearing test.")
                                 Spacer()
                             }
                             HStack {
@@ -561,7 +582,7 @@ struct TestView: View {
                                 Spacer()
                             }
                             HStack {
-                                Text ("As a reminder, please don't change your phone's volume during the test as this will throw off the measurements.")
+                                Text ("As a reminder, please don't change your phone's volume or navigate to a different tab during the test or you will need to start over.")
                                 Spacer()
                             }
                             HStack {
@@ -578,7 +599,9 @@ struct TestView: View {
                             model.stopTrack()
                         }
                         introStep = 40
-                        model.testStatus = .testInProgress
+                        toneProgress = 0
+                        tonesCompleted = 0
+                        model.tapStartTest()
                     })
                     .font(.title)
                     .foregroundColor(.blue)

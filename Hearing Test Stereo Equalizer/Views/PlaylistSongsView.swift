@@ -46,6 +46,8 @@ struct PlaylistSongsView: View {
         }
     }
     
+  //  @State var refreshState = UUID()
+    
     
     var body: some View {  
         
@@ -73,7 +75,7 @@ struct PlaylistSongsView: View {
                 let defaultUIImage = UIImage(systemName: "photo")!
                 let UIAlbumCover = mediatImage?.image(at: size) ?? defaultUIImage
                 let albumCover = Image(uiImage: UIAlbumCover)
-                let albumCover2 = Image(uiImage: defaultUIImage)
+        //        let albumCover2 = Image(uiImage: defaultUIImage)
                 SongsRowView(albumCover: albumCover, songName: songName ?? "Title Unknown")
              //   SongsRowView(songName: songName ?? "Title Unknown")
                     .contentShape(Rectangle())
@@ -95,6 +97,9 @@ struct PlaylistSongsView: View {
         }
         .searchable(text: $searchText)
         .listStyle(PlainListStyle())
+//        .refreshable {
+//            refreshState = UUID()
+//        }
         .navigationTitle(playlistName)
         .onAppear{
             print ("PLAYLIST SONGS VIEW APPEARED")

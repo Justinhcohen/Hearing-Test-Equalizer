@@ -35,6 +35,8 @@ struct PlaylistView: View {
         print (playlistCounts)
         return filteredMPMediaItemCollection
     }
+    
+   // @State var refreshState = UUID()
        
     
 //    func loadLibraryPlaylists () async throws {
@@ -64,6 +66,10 @@ struct PlaylistView: View {
             }
         }
         .listStyle(PlainListStyle())
+        .refreshable {
+            let updatedAllPlaylists = allPlaylists
+            let updatedAllPlaylistsFiltered = allPlaylistsFiltered
+        }
         .navigationTitle("Playlists")
             
         
