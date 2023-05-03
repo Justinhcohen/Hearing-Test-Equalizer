@@ -42,6 +42,7 @@
 		0DE36F332A01D70500AB44A8 /* indiebox-funkhouse.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0DE36F322A01D70500AB44A8 /* indiebox-funkhouse.mp3 */; };
 		0DE36F352A028BF400AB44A8 /* SoloSongView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE36F342A028BF400AB44A8 /* SoloSongView.swift */; };
 		0DE36F372A029BC700AB44A8 /* PlayerViewSoloSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE36F362A029BC700AB44A8 /* PlayerViewSoloSong.swift */; };
+		0DE36F392A02E18D00AB44A8 /* InstructionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE36F382A02E18D00AB44A8 /* InstructionsView.swift */; };
 		0DE5DE6F298ADBB8006C8E7E /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE5DE6E298ADBB8006C8E7E /* PlayerView.swift */; };
 		0DE5DE71298D897F006C8E7E /* PlaylistSongsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE5DE70298D897F006C8E7E /* PlaylistSongsView.swift */; };
 		0DE5DE73299408AD006C8E7E /* UserProfileHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE5DE72299408AD006C8E7E /* UserProfileHeaderView.swift */; };
@@ -91,6 +92,7 @@
 		0DE36F322A01D70500AB44A8 /* indiebox-funkhouse.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "indiebox-funkhouse.mp3"; sourceTree = "<group>"; };
 		0DE36F342A028BF400AB44A8 /* SoloSongView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoloSongView.swift; sourceTree = "<group>"; };
 		0DE36F362A029BC700AB44A8 /* PlayerViewSoloSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewSoloSong.swift; sourceTree = "<group>"; };
+		0DE36F382A02E18D00AB44A8 /* InstructionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = InstructionsView.swift; path = ../../../../Android_Development/InstructionsView.swift; sourceTree = "<group>"; };
 		0DE5DE6E298ADBB8006C8E7E /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		0DE5DE70298D897F006C8E7E /* PlaylistSongsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistSongsView.swift; sourceTree = "<group>"; };
 		0DE5DE72299408AD006C8E7E /* UserProfileHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileHeaderView.swift; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 			children = (
 				0D65AD9B293D14F10017E4F8 /* ContentView.swift */,
 				0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */,
+				0DE36F382A02E18D00AB44A8 /* InstructionsView.swift */,
 				0DCB0E32296504E000083DB4 /* SongsView.swift */,
 				0DE36F342A028BF400AB44A8 /* SoloSongView.swift */,
 				0DE942D02968A5A100FFA006 /* PlaylistView.swift */,
@@ -337,6 +340,7 @@
 				0D0FD6CB29FE0601008C4490 /* AppleMusicPlaylistSongsView.swift in Sources */,
 				0DE5DE772996C122006C8E7E /* GainRowView.swift in Sources */,
 				0D249C902972447C0075FED3 /* UserProfileView.swift in Sources */,
+				0DE36F392A02E18D00AB44A8 /* InstructionsView.swift in Sources */,
 				0D39F12129A5476A00987C02 /* RemoteCommandCenter.swift in Sources */,
 				0D37678F29551DC100F3FF59 /* TestView.swift in Sources */,
 				0D249C8E297242210075FED3 /* HearingTest.xcdatamodeld in Sources */,
@@ -487,7 +491,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;
@@ -525,7 +529,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;

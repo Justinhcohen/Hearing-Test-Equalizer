@@ -600,14 +600,23 @@ class Model: ObservableObject, RemoteCommandHandler {
 //                    print ("PREPAING THE AUDIO ENGINE")
                     audioEngine.prepare()
                 print ("I PREPARED THE AUDIO ENGINE")
+                if !audioEngine.isRunning {
                     try audioEngine.start()
-                print ("I TRIED TO START THE AUDIO ENGINE.")
+                    print ("I TRIED TO START THE AUDIO ENGINE.")
                     print ("AFTER STARTING, AUDIO ENGINE IS RUNNING = \(audioEngine.isRunning)")
+                } else {
+                    print ("The audio engine is already running.")
+                }
 //                }
                 
                
 
                 let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
+                
+                guard audioEngine.isRunning else {
+                    print ("THE AUDIO ENGINE WASN'T RUNNING")
+                    return
+                }
                 
                 // Left Ear Play
             //    audioPlayerNodeL1.scheduleFile(audioFile, at: audioTime, completionHandler: nil) 
@@ -681,11 +690,18 @@ class Model: ObservableObject, RemoteCommandHandler {
             audioFile = try AVAudioFile(forReading: currentURL!)
 
                     audioEngine.prepare()
-                    try audioEngine.start()
-                    print ("AUDIO ENGINE IS RUNNING = \(audioEngine.isRunning)")
+            if !audioEngine.isRunning {
+                try audioEngine.start()
+                print ("Tried to start audio engine for the demo song. AUDIO ENGINE IS RUNNING = \(audioEngine.isRunning)")
+            } else {
+                print ("The audio engine is already running for the demo song.")
+            }
 
                 
-               
+            guard audioEngine.isRunning else {
+                print ("THE AUDIO ENGINE WASN'T RUNNING")
+                return
+            }
 
                 let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
                 

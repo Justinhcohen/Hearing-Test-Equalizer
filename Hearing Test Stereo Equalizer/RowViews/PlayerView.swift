@@ -70,9 +70,9 @@ struct PlayerView: View {
                 
                 Spacer ()
                 Button (action: showModalSoloSongView) {
-                    Image(systemName: "rectangle.expand.vertical")
+                    Image(systemName: "arrow.up")
                 }
-                .disabled(model.songList.isEmpty || model.demoIsPlaying)
+                .disabled(!model.audioEngine.isRunning)
                 .sheet(isPresented: $shouldShowModalSoloSongView, onDismiss: dismiss) {
                     //SoloSongView(albumCover: albumCover, songName: songName, artistName: artistName)
                     SoloSongView()

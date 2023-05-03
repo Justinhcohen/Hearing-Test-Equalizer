@@ -25,6 +25,7 @@ struct LibraryView: View {
     @State var defaultUserProfileHasBeenSet = false 
     @State var shouldShowUnlockLibraryAlert = false
     @State var libraryAccessIsPurchased = false 
+    @State var shouldShowInstructionsViewModal = false
     
     func runStartupItems () {
         print ("CALLED RUN STARTUP ITEMS")
@@ -154,6 +155,14 @@ struct LibraryView: View {
         userDefaults.set(true, forKey: "libraryAccessIsPurchased")
     }
     
+    func showInstructionsViewModal () {
+        shouldShowInstructionsViewModal = true
+    }
+    
+    func dismiss() {
+        
+    }
+    
     
     var body: some View {
         
@@ -162,12 +171,23 @@ struct LibraryView: View {
         VStack {
             
             if model.libraryAccessIsGranted {
-                
-                UserProfileHeaderView()
-                
-                    .onAppear {
-                        runStartupItems()
+                ZStack {
+                    UserProfileHeaderView()
+                    
+                        .onAppear {
+                            runStartupItems()
+                        }
+                    HStack {
+                        Spacer()
+                        Button (action: showInstructionsViewModal) {
+                            Image(systemName: "questionmark.circle")
+                        }
+                        .sheet(isPresented: $shouldShowInstructionsViewModal, onDismiss: dismiss) {
+                            InstructionsView()
+                        }
                     }
+                    .padding()
+                }
                 
                 if !libraryAccessIsPurchased {
                     VStack (spacing: 30)  {
@@ -252,13 +272,7 @@ struct LibraryView: View {
                             } label: {
                                 LibraryRowView(image: Image(systemName: "music.note"), text: "Songs")
                             }
-                            //                            NavigationLink {
-                            //                                AppleMusicPlaylistView().onAppear {
-                            //                                    model.songList = allSongs
-                            //                                }
-                            //                            } label: {
-                            //                                LibraryRowView(image: Image(systemName: "music.note.list"), text: "Apple Music Playlists")
-                            //                            }
+                            
                             
                         }
                         .listStyle(PlainListStyle())
