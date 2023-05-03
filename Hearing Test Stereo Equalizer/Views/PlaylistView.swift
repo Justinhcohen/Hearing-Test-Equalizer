@@ -32,7 +32,7 @@ struct PlaylistView: View {
                 filteredMPMediaItemCollection.append (playlist)
             }
         } 
-        print (playlistCounts)
+      //  print (playlistCounts)
         return filteredMPMediaItemCollection
     }
     
@@ -66,10 +66,10 @@ struct PlaylistView: View {
             }
         }
         .listStyle(PlainListStyle())
-        .refreshable {
-            let updatedAllPlaylists = allPlaylists
-            let updatedAllPlaylistsFiltered = allPlaylistsFiltered
-        }
+//        .refreshable {
+//            let updatedAllPlaylists = allPlaylists
+//            let updatedAllPlaylistsFiltered = allPlaylistsFiltered
+//        }
         .navigationTitle("Playlists")
             
         

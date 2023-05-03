@@ -207,7 +207,7 @@ struct TestView: View {
                                 Spacer()
                             }
                             HStack {
-                                Text ("After the hearing test, you'll see which frequencies Spex is boosting and by how much. It will apply zero boost to the frequency you hear the best, max boost to the frequency you hear ther worst, and relative boosts to all the frequencies inbetween. In addition to seeing the boosts, you'll hear how these boosts focus the demo song. Toggle Spex on and off while listening to determine if Spex is for you.")
+                                Text ("After the hearing test, you'll see which frequencies Spex is boosting and by how much. It will apply zero boost to the frequency you hear the best, max boost to the frequency you hear ther worst, and relative boosts to all the frequencies inbetween. In addition to seeing the boosts, you'll hear how these boosts focus the demo songs. Toggle Spex on and off while listening to determine if Spex is for you.")
                                 Spacer()
                             }
                             HStack {

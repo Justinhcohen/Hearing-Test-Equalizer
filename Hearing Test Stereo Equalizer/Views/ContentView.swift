@@ -19,13 +19,13 @@ var body: some View {
                 .tabItem({ Label("Library", systemImage: "music.note.list")})
                 .tag(1)
             EQView(tabSelection: $tabSelection)
-                .tabItem({ Label("Spex", systemImage: "speaker") }) 
+                .tabItem({ Label("Spex", systemImage: "sparkles") }) 
                 .tag (2)
             TestView(tabSelection: $tabSelection)
                 .tabItem({ Label("Test", systemImage: "ear.and.waveform") }) 
                 .tag (3)
             UserProfileView(tabSelection: $tabSelection)
-                .tabItem({ Label("Profiles", systemImage: "music.note.list")})
+                .tabItem({ Label("Profiles", systemImage: "person.crop.circle")})
                 .tag (4)
         }
     }

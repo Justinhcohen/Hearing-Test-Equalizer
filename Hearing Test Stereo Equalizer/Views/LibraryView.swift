@@ -176,11 +176,11 @@ struct LibraryView: View {
                         ScrollView {
                             VStack (spacing: 30) {
                                 HStack {
-                                    Text ("Were you able to find the sweet spot on the Intensity slider that increased your enjoyment of the demo song?")
+                                    Text ("Were you able to find the sweet spot on the Intensity slider that increased your enjoyment of the demo songs?")
                                     Spacer ()
                                 }
                                 HStack {
-                                    Text ("If you didn't notice an improvement when toggling Spex on and off while listening to the demo, Spex may not be for you.")
+                                    Text ("If you didn't notice an improvement when toggling Spex on and off while listening to the demo songs, Spex may not be for you.")
                                     Spacer ()
                                 }
                                 HStack {

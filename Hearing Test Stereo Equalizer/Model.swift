@@ -9,6 +9,7 @@ import Foundation
 import AVKit
 import MediaPlayer
 import MusicKit
+import SwiftUI
 
 class Model: ObservableObject, RemoteCommandHandler {
     
@@ -23,6 +24,26 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var playState: PlayState = .stopped
     @Published var demoIsPlaying = false
     @Published var didViewMusicLibrary = false
+    
+    @Published var albumCover = Image(systemName: "photo")
+     @Published var songName = ""
+    @Published var artistName = ""
+    @Published var currentSongTime: TimeInterval = 0
+    @Published var currentSongTimeStatic: TimeInterval = 0
+    @Published var currentSongDuration: TimeInterval = 0
+     
+     func updateSongMetadata () {
+         let size = CGSize(width: 1284, height: 1284)
+          songName = currentMediaItem.title ?? "Unknown title"
+          artistName = currentMediaItem.artist ?? "Unknown artist"
+         let mediaImage = currentMediaItem.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
+         let UIAlbumCover = mediaImage?.image(at: size)
+         let defaultUIImage = UIImage(systemName: "photo")!
+          albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
+         currentSongTime = audioPlayerNodeL1.current
+         currentSongTimeStatic = max (currentSongTime, currentSongTimeStatic)
+         currentSongDuration = audioFile.duration
+     }
     
     let systemMusicPlayer = MPMusicPlayerController.systemMusicPlayer
     
@@ -184,8 +205,10 @@ class Model: ObservableObject, RemoteCommandHandler {
                    if audioPlayerNodeL1.currentFrame > 0 {
                        cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
                    }
+                    playOrPauseCurrentTrack()
                    setNowPlayingMetadata()
-                   playTrack()
+                  
+                   //playTrack()
            
            case .oldDeviceUnavailable: // Old device removed.
                print ("CALLED OLD DEVEICE UNAVAILABLE")
@@ -197,12 +220,17 @@ class Model: ObservableObject, RemoteCommandHandler {
                        if audioPlayerNodeL1.currentFrame > 0 {
                            cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
                        }
+                       print ("Headphones are connected and calling play or pause current track.")
+                       playOrPauseCurrentTrack()
                        setNowPlayingMetadata()
-                       playTrack()
+                       
+                       //playTrack()
                    } else {
                        if audioPlayerNodeL1.currentFrame > 0 {
                            cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
                        }
+                       print ("Headphones are not conencted and calling play or pause current track. Playstate = \(playState)")
+                    //   playOrPauseCurrentTrack()
                        setNowPlayingMetadata()
                    }
                }
@@ -314,6 +342,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     
     func onSongEnd(){
+        updateSongMetadata()
         if audioPlayerNodeL1.current >= audioFile.duration {
             playNextTrack()
         }
@@ -440,33 +469,33 @@ class Model: ObservableObject, RemoteCommandHandler {
         }
     } 
     
-    func setEQBandsForCurrentProfile () {
-        print ("CALLED SET EQ BAND FOR CURRENT PROFILE")
-        
-        let multiplier = equalizerIsActive ? Float (currentUserProfile.intensity / 6.0) : 0.0
-        
-        // Left Ear
-        let bandsL = equalizerL1.bands
-        bandsL[0].gain = currentUserProfile.left60 * multiplier
-        bandsL[1].gain = currentUserProfile.left100 * multiplier
-        bandsL[2].gain = currentUserProfile.left230 * multiplier
-        bandsL[3].gain = currentUserProfile.left500 * multiplier
-        bandsL[4].gain = currentUserProfile.left1100 * multiplier
-        bandsL[5].gain = currentUserProfile.left2400 * multiplier
-        bandsL[6].gain = currentUserProfile.left5400 * multiplier
-        bandsL[7].gain = currentUserProfile.left12000 * multiplier
-        
-        // Right Ear
-        let bandsR = equalizerR1.bands
-        bandsR[0].gain = currentUserProfile.right60 * multiplier
-        bandsR[1].gain = currentUserProfile.right100 * multiplier
-        bandsR[2].gain = currentUserProfile.right230 * multiplier
-        bandsR[3].gain = currentUserProfile.right500 * multiplier
-        bandsR[4].gain = currentUserProfile.right1100 * multiplier
-        bandsR[5].gain = currentUserProfile.right2400 * multiplier
-        bandsR[6].gain = currentUserProfile.right5400 * multiplier
-        bandsR[7].gain = currentUserProfile.right12000 * multiplier
-    }
+//    func setEQBandsForCurrentProfile () {
+//        print ("CALLED SET EQ BAND FOR CURRENT PROFILE")
+//        
+//        let multiplier = equalizerIsActive ? Float (currentUserProfile.intensity / 6.0) : 0.0
+//        
+//        // Left Ear
+//        let bandsL = equalizerL1.bands
+//        bandsL[0].gain = currentUserProfile.left60 * multiplier
+//        bandsL[1].gain = currentUserProfile.left100 * multiplier
+//        bandsL[2].gain = currentUserProfile.left230 * multiplier
+//        bandsL[3].gain = currentUserProfile.left500 * multiplier
+//        bandsL[4].gain = currentUserProfile.left1100 * multiplier
+//        bandsL[5].gain = currentUserProfile.left2400 * multiplier
+//        bandsL[6].gain = currentUserProfile.left5400 * multiplier
+//        bandsL[7].gain = currentUserProfile.left12000 * multiplier
+//        
+//        // Right Ear
+//        let bandsR = equalizerR1.bands
+//        bandsR[0].gain = currentUserProfile.right60 * multiplier
+//        bandsR[1].gain = currentUserProfile.right100 * multiplier
+//        bandsR[2].gain = currentUserProfile.right230 * multiplier
+//        bandsR[3].gain = currentUserProfile.right500 * multiplier
+//        bandsR[4].gain = currentUserProfile.right1100 * multiplier
+//        bandsR[5].gain = currentUserProfile.right2400 * multiplier
+//        bandsR[6].gain = currentUserProfile.right5400 * multiplier
+//        bandsR[7].gain = currentUserProfile.right12000 * multiplier
+//    }
                                 
     
     func getQueueIndex (playQueue: [MPMediaItem], currentMPMediaItem: MPMediaItem) -> Int {
@@ -480,6 +509,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     func setNowPlayingMetadata() {
+        updateSongMetadata()
        print ("CALLED SET NOW PLAYING METADATA")
         let nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
         var nowPlayingInfo = [String: Any]()
@@ -490,7 +520,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         nowPlayingInfo[MPNowPlayingInfoPropertyMediaType] = currentMediaItem.mediaType.rawValue
      //   nowPlayingInfo[MPNowPlayingInfoPropertyIsLiveStream] = currentMediaItem.isLiveStream
         nowPlayingInfo[MPMediaItemPropertyTitle] = currentMediaItem.title ?? "Unknown title"
-        nowPlayingInfo[MPMediaItemPropertyArtist] = currentMediaItem.artist ?? "Uknown artist"
+        nowPlayingInfo[MPMediaItemPropertyArtist] = currentMediaItem.artist ?? "Unknown artist"
         let defaultImage = UIImage(systemName: "photo")!
         let defaultArtwork = MPMediaItemArtwork (boundsSize: defaultImage.size, requestHandler: { (size) -> UIImage in
             return defaultImage
@@ -506,15 +536,16 @@ class Model: ObservableObject, RemoteCommandHandler {
         case .playing: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1.0
 //            nowPlayingInfoCenter.playbackState = .playing
 //            mpNowPlayingPlaybackState = .playing
-//            print ("mpNowPlayingPlaybackState = \(mpNowPlayingPlaybackState)")
+             print ("The nowPlayingPlayback rate should now be 1.0")
         case .paused: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
 //            nowPlayingInfoCenter.playbackState = .paused
 //            mpNowPlayingPlaybackState = .paused
-//            print ("PlayState should be paused = \(playState)")
-//            print ("mpNowPlayingPlaybackState = \(mpNowPlayingPlaybackState)")
+            print ("The nowPlayingPlayback rate should now be 0")
+
         case .stopped: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
 //            nowPlayingInfoCenter.playbackState = .stopped
 //            mpNowPlayingPlaybackState = .stopped
+            print ("The nowPlayingPlayback rate should now be 0")
         }
         
         nowPlayingInfo[MPNowPlayingInfoPropertyDefaultPlaybackRate] = 1.0
@@ -532,6 +563,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     func playTrack () {
         print ("CALLED PLAY TRACK")
+        currentSongTimeStatic = 0
         isPlayingDemoOne = false
         isPlayingDemoTwo = false
         if playQueue.isEmpty {
@@ -632,7 +664,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         switch demoTrack {
         case .trackOne:
             demoTrackName = "Evert Zeevalkink - On The Roads"
-            isPlayingDemoOne = true
+            isPlayingDemoOne = true 
         case .trackTwo:
             demoTrackName = "indiebox-funkhouse"
             isPlayingDemoTwo = true
@@ -641,7 +673,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         songList = [MPMediaItem]()
         demoIsPlaying = true
         prepareAudioEngine() 
-        setEQBandsForCurrentProfile()
+        setEQBands(for: currentUserProfile)
         do {
             print ("Index = \(queueIndex)")
              let currentURL = Bundle.main.url(forResource: demoTrackName, withExtension: "mp3")
@@ -687,7 +719,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     func stopTrack () {
         print ("CALLED STOP TRACK")
-        
+        currentSongTimeStatic = 0
         audioPlayerNodeL1.stop()
         audioPlayerNodeR1.stop()
         playState = .stopped
@@ -700,11 +732,10 @@ class Model: ObservableObject, RemoteCommandHandler {
     func playPreviousTrack () {
         print ("CALLED PLAY PREVIOUS TRACK")
         cachedAudioFrame = nil
-//        if isInterrupted {
-//            isInterrupted.toggle()
-//        }
         guard queueIndex > 0 else {return}
-        queueIndex -= 1
+        if audioPlayerNodeL1.current < 2.0 {
+            queueIndex -= 1
+        }
         currentMediaItem = playQueue[queueIndex]
         if playState == .playing {
             playTrack()
@@ -736,6 +767,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     func pauseTrack () {
+        guard !songList.isEmpty else {return}
         print ("CALLED PAUSE TRACK")
         fadeInTimer?.invalidate()
         fadeInTimer = nil
@@ -752,6 +784,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     func unPauseTrack () {
+        guard !songList.isEmpty else {return}
         print ("CALLED UNPAUSE TRACK")
         let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
         audioPlayerNodeL1.play(at: audioTime)
@@ -766,9 +799,6 @@ class Model: ObservableObject, RemoteCommandHandler {
         print ("CALLED PLAY NEXT TRACK")
         print ("PLAY NEXT TRACK PLAY STATE = \(playState)")
         cachedAudioFrame = nil
-//        if isInterrupted {
-//            isInterrupted.toggle()
-//        }
         guard queueIndex < playQueue.count - 1 else {return}
         queueIndex += 1
         currentMediaItem = playQueue[queueIndex]
@@ -780,101 +810,6 @@ class Model: ObservableObject, RemoteCommandHandler {
         setNowPlayingMetadata()
     }
     
-//    func playNextTrackFromCallBack (_ callBack: AVAudioPlayerNodeCompletionCallbackType) {
-//        
-//        DispatchQueue.main.sync {
-//            print ("CALLED PLAY NEXT TRACK")
-//            if self.isInterrupted {
-//                self.isInterrupted.toggle()
-//            }
-//            guard self.queueIndex < self.playQueue.count - 1 else {return}
-//            self.queueIndex += 1
-//            self.currentMediaItem = self.playQueue[self.queueIndex]
-//            if self.playState == .playing {
-//                self.playTrack()
-//            } else {
-//                self.stopTrack()
-//            }
-//            self.setNowPlayingMetadata()
-//        }
-//        
-//    }
-    
-//    func receivedTrackFinishedPlaying () {
-//        print ("Received Track Finished Playing")
-//        playNextTrack()
-//    }
-    
-   
-//    func toggleEqualizer () {
-//        if equalizerIsActive {
-//            equalizerIsActive = false
-//            userDefaults.set(false, forKey: "equalizerIsActive")
-//            print ("Equalizer is off")
-//        } else {
-//            equalizerIsActive = true
-//            userDefaults.set(true, forKey: "equalizerIsActive")
-//            print ("Equalizer is active")
-//        }
-//        setEQBands(for: currentUserProfile)
-//    }
-    
-//    func toggleEqualizer () {
-//        setEQBands(for: currentUserProfile)
-//    }
-    
-//    func toggleManualAdjustments () {
-//        if manualAdjustmentsAreActive {
-//            manualAdjustmentsAreActive = false
-//            userDefaults.set(false, forKey: "manualAdjustmentsAreActive")
-//            print ("Manual Adjustments are off")
-//        } else {
-//            manualAdjustmentsAreActive = true
-//            userDefaults.set(true, forKey: "manualAdjustmentsAreActive")
-//            print ("Manual Adjustment are on")
-//        }
-//       setEQBands(for: currentUserProfile)
-//    }
-
-    
-//    func setEQBandsGainForNewProfile () {
-//       // var currentLowestAudibleDecibelBands = [Double]()
-//        var minValue = 0.0
-//        var maxValue = -160.0
-//        for i in 0...lowestAudibleDecibelBands.count - 1 {
-//            if lowestAudibleDecibelBands[i] < minValue {
-//                minValue = lowestAudibleDecibelBands[i]
-//            }
-//            if lowestAudibleDecibelBands[i] > maxValue {
-//                maxValue = lowestAudibleDecibelBands[i]
-//            }
-//        }
-//        if abs (minValue - maxValue) < 1 {
-//            minValue = maxValue - 1 // Avoiding dividing by zero.
-//        }
-//        let multiplier: Double = min(6.0 / abs(minValue - maxValue), 1.0)
-//        
-//        var workingBandsGain = [Float]()
-//        for i in 0...lowestAudibleDecibelBands.count - 1 {
-//            workingBandsGain.insert(Float(multiplier * abs(minValue - lowestAudibleDecibelBands[i]) ), at: i)
-//        }
-//        currentUserProfile.left60 = workingBandsGain[0]
-//        currentUserProfile.left100 = workingBandsGain[1]
-//        currentUserProfile.left230 = workingBandsGain[2]
-//        currentUserProfile.left500 = workingBandsGain[3]
-//        currentUserProfile.left1100 = workingBandsGain[4]
-//        currentUserProfile.left2400 = workingBandsGain[5]
-//        currentUserProfile.left5400 = workingBandsGain[6]
-//        currentUserProfile.left12000 = workingBandsGain[7]
-//        currentUserProfile.right60 = workingBandsGain[8]
-//        currentUserProfile.right100 = workingBandsGain[9]
-//        currentUserProfile.right230 = workingBandsGain[10]
-//        currentUserProfile.right500 = workingBandsGain[11]
-//        currentUserProfile.right1100 = workingBandsGain[12]
-//        currentUserProfile.right2400 = workingBandsGain[13]
-//        currentUserProfile.right5400 = workingBandsGain[14]
-//        currentUserProfile.right12000 = workingBandsGain[15]
-//    }
     
     func setEQBands (for currentUserProfile: UserProfile) {
         let multiplier = Float (currentUserProfile.intensity / 6.0)

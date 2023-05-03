@@ -40,6 +40,8 @@
 		0DCB0E33296504E000083DB4 /* SongsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCB0E32296504E000083DB4 /* SongsView.swift */; };
 		0DE36F312A01D6F500AB44A8 /* Evert Zeevalkink - On The Roads.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0DE36F302A01D6F500AB44A8 /* Evert Zeevalkink - On The Roads.mp3 */; };
 		0DE36F332A01D70500AB44A8 /* indiebox-funkhouse.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0DE36F322A01D70500AB44A8 /* indiebox-funkhouse.mp3 */; };
+		0DE36F352A028BF400AB44A8 /* SoloSongView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE36F342A028BF400AB44A8 /* SoloSongView.swift */; };
+		0DE36F372A029BC700AB44A8 /* PlayerViewSoloSong.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE36F362A029BC700AB44A8 /* PlayerViewSoloSong.swift */; };
 		0DE5DE6F298ADBB8006C8E7E /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE5DE6E298ADBB8006C8E7E /* PlayerView.swift */; };
 		0DE5DE71298D897F006C8E7E /* PlaylistSongsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE5DE70298D897F006C8E7E /* PlaylistSongsView.swift */; };
 		0DE5DE73299408AD006C8E7E /* UserProfileHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE5DE72299408AD006C8E7E /* UserProfileHeaderView.swift */; };
@@ -87,6 +89,8 @@
 		0DCB0E32296504E000083DB4 /* SongsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongsView.swift; sourceTree = "<group>"; };
 		0DE36F302A01D6F500AB44A8 /* Evert Zeevalkink - On The Roads.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Evert Zeevalkink - On The Roads.mp3"; sourceTree = "<group>"; };
 		0DE36F322A01D70500AB44A8 /* indiebox-funkhouse.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "indiebox-funkhouse.mp3"; sourceTree = "<group>"; };
+		0DE36F342A028BF400AB44A8 /* SoloSongView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoloSongView.swift; sourceTree = "<group>"; };
+		0DE36F362A029BC700AB44A8 /* PlayerViewSoloSong.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewSoloSong.swift; sourceTree = "<group>"; };
 		0DE5DE6E298ADBB8006C8E7E /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		0DE5DE70298D897F006C8E7E /* PlaylistSongsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistSongsView.swift; sourceTree = "<group>"; };
 		0DE5DE72299408AD006C8E7E /* UserProfileHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileHeaderView.swift; sourceTree = "<group>"; };
@@ -117,6 +121,7 @@
 				0D65AD9B293D14F10017E4F8 /* ContentView.swift */,
 				0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */,
 				0DCB0E32296504E000083DB4 /* SongsView.swift */,
+				0DE36F342A028BF400AB44A8 /* SoloSongView.swift */,
 				0DE942D02968A5A100FFA006 /* PlaylistView.swift */,
 				0D6197C329A2C470003F3FE3 /* ArtistView.swift */,
 				0D39F11E29A2DC8A00987C02 /* ArtistSongsView.swift */,
@@ -140,6 +145,7 @@
 				0DE5DE762996C122006C8E7E /* GainRowView.swift */,
 				0DE5DE72299408AD006C8E7E /* UserProfileHeaderView.swift */,
 				0DE5DE6E298ADBB8006C8E7E /* PlayerView.swift */,
+				0DE36F362A029BC700AB44A8 /* PlayerViewSoloSong.swift */,
 			);
 			path = RowViews;
 			sourceTree = "<group>";
@@ -322,6 +328,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0DE36F372A029BC700AB44A8 /* PlayerViewSoloSong.swift in Sources */,
 				0D32338F29F57A0F00A3C4AE /* ManualEQView.swift in Sources */,
 				0DE5DE73299408AD006C8E7E /* UserProfileHeaderView.swift in Sources */,
 				0D19B1532955F3E600D17C16 /* Model.swift in Sources */,
@@ -350,6 +357,7 @@
 				0D2DCFCF2972EFC300BFFAD6 /* UserProfileRowView.swift in Sources */,
 				0DE942D32968A71F00FFA006 /* LibraryRowView.swift in Sources */,
 				0D39F11F29A2DC8A00987C02 /* ArtistSongsView.swift in Sources */,
+				0DE36F352A028BF400AB44A8 /* SoloSongView.swift in Sources */,
 				0DC1213929762AAD00736FA6 /* Player.swift in Sources */,
 				0DE5DE71298D897F006C8E7E /* PlaylistSongsView.swift in Sources */,
 				0D71B327296B0C3C00C467FD /* VolumeObserver.swift in Sources */,

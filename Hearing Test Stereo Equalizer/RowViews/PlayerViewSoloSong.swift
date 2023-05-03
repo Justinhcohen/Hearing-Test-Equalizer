@@ -1,15 +1,13 @@
 //
-//  PlayerView.swift
+//  PlayerViewSoloSong.swift
 //  Hearing Test Stereo Equalizer
 //
-//  Created by Justin Cohen on 2/1/23.
+//  Created by Justin Cohen on 5/3/23.
 //
 
 import SwiftUI
-import MediaPlayer
 
-struct PlayerView: View {
-    
+struct PlayerViewSoloSong: View {
     @EnvironmentObject var model: Model
     @ObservedObject private var volObserver = VolumeObserver() 
     
@@ -44,7 +42,6 @@ struct PlayerView: View {
                 model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
             })
         }
-        ZStack {
             HStack (spacing: 30) {
                 Button (action: model.playPreviousTrack) {
                     Image(systemName: "backward.fill")
@@ -66,34 +63,15 @@ struct PlayerView: View {
                 .disabled(model.songList.isEmpty || model.demoIsPlaying)
     
             }
-            HStack {
-                
-                Spacer ()
-                Button (action: showModalSoloSongView) {
-                    Image(systemName: "rectangle.expand.vertical")
-                }
-                .disabled(model.songList.isEmpty || model.demoIsPlaying)
-                .sheet(isPresented: $shouldShowModalSoloSongView, onDismiss: dismiss) {
-                    //SoloSongView(albumCover: albumCover, songName: songName, artistName: artistName)
-                    SoloSongView()
-                }
-                
-                
-            }
-        }
+       
         .font(.largeTitle)
         .padding()
         
     }
 }
 
-
-
-
-
-
-//struct PlayerView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        PlayerView()
-//    }
-//}
+struct PlayerViewSoloSong_Previews: PreviewProvider {
+    static var previews: some View {
+        PlayerViewSoloSong()
+    }
+}
