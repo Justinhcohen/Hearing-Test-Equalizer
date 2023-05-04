@@ -36,6 +36,7 @@ struct UserProfileHeaderView: View {
             Spacer()
         }
         .foregroundColor(model.equalizerIsActive ? .green : .gray)
+        .font(.callout)
 //        .onTapGesture {
 //            showUserProfilesModalView = true
 //        }

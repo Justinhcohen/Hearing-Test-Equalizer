@@ -294,6 +294,9 @@ struct LibraryView: View {
                         if model.testStatus != .stopped {
                             model.stopAndResetTest()
                         }
+                        if model.demoIsPlaying {
+                            model.stopDemoTrack()
+                        }
                         
                     }
 //                    Button("Temp Reset", 

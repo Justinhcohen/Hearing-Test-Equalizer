@@ -11,6 +11,7 @@ import AVKit
 struct TestView: View {
     
     @EnvironmentObject var model: Model
+    @ObservedObject private var volObserver = VolumeObserver() 
     @FetchRequest(sortDescriptors: []) var userProfiles: FetchedResults<UserProfile>
     @Environment(\.managedObjectContext) var moc
     @Binding var tabSelection: Int
@@ -24,6 +25,7 @@ struct TestView: View {
     @State private var yesIsTemporarilyDisabled = false
     @State private var toneProgress = 0.0
     @State private var showTestResultsView = false
+    @State private var shouldShowVolumeChangedAlert = false
     @State private var introStep = 0 {
         willSet {
             userDefaults.setValue(newValue, forKey: "introStep")  
@@ -461,6 +463,17 @@ struct TestView: View {
                         .onAppear {
                             if model.testStatus != .testInProgress {
                                 introStep = 50
+                            }
+                        }
+                        .onChange(of: volObserver.volume, perform: {value in
+                            shouldShowVolumeChangedAlert = true
+                        })
+                        .alert("Volume change detected. Test will restart.", isPresented: $shouldShowVolumeChangedAlert) {
+                            Button ("Got it.") {
+                                model.stopAndResetTest()
+                                toneProgress = 0
+                                tonesCompleted = 0
+                                model.tapStartTest()
                             }
                         }
                     

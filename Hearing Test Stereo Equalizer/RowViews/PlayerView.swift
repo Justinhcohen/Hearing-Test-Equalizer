@@ -30,60 +30,69 @@ struct PlayerView: View {
     }
     
     var body: some View {
-        HStack {
+        VStack {
+//            HStack {
+//                Image(systemName: "speaker.wave.2")
+//                    .foregroundColor((model.songList.isEmpty || model.demoIsPlaying) ? .gray : .blue)
+//                    .font(.callout)
+//                
+//                Slider(value: $fineTuneSoundLevel, in: 0...100, onEditingChanged: { editing in
+//                    model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
+//                    model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
+//                    soundLevelIsEditing = editing
+//                })
+//                // .padding()
+//                .onChange(of: volObserver.volume, perform: {value in
+//                    fineTuneSoundLevel = 0.0
+//                    model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
+//                    model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
+//                })
+//                
+//            }
+//            .padding(.leading, 20)
+//            .padding(.trailing, 20)
+//            .padding(.top, 30)
             
-            Slider(value: $fineTuneSoundLevel, in: 0...100, onEditingChanged: { editing in
-                model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                soundLevelIsEditing = editing
-            })
-            .padding()
-            .onChange(of: volObserver.volume, perform: {value in
-                fineTuneSoundLevel = 0.0
-                model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-            })
-        }
-        ZStack {
-            HStack (spacing: 30) {
-                Button (action: model.playPreviousTrack) {
-                    Image(systemName: "backward.fill")
-                }
-                .disabled(model.songList.isEmpty || model.demoIsPlaying)
-                
-                Button (action: model.playOrPauseCurrentTrack) {
-                    if model.playState == .stopped || model.playState == .paused {
-                        Image(systemName: "play.fill")
-                    } else {
-                        Image(systemName: "pause.fill")
+            ZStack {
+                HStack (spacing: 30) {
+                    Button (action: model.playPreviousTrack) {
+                        Image(systemName: "backward.fill")
                     }
+                    .disabled(model.songList.isEmpty || model.demoIsPlaying)
+                    
+                    Button (action: model.playOrPauseCurrentTrack) {
+                        if model.playState == .stopped || model.playState == .paused {
+                            Image(systemName: "play.fill")
+                        } else {
+                            Image(systemName: "pause.fill")
+                        }
+                    }
+                    .disabled(model.songList.isEmpty || model.demoIsPlaying)
+                    
+                    Button (action: model.playNextTrack) {
+                        Image(systemName: "forward.fill")
+                    }
+                    .disabled(model.songList.isEmpty || model.demoIsPlaying)
+                    
                 }
-                .disabled(model.songList.isEmpty || model.demoIsPlaying)
-                
-                Button (action: model.playNextTrack) {
-                    Image(systemName: "forward.fill")
+                HStack {
+                    
+                    Spacer ()
+                    Button (action: showModalSoloSongView) {
+                        Image(systemName: "arrow.up")
+                    }
+                    .disabled(!model.audioEngine.isRunning || model.songList.isEmpty || model.demoIsPlaying || !model.audioPlayerNodeL1.isPlaying)
+                    .sheet(isPresented: $shouldShowModalSoloSongView, onDismiss: dismiss) {
+                        //SoloSongView(albumCover: albumCover, songName: songName, artistName: artistName)
+                        SoloSongView()
+                    }
+                    
+                    
                 }
-                .disabled(model.songList.isEmpty || model.demoIsPlaying)
-    
             }
-            HStack {
-                
-                Spacer ()
-                Button (action: showModalSoloSongView) {
-                    Image(systemName: "arrow.up")
-                }
-                .disabled(!model.audioEngine.isRunning)
-                .sheet(isPresented: $shouldShowModalSoloSongView, onDismiss: dismiss) {
-                    //SoloSongView(albumCover: albumCover, songName: songName, artistName: artistName)
-                    SoloSongView()
-                }
-                
-                
-            }
+            .font(.largeTitle)
+            .padding()
         }
-        .font(.largeTitle)
-        .padding()
-        
     }
 }
 

@@ -28,6 +28,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var albumCover = Image(systemName: "photo")
      @Published var songName = ""
     @Published var artistName = ""
+    @Published var albumName = ""
     @Published var currentSongTime: TimeInterval = 0
     @Published var currentSongTimeStatic: TimeInterval = 0
     @Published var currentSongDuration: TimeInterval = 0
@@ -36,6 +37,7 @@ class Model: ObservableObject, RemoteCommandHandler {
          let size = CGSize(width: 1284, height: 1284)
           songName = currentMediaItem.title ?? "Unknown title"
           artistName = currentMediaItem.artist ?? "Unknown artist"
+         albumName = currentMediaItem.albumTitle ?? "Unknown album"
          let mediaImage = currentMediaItem.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
          let UIAlbumCover = mediaImage?.image(at: size)
          let defaultUIImage = UIImage(systemName: "photo")!
@@ -266,6 +268,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         equalizerIsActive = userDefaults.bool(forKey: "equalizerIsActive")
         manualAdjustmentsAreActive = userDefaults.bool(forKey: "manualAdjustmentsAreActive")
         currentUserProfileName = userDefaults.string(forKey: "currentUserProfileName") ?? "There is no name"
+        fineTuneSoundLevel = userDefaults.float(forKey: "fineTuneSoundLevel")
         print ("Equalizer is active = \(equalizerIsActive)")
     }
     
@@ -313,7 +316,11 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var timer: Timer?
     @Published var fadeInTimer: Timer?
     @Published var fadeOutTimer: Timer?
-    @Published var fineTuneSoundLevel: Float = 0.0
+    @Published var fineTuneSoundLevel: Float = 0.0 {
+        didSet {
+            userDefaults.set(fineTuneSoundLevel, forKey: "fineTuneSoundLevel")
+        }
+    }
     var fadeOutSoundLevel: Float = 0.0
     @Published var currentVolume: Float = 0.0
     @Published var systemVolume = AVAudioSession.sharedInstance().outputVolume
@@ -668,6 +675,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     func playDemoTrack () {
         print ("CALLED PLAY DEMO TRACK")
+        stopTrack()
         stopDemoTrack()
         var demoTrackName = ""
         switch demoTrack {

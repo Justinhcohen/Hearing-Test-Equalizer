@@ -35,11 +35,11 @@ struct EQView: View {
     @State private var intensity: Double = 6.0
     @State private var bassBoost: Double = 0.0
     @State private var reverb: Double = 0.0
-    @State private var fineTuneSoundLevel: Float = 0 {
-        didSet {
-            model.fineTuneSoundLevel =  (0.7 + (fineTuneSoundLevel * 0.003))
-        }
-    }
+//    @State private var fineTuneSoundLevel: Float = 0 {
+//        didSet {
+//            model.fineTuneSoundLevel =  (0.7 + (fineTuneSoundLevel * 0.003))
+//        }
+//    }
     @State private var slider = RepresentedMPVolumeView()
     @State private var systemSoundLevel: Float = 0.2
     @State private var soundLevelIsEditing = false

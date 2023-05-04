@@ -27,12 +27,19 @@ struct SoloSongView: View {
 //    }
     
     var body: some View {
-        VStack (spacing: 30) {
+        
+        UserProfileHeaderView()
+        
+        VStack (spacing: 20) {
             model.albumCover
                 .resizable()
                 .aspectRatio(contentMode: .fit)
             Text (model.artistName)
+                .font(.largeTitle)
+            Text (model.albumName)
+                .font(.title)
             Text(model.songName)
+                .font(.title3)
 //            ProgressView(value: model.currentSongTimeStatic, total: modelI'm I'm .currentSongDuration)
 //                .padding()
             Spacer()
