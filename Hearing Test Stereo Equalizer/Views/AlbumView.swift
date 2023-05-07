@@ -1,18 +1,18 @@
 //
-//  ArtistView.swift
+//  AlbumView.swift
 //  Hearing Test Stereo Equalizer
 //
-//  Created by Justin Cohen on 2/19/23.
+//  Created by Justin Cohen on 5/4/23.
 //
 
 import SwiftUI
 import MediaPlayer
 
-struct ArtistView: View {
+struct AlbumView: View {
     @EnvironmentObject var model: Model
  
-    var allArtists: [MPMediaItemCollection] {
-        let query = MPMediaQuery.artists()
+    var allAlbums: [MPMediaItemCollection] {
+        let query = MPMediaQuery.albums()
         return query.collections!
     }
     
@@ -20,9 +20,9 @@ struct ArtistView: View {
     
     var searchResults: [MPMediaItemCollection] {
         if searchText.isEmpty {
-            return allArtists
+            return allAlbums
         } else {
-            return allArtists.filter { ($0.representativeItem!.artist ?? "Unknown Artist").contains(searchText) }
+            return allAlbums.filter { ($0.representativeItem!.albumTitle ?? "Unknown Album Name").lowercased().contains(searchText.lowercased()) || ($0.representativeItem!.artist ?? "Unknown Artist").lowercased().contains(searchText.lowercased())}
         }
     }
     
@@ -31,22 +31,26 @@ struct ArtistView: View {
     var body: some View {
         
         List {
-            ForEach (searchResults, id: \.self) {artist in
-                let artistName = artist.representativeItem?.artist as? String
+            ForEach (searchResults, id: \.self) {album in
+                let albumName = album.representativeItem?.albumTitle ?? "Unknown Album"
                 let size = CGSize(width: 30, height: 30)
-                let firstTrack = artist.items[0]
+               // let songName = item.title ?? "Unknown title"
+                let firstTrack = album.items[0]
+                let artist = firstTrack.artist ?? "Unknown Artist"
+                let combinedAlbumPlusArtist = "\(albumName) - \(artist)"
                 let mediaImage = firstTrack.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
                 let UIAlbumCover = mediaImage?.image(at: size)
                 let defaultUIImage = UIImage(systemName: "photo")!
                 let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
                 NavigationLink {
-                    ArtistSongsView(artistName: artistName ?? "No Name").onAppear {
-                        model.songList = artist.items
+                    AlbumSongsView(albumName: combinedAlbumPlusArtist).onAppear {
+                        model.songList = album.items
                     }
                         .contentShape(Rectangle())
                 } label: {
                     HStack {
-                        ArtistRowView(albumCover: albumCover, artistName: artistName ?? "Unknown Artist")
+                        AlbumRowView(albumCover: albumCover, albumName: combinedAlbumPlusArtist)
+                      //  Text (albumName ?? "No Album Name")
                         Spacer()
                     }
                 }  
@@ -58,19 +62,19 @@ struct ArtistView: View {
 //        .refreshable {
 //            refreshState = UUID()
 //        }
-        .navigationTitle("Artists")
+        .navigationTitle("Albums")
         
-        if allArtists.isEmpty {
+        if allAlbums.isEmpty {
             HStack {
-                Text ("You have no artists.")
+                Text ("You have no albums.")
                 Spacer()
             }
         }
     }
 }
 
-struct ArtistView_Previews: PreviewProvider {
+struct AlbumView_Previews: PreviewProvider {
     static var previews: some View {
-        ArtistView()
+        AlbumView()
     }
 }

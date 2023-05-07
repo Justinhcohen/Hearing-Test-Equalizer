@@ -51,6 +51,14 @@ struct PlaylistView: View {
         
         List (allPlaylistsFiltered, id: \.self) { playlist in
             let playlistName = playlist.value(forProperty: MPMediaPlaylistPropertyName) as? String
+            let size = CGSize(width: 30, height: 30)
+           // let songName = item.title ?? "Unknown title"
+            let firstTrack = playlist.items[0]
+            let artist = firstTrack.artist ?? "Unknown Artist"
+            let mediaImage = firstTrack.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
+            let UIAlbumCover = mediaImage?.image(at: size)
+            let defaultUIImage = UIImage(systemName: "photo")!
+            let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
             NavigationLink {
                 
                 PlaylistSongsView(playlistName: playlistName ?? "No Name").onAppear {
@@ -59,8 +67,7 @@ struct PlaylistView: View {
                 }
             } label: {
                 HStack {    
-                    Text (playlistName ?? "No Playlist Name")
-                    Spacer()
+                    PlaylistRowView(albumCover: albumCover, playlistName: playlistName ?? "Unknown Playlist Name")
                 }
                 .contentShape(Rectangle())
             }

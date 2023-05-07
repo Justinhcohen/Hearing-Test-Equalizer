@@ -29,7 +29,7 @@ extension AVAudioFile{
 extension AVAudioPlayerNode{
 
     var current: TimeInterval{
-        if let nodeTime = lastRenderTime,let playerTime = playerTime(forNodeTime: nodeTime) {
+        if let nodeTime = lastRenderTime, let playerTime = playerTime(forNodeTime: nodeTime) {
             return Double(playerTime.sampleTime) / playerTime.sampleRate
         }
         return 0
@@ -65,5 +65,25 @@ extension Float {
 extension Double {
     func decimals(_ nbr: Int) -> String {
         String(self.formatted(.number.precision(.fractionLength(nbr))))
+    }
+}
+
+extension Formatter {
+    static let positional: DateComponentsFormatter = {
+        let positional = DateComponentsFormatter()
+        positional.unitsStyle = .positional
+        positional.zeroFormattingBehavior = .pad
+        return positional
+    }()
+}
+
+extension TimeInterval {
+    var positionalTime: String {
+        Formatter.positional.allowedUnits = self >= 3600 ?
+                                            [.hour, .minute, .second] :
+                                            [.minute, .second]
+        let string = Formatter.positional.string(from: self)!
+        return string.hasPrefix("0") && string.count > 4 ?
+            .init(string.dropFirst()) : string
     }
 }

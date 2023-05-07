@@ -42,9 +42,12 @@ class Model: ObservableObject, RemoteCommandHandler {
          let UIAlbumCover = mediaImage?.image(at: size)
          let defaultUIImage = UIImage(systemName: "photo")!
           albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
-         currentSongTime = audioPlayerNodeL1.current
+         currentSongTime = audioPlayerNodeL1.current + (cachedAudioTime ?? 0)
          currentSongTimeStatic = max (currentSongTime, currentSongTimeStatic)
          currentSongDuration = audioFile.duration
+//         print ("On updateSongMetadata, currentSongTimeStatic = \(currentSongTimeStatic)")
+//         print ("On updateSongMetaData, audioPlayNodeL1.current = \(audioPlayerNodeL1.current)")
+//         print ("On updateSongMetaData, currentSongTime = \(currentSongTime)")
      }
     
     let systemMusicPlayer = MPMusicPlayerController.systemMusicPlayer
@@ -59,11 +62,13 @@ class Model: ObservableObject, RemoteCommandHandler {
     // The handler to be invoked when an interruption begins or ends.
     private var interruptionHandler: (NowPlayableInterruption) -> Void = { _ in }
     
-    var cachedAudioFrame: AVAudioFramePosition? {
+    @Published var cachedAudioFrame: AVAudioFramePosition? {
         didSet {
             print ("CACHED AUDIO FRAME = \(cachedAudioFrame ?? 0)")
         }
     }
+    
+    @Published var cachedAudioTime: TimeInterval? = 0
     
 //    private var isInterrupted = false {
 //        didSet {
@@ -158,6 +163,7 @@ class Model: ObservableObject, RemoteCommandHandler {
             playState = .stopped 
             if audioPlayerNodeL1.currentFrame > 0 {
                 cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+                cachedAudioTime = audioPlayerNodeL1.current
                 //isInterrupted = true
             }
             setNowPlayingMetadata()
@@ -181,64 +187,140 @@ class Model: ObservableObject, RemoteCommandHandler {
        // playState = .stopped 
         if audioPlayerNodeL1.currentFrame > 0 {
             cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+            cachedAudioTime = audioPlayerNodeL1.current
             //isInterrupted = true
         }
     }
     
+//    func handleRouteChangeNotification(notification: Notification) {
+//        guard audioPlayerNodeL1.isPlaying else {return}
+//       // guard !songList.isEmpty else {return}
+//        print ("HANDLE ROUTE CHANGE")
+//        playState = .stopped 
+//        guard let userInfo = notification.userInfo,
+//               let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
+//               let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
+//                   return
+//           }
+//           
+//           // Switch over the route change reason.
+//           switch reason {
+//
+//           case .newDeviceAvailable: // New device found.
+//               print ("CALLED NEW DEVICE AVAILABLE")
+//               let session = AVAudioSession.sharedInstance()
+//               headphonesConnected = hasHeadphones(in: session.currentRoute)
+//               print ("HEAD PHONES CONNECTED = \(headphonesConnected)")
+// 
+//                   if audioPlayerNodeL1.currentFrame > 0 {
+//                       cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+//                       cachedAudioTime = audioPlayerNodeL1.current
+//                   }
+//                    playOrPauseCurrentTrack()
+//                   setNowPlayingMetadata()
+//                  
+//                   //playTrack()
+//           
+//           case .oldDeviceUnavailable: // Old device removed.
+//               print ("CALLED OLD DEVEICE UNAVAILABLE")
+//               if let previousRoute =
+//                   userInfo[AVAudioSessionRouteChangePreviousRouteKey] as? AVAudioSessionRouteDescription {
+//                   headphonesConnected = hasHeadphones(in: previousRoute)
+//                   print ("HEAD PHONES CONNECTED = \(headphonesConnected)")
+//                   if headphonesConnected {
+//                       if audioPlayerNodeL1.currentFrame > 0 {
+//                           cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+//                           cachedAudioTime = audioPlayerNodeL1.current
+//                       }
+//                       print ("Headphones are connected and calling play or pause current track.")
+//                       playOrPauseCurrentTrack()
+//                       setNowPlayingMetadata()
+//                       
+//                       //playTrack()
+//                   } else {
+//                       if audioPlayerNodeL1.currentFrame > 0 {
+//                           cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+//                           cachedAudioTime = audioPlayerNodeL1.current
+//                       }
+//                       print ("Headphones are not conencted and calling play or pause current track. Playstate = \(playState)")
+//                    //   playOrPauseCurrentTrack()
+//                       setNowPlayingMetadata()
+//                   }
+//               }
+//           
+//           default: break
+//           }
+//    }
+    
     func handleRouteChangeNotification(notification: Notification) {
-        guard !songList.isEmpty else {return}
-        print ("HANDLE ROUTE CHANGE")
-        playState = .stopped 
-        guard let userInfo = notification.userInfo,
-               let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
-               let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
-                   return
-           }
+        print ("HANDLING ROUTE CHANGE NOTIFICATION")
+        guard audioEngine.isRunning else {return}
+        // stopTrackAfterSeek()
+        if playState == .playing {
+            playOrPauseCurrentTrack()
+        }
+//        switch playState {
+//        case .paused:
+//            break
+//        case .stopped:
+//            break
+//        case .playing:
+//            print ("PLAY STATE IS \(playState)")
+//            guard let userInfo = notification.userInfo,
+//                          let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
+//                          let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
+//                              return
+//                      }
+//            switch reason {
+//
+//            case .newDeviceAvailable: // New device found.
+//                print ("REASON IS NEW DEVICE AVAILABLE")
+////                print ("CALLED NEW DEVICE AVAILABLE")
+////                let session = AVAudioSession.sharedInstance()
+////                headphonesConnected = hasHeadphones(in: session.currentRoute)
+////                print ("HEAD PHONES CONNECTED = \(headphonesConnected)")
+////  
+////                    if audioPlayerNodeL1.currentFrame > 0 {
+////                        cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+////                        cachedAudioTime = audioPlayerNodeL1.current
+////                    }
+//                     playTrackAfterSeek()
+//                   
+//                    //playTrack()
+//            
+//            case .oldDeviceUnavailable: // Old device removed.
+//                print ("CALLED OLD DEVEICE UNAVAILABLE")
+//                if let previousRoute =
+//                    userInfo[AVAudioSessionRouteChangePreviousRouteKey] as? AVAudioSessionRouteDescription {
+//                    headphonesConnected = hasHeadphones(in: previousRoute)
+//                    print ("HEAD PHONES CONNECTED = \(headphonesConnected)")
+//                    stopTrackAfterSeek()
+////                    if headphonesConnected {
+////                        if audioPlayerNodeL1.currentFrame > 0 {
+////                            cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+////                            cachedAudioTime = audioPlayerNodeL1.current
+////                        }
+////                        print ("Headphones are connected and calling play or pause current track.")
+////                        playOrPauseCurrentTrack()
+////                        setNowPlayingMetadata()
+////                        
+////                        //playTrack()
+////                    } else {
+////                        if audioPlayerNodeL1.currentFrame > 0 {
+////                            cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
+////                            cachedAudioTime = audioPlayerNodeL1.current
+////                        }
+////                        print ("Headphones are not conencted and calling play or pause current track. Playstate = \(playState)")
+////                     //   playOrPauseCurrentTrack()
+////                        setNowPlayingMetadata()
+////                    }
+//                }
+//            
+//            default: break
+//            }
+//        }
+        
            
-           // Switch over the route change reason.
-           switch reason {
-
-           case .newDeviceAvailable: // New device found.
-               print ("CALLED NEW DEVICE AVAILABLE")
-               let session = AVAudioSession.sharedInstance()
-               headphonesConnected = hasHeadphones(in: session.currentRoute)
-               print ("HEAD PHONES CONNECTED = \(headphonesConnected)")
- 
-                   if audioPlayerNodeL1.currentFrame > 0 {
-                       cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
-                   }
-                    playOrPauseCurrentTrack()
-                   setNowPlayingMetadata()
-                  
-                   //playTrack()
-           
-           case .oldDeviceUnavailable: // Old device removed.
-               print ("CALLED OLD DEVEICE UNAVAILABLE")
-               if let previousRoute =
-                   userInfo[AVAudioSessionRouteChangePreviousRouteKey] as? AVAudioSessionRouteDescription {
-                   headphonesConnected = hasHeadphones(in: previousRoute)
-                   print ("HEAD PHONES CONNECTED = \(headphonesConnected)")
-                   if headphonesConnected {
-                       if audioPlayerNodeL1.currentFrame > 0 {
-                           cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
-                       }
-                       print ("Headphones are connected and calling play or pause current track.")
-                       playOrPauseCurrentTrack()
-                       setNowPlayingMetadata()
-                       
-                       //playTrack()
-                   } else {
-                       if audioPlayerNodeL1.currentFrame > 0 {
-                           cachedAudioFrame = (cachedAudioFrame ?? 0) + Int64(audioPlayerNodeL1.currentFrame)
-                       }
-                       print ("Headphones are not conencted and calling play or pause current track. Playstate = \(playState)")
-                    //   playOrPauseCurrentTrack()
-                       setNowPlayingMetadata()
-                   }
-               }
-           
-           default: break
-           }
     }
     
     func hasHeadphones(in routeDescription: AVAudioSessionRouteDescription) -> Bool {
@@ -348,9 +430,10 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     
-    func onSongEnd(){
+    func playbackTimer(){
         updateSongMetadata()
-        if audioPlayerNodeL1.current >= audioFile.duration {
+     
+        if currentSongTime >= audioFile.duration {
             playNextTrack()
         }
     }
@@ -416,11 +499,11 @@ class Model: ObservableObject, RemoteCommandHandler {
         fadeOutTimer = nil
     }
     
-    func startTimer () {
+    func startPlaybackTimer () {
         print ("START TIMER CALLED")
         if timer == nil {
             timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
-                self.onSongEnd()
+                self.playbackTimer()
             })
             timer?.fire()
         } 
@@ -516,7 +599,11 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     func setNowPlayingMetadata() {
-        updateSongMetadata()
+        guard !songList.isEmpty else {return}
+        print ("CALLED SET NOW PLAYING METADATA, playState = \(playState)")
+        if playState == .playing {
+            updateSongMetadata()
+        }
        print ("CALLED SET NOW PLAYING METADATA")
         let nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
         var nowPlayingInfo = [String: Any]()
@@ -578,7 +665,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         }
         currentMediaItem = playQueue[queueIndex]
         
-        if playState == .playing {
+        if (playState == .playing || playState == .paused)  {
             self.stopTrack()
         }
         
@@ -586,10 +673,11 @@ class Model: ObservableObject, RemoteCommandHandler {
             demoIsPlaying = false
         }
         
-        prepareAudioEngine() 
-        
-        print ("PREPARE AUDIO ENGINE WAS CALLED")
-        print ("AFTER PREPARING, AUDIO ENGINE IS RUNNING = \(audioEngine.isRunning)")
+        if !audioEngine.isRunning {
+            prepareAudioEngine() 
+            print ("PREPARE AUDIO ENGINE WAS CALLED")
+            print ("AFTER PREPARING, AUDIO ENGINE IS RUNNING = \(audioEngine.isRunning)")
+        }
         
         
         setEQBands(for: currentUserProfile)
@@ -605,9 +693,9 @@ class Model: ObservableObject, RemoteCommandHandler {
                 //    Start your Engines 
 //                if !audioEngine.isRunning {
 //                    print ("PREPAING THE AUDIO ENGINE")
-                    audioEngine.prepare()
-                print ("I PREPARED THE AUDIO ENGINE")
                 if !audioEngine.isRunning {
+                    audioEngine.prepare()
+                    print ("I PREPARED THE AUDIO ENGINE")
                     try audioEngine.start()
                     print ("I TRIED TO START THE AUDIO ENGINE.")
                     print ("AFTER STARTING, AUDIO ENGINE IS RUNNING = \(audioEngine.isRunning)")
@@ -627,25 +715,156 @@ class Model: ObservableObject, RemoteCommandHandler {
                 
                 // Left Ear Play
             //    audioPlayerNodeL1.scheduleFile(audioFile, at: audioTime, completionHandler: nil) 
-                audioPlayerNodeL1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
-                audioPlayerNodeL1.pan = -1
-                audioPlayerNodeL1.play()  
+//                audioPlayerNodeL1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
+//                audioPlayerNodeL1.pan = -1
+//                audioPlayerNodeL1.play()  
+//                
+//                
+//                // Right Ear Play
+//           //     audioPlayerNodeR1.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
+//                audioPlayerNodeR1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
+//                audioPlayerNodeR1.pan = 1
+//                audioPlayerNodeR1.play()
+                
+              
+               
+                    stopTrack()
+                    audioPlayerNodeL1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
+                    audioPlayerNodeL1.pan = -1
+                    audioPlayerNodeL1.play()  
+                    
+                    
+                    // Right Ear Play
+               //     audioPlayerNodeR1.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
+                    audioPlayerNodeR1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
+                    audioPlayerNodeR1.pan = 1
+                    audioPlayerNodeR1.play()
+                    playState = .playing
+                    startPlaybackTimer()
                 
                 
-                // Right Ear Play
-           //     audioPlayerNodeR1.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
-                audioPlayerNodeR1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
-                audioPlayerNodeR1.pan = 1
-                audioPlayerNodeR1.play()
+//                if playState != .playing {
+//                    print ("PLAY STATE = \(playState)")
+//                    playState = .playing 
+//                   startTimer()
+//                }
+                
+            
+                setNowPlayingMetadata()
+                print ("PLAY STATE 2 = \(playState)")
+                print ("AUDIO IS PLAYING = \(audioPlayerNodeL1.isPlaying)")
+                print ("NODE VOLUME = \(audioPlayerNodeL1.volume)")
+                
+            }
+            
+        } catch _ {print ("Catching Audio Engine Error")}
+    }
+    
+    func playTrackAfterSeek () {
+        print ("CALLED PLAY TRACK AFTER SEEK")
+        isPlayingDemoOne = false
+        isPlayingDemoTwo = false
+        if playQueue.isEmpty {
+            playQueue = songList
+        }
+        currentMediaItem = playQueue[queueIndex]
+        
+//        if (playState == .playing || playState == .paused) {
+//            self.stopTrackAfterSeek()
+//        }
+        
+        if demoIsPlaying {
+            demoIsPlaying = false
+        }
+        
+        if !audioEngine.isRunning {
+            prepareAudioEngine() 
+            print ("PREPARE AUDIO ENGINE WAS CALLED")
+            print ("AFTER PREPARING, AUDIO ENGINE IS RUNNING = \(audioEngine.isRunning)")
+        }
+        
+        
+        setEQBands(for: currentUserProfile)
+        
+      
+        do {
+            print ("Index = \(queueIndex)")
+          //  let currentMPMediaItem = playQueue[queueIndex]
+         //   currentPersistentID = currentMediaItem.persistentID
+            if let currentURL = currentMediaItem.assetURL {
+                audioFile = try AVAudioFile(forReading: currentURL)
+                 
+                //    Start your Engines 
+//                if !audioEngine.isRunning {
+//                    print ("PREPAING THE AUDIO ENGINE")
+                if !audioEngine.isRunning {
+                    audioEngine.prepare()
+                    print ("I PREPARED THE AUDIO ENGINE")
+                    try audioEngine.start()
+                    print ("I TRIED TO START THE AUDIO ENGINE.")
+                    print ("AFTER STARTING, AUDIO ENGINE IS RUNNING = \(audioEngine.isRunning)")
+                } else {
+                    print ("The audio engine is already running.")
+                }
+//                }
+                
+               
+
+                let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
+                
+                guard audioEngine.isRunning else {
+                    print ("THE AUDIO ENGINE WASN'T RUNNING")
+                    return
+                }
+                
+                // Left Ear Play
+            //    audioPlayerNodeL1.scheduleFile(audioFile, at: audioTime, completionHandler: nil) 
+//                audioPlayerNodeL1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
+//                audioPlayerNodeL1.pan = -1
+//                audioPlayerNodeL1.play()  
+//                
+//                
+//                // Right Ear Play
+//           //     audioPlayerNodeR1.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
+//                audioPlayerNodeR1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
+//                audioPlayerNodeR1.pan = 1
+//                audioPlayerNodeR1.play()
+                
+//                switch playState {
+//                case .stopped:
+//                    playState = .playing
+//                    startPlaybackTimer()
+//                case .paused:
+//                    playState = .playing
+//                case .playing: 
+//                    playState = .paused
+//                }
                 
                 switch playState {
                 case .stopped:
-                    playState = .playing
-                    startTimer()
+//                    playState = .playing
+//                    startPlaybackTimer()
+                    break
                 case .paused:
-                    playState = .playing
+                    stopTrackAfterSeek()
+                    break
+                   // playState = .playing
                 case .playing: 
-                    playState = .paused
+                    stopTrackAfterSeek()
+                    playState = .playing
+                    startPlaybackTimer()
+                    audioPlayerNodeL1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
+                    audioPlayerNodeL1.pan = -1
+                    audioPlayerNodeL1.play()  
+                    
+                    
+                    // Right Ear Play
+               //     audioPlayerNodeR1.scheduleFile(audioFile, at: audioTime, completionHandler: nil)
+                    audioPlayerNodeR1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
+                    audioPlayerNodeR1.pan = 1
+                    audioPlayerNodeR1.play()
+                    
+                   
                 }
                 
 //                if playState != .playing {
@@ -675,6 +894,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     func playDemoTrack () {
         print ("CALLED PLAY DEMO TRACK")
+        playState = .stopped
         stopTrack()
         stopDemoTrack()
         var demoTrackName = ""
@@ -750,12 +970,21 @@ class Model: ObservableObject, RemoteCommandHandler {
         setNowPlayingMetadata()
     }
     
+    func stopTrackAfterSeek () {
+        print ("CALLED STOP TRACK AFTER SEEK")
+        audioPlayerNodeL1.stop()
+        audioPlayerNodeR1.stop()
+        playState = .stopped
+        setNowPlayingMetadata()
+    }
+    
     
     
     
     func playPreviousTrack () {
         print ("CALLED PLAY PREVIOUS TRACK")
         cachedAudioFrame = nil
+        cachedAudioTime = nil
         guard queueIndex > 0 else {return}
         if audioPlayerNodeL1.current < 2.0 {
             queueIndex -= 1
@@ -780,7 +1009,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         if playState == .stopped {
             startFadeInTimer()
             playTrack()
-            startTimer()
+            startPlaybackTimer()
             
         } else if playState == .paused {
             startFadeInTimer()
@@ -811,11 +1040,20 @@ class Model: ObservableObject, RemoteCommandHandler {
         guard !songList.isEmpty else {return}
         print ("CALLED UNPAUSE TRACK")
         let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
+        if !audioEngine.isRunning {
+            audioEngine.prepare()
+            do {
+                try audioEngine.start()  
+            } catch {
+                 print ("Catching Audio Engine Error")
+            }
+        }
         audioPlayerNodeL1.play(at: audioTime)
         audioPlayerNodeR1.play(at: audioTime)
         playState = .playing
         setNowPlayingMetadata()
-    }
+    } 
+
     
     
     
@@ -823,6 +1061,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         print ("CALLED PLAY NEXT TRACK")
         print ("PLAY NEXT TRACK PLAY STATE = \(playState)")
         cachedAudioFrame = nil
+        cachedAudioTime = nil
         guard queueIndex < playQueue.count - 1 else {return}
         queueIndex += 1
         currentMediaItem = playQueue[queueIndex]

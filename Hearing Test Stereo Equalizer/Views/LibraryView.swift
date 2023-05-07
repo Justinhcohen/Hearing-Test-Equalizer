@@ -260,11 +260,19 @@ struct LibraryView: View {
                             } label: {
                                 LibraryRowView(image: Image(systemName: "music.note.list"), text: "Playlists")
                             }
+                            
                             NavigationLink {
                                 ArtistView()
                             } label: {
                                 LibraryRowView(image: Image(systemName: "music.mic"), text: "Artists")
                             }
+                            
+                            NavigationLink {
+                                AlbumView()
+                            } label: {
+                                LibraryRowView(image: Image(systemName: "square.stack"), text: "Albums")
+                            }
+                            
                             NavigationLink {
                                 SongsView().onAppear {
                                     model.songList = allSongs

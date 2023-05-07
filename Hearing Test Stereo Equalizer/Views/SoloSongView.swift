@@ -11,6 +11,30 @@ import MediaPlayer
 struct SoloSongView: View {
     
     @EnvironmentObject var model: Model
+    @State var currentTime: TimeInterval = 0
+    @State var currentTimeRemaining: TimeInterval = 0
+    @State var soloViewPlaybackTimer: Timer?
+    
+    func soloViewPlaybackTimerAction () {
+        currentTime = model.currentSongTimeStatic
+        currentTimeRemaining = model.audioFile.duration - model.currentSongTimeStatic
+//        let formatter = DateComponentsFormatter()
+//        formatter.unitsStyle = .positional
+//        let formattedTime = currentTime.positionalTime
+//        let formattedTimeRemaining = currentTimeRemaining.positionalTime
+//        print (formattedTime as Any)
+//        print (formattedTimeRemaining as Any)
+    }
+    
+    func startPlaybackTimer () {
+        print ("START TIMER CALLED")
+        if soloViewPlaybackTimer == nil {
+            soloViewPlaybackTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { _ in
+                self.soloViewPlaybackTimerAction()
+            })
+            soloViewPlaybackTimer?.fire()
+        } 
+    }
     
 //   @State var albumCover: Image
 //    @State var songName: String
@@ -34,19 +58,62 @@ struct SoloSongView: View {
             model.albumCover
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-            Text (model.artistName)
-                .font(.largeTitle)
-            Text (model.albumName)
-                .font(.title)
-            Text(model.songName)
+                .cornerRadius(15)
+                .padding(10)
+            
+            VStack {
+                
+                Slider(value: $currentTime, in: 0...model.audioFile.duration, onEditingChanged: { editing in
+                    let sampleRateSong = model.audioFile.processingFormat.sampleRate
+                    model.cachedAudioFrame = Int64 (Double(currentTime) * Double(sampleRateSong))
+                    model.cachedAudioTime = currentTime
+                    model.currentSongTimeStatic = currentTime
+                    model.playTrackAfterSeek()
+                    //                model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
+                    //                model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
+                    //                model.fineTuneSoundLevel = fineTuneSoundLevel
+                    //                soundLevelIsEditing = editing
+                })
+                .padding(.leading, 10)
+                .padding(.trailing, 10)
+                
+                
+                HStack {
+                    Text (currentTime.positionalTime)
+                    Spacer()
+                    Text (currentTimeRemaining.positionalTime)
+                }
+                .padding(.leading, 10)
+                .padding(.trailing, 10)
+                .opacity(0.3)
+            }
+            VStack {
+                HStack{
+                    Text (model.artistName)
+                    Spacer()
+                }
+                    .font(.title)
+                HStack {
+                    Text(model.songName)
+                    Spacer()
+                }
                 .font(.title3)
-//            ProgressView(value: model.currentSongTimeStatic, total: modelI'm I'm .currentSongDuration)
-//                .padding()
+     
+                HStack {
+                    Text (model.albumName)
+                    Spacer()
+                }
+                .font(.title3)
+                    .opacity(0.7 )
+            }
+            .padding(.leading, 10)
+            .padding(.trailing, 10)
             Spacer()
             PlayerViewSoloSong()
         }
         .onAppear {
             model.updateSongMetadata()
+            startPlaybackTimer()
         }
     }
 }
