@@ -53,6 +53,7 @@ struct SoloSongView: View {
     var body: some View {
         
         UserProfileHeaderView()
+            .padding(.top, 10)
         
         VStack (spacing: 20) {
             model.albumCover
@@ -61,50 +62,67 @@ struct SoloSongView: View {
                 .cornerRadius(15)
                 .padding(10)
             
-            VStack {
+           
+            if model.showPlaytimeSlider {
                 
-                Slider(value: $currentTime, in: 0...model.audioFile.duration, onEditingChanged: { editing in
-                    let sampleRateSong = model.audioFile.processingFormat.sampleRate
-                    model.cachedAudioFrame = Int64 (Double(currentTime) * Double(sampleRateSong))
-                    model.cachedAudioTime = currentTime
-                    model.currentSongTimeStatic = currentTime
-                    model.playTrackAfterSeek()
-                    //                model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                    //                model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                    //                model.fineTuneSoundLevel = fineTuneSoundLevel
-                    //                soundLevelIsEditing = editing
-                })
-                .padding(.leading, 10)
-                .padding(.trailing, 10)
-                
-                
-                HStack {
-                    Text (currentTime.positionalTime)
-                    Spacer()
-                    Text (currentTimeRemaining.positionalTime)
+                VStack {
+                    
+                    Slider(value: $currentTime, in: 0...model.audioFile.duration, onEditingChanged: { editing in
+                        let sampleRateSong = model.audioFile.processingFormat.sampleRate
+                        model.cachedAudioFrame = Int64 (Double(currentTime) * Double(sampleRateSong))
+                        model.cachedAudioTime = currentTime
+                        model.currentSongTimeStatic = currentTime
+                        model.playTrackAfterSeek()
+                        //                model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
+                        //                model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
+                        //                model.fineTuneSoundLevel = fineTuneSoundLevel
+                        //                soundLevelIsEditing = editing
+                    })
+                    .padding(.leading, 10)
+                    .padding(.trailing, 10)
+                    
+                    
+                    HStack {
+                        Text (currentTime.positionalTime)
+                        Spacer()
+                        Text (currentTimeRemaining.positionalTime)
+                    }
+                    .padding(.leading, 10)
+                    .padding(.trailing, 10)
+                    .opacity(0.3)
+                    .font(.body)
                 }
-                .padding(.leading, 10)
-                .padding(.trailing, 10)
-                .opacity(0.3)
             }
+            
+            
             VStack {
-                HStack{
-                    Text (model.artistName)
-                    Spacer()
-                }
+                
+                if model.showSongInformation {
+                    
+                    HStack{
+                        Text (model.artistName)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                        Spacer()
+                    }
                     .font(.title)
-                HStack {
-                    Text(model.songName)
-                    Spacer()
-                }
-                .font(.title3)
-     
-                HStack {
-                    Text (model.albumName)
-                    Spacer()
-                }
-                .font(.title3)
+                    HStack {
+                        Text(model.songName)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                        Spacer()
+                    }
+                    .font(.title3)
+                    
+                    HStack {
+                        Text (model.albumName)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                        Spacer()
+                    }
+                    .font(.title3)
                     .opacity(0.7 )
+                }
             }
             .padding(.leading, 10)
             .padding(.trailing, 10)

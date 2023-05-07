@@ -39,7 +39,7 @@ struct SongsView: View {
         if searchText.isEmpty {
             return model.songList
         } else {
-            return model.songList.filter { $0.title!.contains(searchText) }
+            return model.songList.filter { ($0.title ?? "Unknown Title").lowercased().contains(searchText.lowercased()) }
         }
     }
     
@@ -95,6 +95,7 @@ struct SongsView: View {
                 }
             }
             .searchable(text: $searchText)
+            .disableAutocorrection(true)
             .listStyle(PlainListStyle())
 //            .refreshable {
 //                refreshState = UUID()

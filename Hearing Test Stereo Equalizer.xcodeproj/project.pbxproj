@@ -55,6 +55,7 @@
 		0DE942D32968A71F00FFA006 /* LibraryRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE942D22968A71F00FFA006 /* LibraryRowView.swift */; };
 		0DE942D52969F3DC00FFA006 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE942D42969F3DC00FFA006 /* Extensions.swift */; };
 		0DE942D7296A474200FFA006 /* SongsRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE942D6296A474200FFA006 /* SongsRowView.swift */; };
+		0DF1B8BB2A07E2D800DDA2D2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DF1B8BA2A07E2D800DDA2D2 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -108,6 +109,7 @@
 		0DE942D42969F3DC00FFA006 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		0DE942D6296A474200FFA006 /* SongsRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongsRowView.swift; sourceTree = "<group>"; };
 		0DE942D8296A63DA00FFA006 /* Hearing-Test-Stereo-Equalizer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Hearing-Test-Stereo-Equalizer-Info.plist"; sourceTree = SOURCE_ROOT; };
+		0DF1B8BA2A07E2D800DDA2D2 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +129,7 @@
 				0D65AD9B293D14F10017E4F8 /* ContentView.swift */,
 				0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */,
 				0DE36F382A02E18D00AB44A8 /* InstructionsView.swift */,
+				0DF1B8BA2A07E2D800DDA2D2 /* SettingsView.swift */,
 				0DCB0E32296504E000083DB4 /* SongsView.swift */,
 				0DE36F342A028BF400AB44A8 /* SoloSongView.swift */,
 				0DE942D02968A5A100FFA006 /* PlaylistView.swift */,
@@ -343,6 +346,7 @@
 				0DE5DE73299408AD006C8E7E /* UserProfileHeaderView.swift in Sources */,
 				0DE36F3B2A042CA100AB44A8 /* AlbumView.swift in Sources */,
 				0D19B1532955F3E600D17C16 /* Model.swift in Sources */,
+				0DF1B8BB2A07E2D800DDA2D2 /* SettingsView.swift in Sources */,
 				0DE36F432A057FFC00AB44A8 /* PlaylistRowView.swift in Sources */,
 				0DE5DE772996C122006C8E7E /* GainRowView.swift in Sources */,
 				0DE36F3F2A04343100AB44A8 /* AlbumRowView.swift in Sources */,

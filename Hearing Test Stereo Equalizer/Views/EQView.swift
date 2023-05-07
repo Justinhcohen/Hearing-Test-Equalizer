@@ -145,61 +145,63 @@ struct EQView: View {
                 }
                 
                 // The play demo button just below the slider
-               
-                HStack (spacing: 30) {
-                    
-                    Button {
-                        model.demoTrack = .trackOne
-                        if !model.isPlayingDemoOne {
-                            model.playDemoTrack()
-                            model.isPlayingDemoTwo = false
-                        } else {
-                            model.stopDemoTrack()
-                        }
-                    } label: {
-                        if !model.isPlayingDemoOne {
-                            Text("Play Demo 1")
-                        } else {
-                            Text ("Stop Demo 1")
-                        }
-                    }
-                    .font(.title)
-                    .padding ()
-                    .overlay(
-                        Capsule(style: .continuous)
-                        //  .stroke(.blue, lineWidth: 5)
-                            .stroke(model.isPlayingDemoOne ? Color.green : Color.blue, lineWidth: 5)
-                    )
-                    .foregroundColor(model.isPlayingDemoOne ? Color.green : Color.blue)
-                    .padding (.bottom, 20)
-                    
-                    Button {
-                        model.demoTrack = .trackTwo
-                        if !model.isPlayingDemoTwo {
-                            model.playDemoTrack()
-                            model.isPlayingDemoOne = false
-                        } else {
-                            model.stopDemoTrack()
-                        }
-                    } label: {
-                        if !model.isPlayingDemoTwo {
-                            Text("Play Demo 2")
-                        } else {
-                            Text ("Stop Demo 2")
-                        }
-                    }
-                    .font(.title)
-                    .padding ()
-                    .overlay(
-                        Capsule(style: .continuous)
-                        //  .stroke(.blue, lineWidth: 5)
-                            .stroke(model.isPlayingDemoTwo ? Color.green : Color.blue, lineWidth: 5)
-                    )
-                    .foregroundColor(model.isPlayingDemoTwo ? Color.green : Color.blue)
-                    .padding (.bottom, 20)
-                }
-              
                 
+                if model.showDemoSongButtons {
+                    
+                    HStack (spacing: 30) {
+                        
+                        Button {
+                            model.demoTrack = .trackOne
+                            if !model.isPlayingDemoOne {
+                                model.playDemoTrack()
+                                model.isPlayingDemoTwo = false
+                            } else {
+                                model.stopDemoTrack()
+                            }
+                        } label: {
+                            if !model.isPlayingDemoOne {
+                                Text("Play Demo 1")
+                            } else {
+                                Text ("Stop Demo 1")
+                            }
+                        }
+                        .font(.title)
+                        .padding ()
+                        .overlay(
+                            Capsule(style: .continuous)
+                            //  .stroke(.blue, lineWidth: 5)
+                                .stroke(model.isPlayingDemoOne ? Color.green : Color.blue, lineWidth: 5)
+                        )
+                        .foregroundColor(model.isPlayingDemoOne ? Color.green : Color.blue)
+                        .padding (.bottom, 20)
+                        
+                        Button {
+                            model.demoTrack = .trackTwo
+                            if !model.isPlayingDemoTwo {
+                                model.playDemoTrack()
+                                model.isPlayingDemoOne = false
+                            } else {
+                                model.stopDemoTrack()
+                            }
+                        } label: {
+                            if !model.isPlayingDemoTwo {
+                                Text("Play Demo 2")
+                            } else {
+                                Text ("Stop Demo 2")
+                            }
+                        }
+                        .font(.title)
+                        .padding ()
+                        .overlay(
+                            Capsule(style: .continuous)
+                            //  .stroke(.blue, lineWidth: 5)
+                                .stroke(model.isPlayingDemoTwo ? Color.green : Color.blue, lineWidth: 5)
+                        )
+                        .foregroundColor(model.isPlayingDemoTwo ? Color.green : Color.blue)
+                        .padding (.bottom, 20)
+                    }
+                    
+                }
                 
                 // The listing of EQ Boosts
                 VStack {
@@ -325,25 +327,29 @@ struct EQView: View {
             
             // The Manual Adjustments Button
             
+            
+            
             VStack {
                 
-                
-                
-                Button("Manual Adjustments", 
-                       action: {
-                    showManualControlsView = true
-                })
-                .font(.title)
-                .foregroundColor(model.equalizerIsActive ? .blue : .gray)
-                .padding ()
-                .overlay(
-                    Capsule(style: .continuous)
-                        .stroke( model.equalizerIsActive ? .blue : .gray, lineWidth: 5)
-                ) 
-                .sheet(isPresented: $showManualControlsView, onDismiss: didDismiss) {
-                    ManualEQView()
+                if model.showManualAdjustmentsButton {
+                    
+                    Button("Manual Adjustments", 
+                           action: {
+                        showManualControlsView = true
+                    })
+                    .font(.title)
+                    .foregroundColor(model.equalizerIsActive ? .blue : .gray)
+                    .padding ()
+                    .overlay(
+                        Capsule(style: .continuous)
+                            .stroke( model.equalizerIsActive ? .blue : .gray, lineWidth: 5)
+                    ) 
+                    .sheet(isPresented: $showManualControlsView, onDismiss: didDismiss) {
+                        ManualEQView()
+                    }
+                    .disabled(!model.equalizerIsActive)
+                    
                 }
-                .disabled(!model.equalizerIsActive)
                 
                 // The Player
                 

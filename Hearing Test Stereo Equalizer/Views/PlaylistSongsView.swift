@@ -113,6 +113,7 @@ struct PlaylistSongsView: View {
             }
         }
         .searchable(text: $searchText)
+        .disableAutocorrection(true)
         .listStyle(PlainListStyle())
 //        .refreshable {
 //            refreshState = UUID()

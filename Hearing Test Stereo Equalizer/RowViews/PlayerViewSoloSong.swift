@@ -33,53 +33,54 @@ struct PlayerViewSoloSong: View {
     
     var body: some View {
         VStack {
-            ZStack {
-                if model.equalizerIsActive {
-                    Image("SpexOwl1024")
-                        .resizable()
-                        .frame(width: 50, height: 50, alignment: .center)
-                } else {
-                    Image("SpexOwl1024BW")
-                        .resizable()
-                        .frame(width: 50, height: 50, alignment: .center)
-                }
-                Toggle("", isOn: $model.equalizerIsActive)
-                    .onChange(of: model.equalizerIsActive) { value in
-                        model.setEQBands(for: model.currentUserProfile)
-                    }
-                    .padding(.trailing)
-                    .padding(.leading)
-                    .font(.title3)
-                    .foregroundColor(model.equalizerIsActive ? .blue : .gray)
-            }
-            HStack {
-                Image(systemName: "speaker.wave.2")
-                    .foregroundColor((model.songList.isEmpty || model.demoIsPlaying) ? .gray : .blue)
-                    .font(.callout)
+            
+            if model.showSpexToggle {
                 
-                Slider(value: $fineTuneSoundLevel, in: 0...100, onEditingChanged: { editing in
-                    model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                    model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                    model.fineTuneSoundLevel = fineTuneSoundLevel
-                    soundLevelIsEditing = editing
-                })
-             //   .padding()
-//                .onChange(of: volObserver.volume, perform: {value in
-//                    print ("CHANGE IN VOLUME OBSERVED")
-//                    fineTuneSoundLevel = 0.0
-//                    model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-//                    model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-//                })
+                ZStack {
+                    if model.equalizerIsActive {
+                        Image("SpexOwl1024")
+                            .resizable()
+                            .frame(width: 50, height: 50, alignment: .center)
+                    } else {
+                        Image("SpexOwl1024BW")
+                            .resizable()
+                            .frame(width: 50, height: 50, alignment: .center)
+                    }
+                    Toggle("", isOn: $model.equalizerIsActive)
+                        .onChange(of: model.equalizerIsActive) { value in
+                            model.setEQBands(for: model.currentUserProfile)
+                        }
+                        .padding(.trailing)
+                        .padding(.leading)
+                        .font(.title3)
+                        .foregroundColor(model.equalizerIsActive ? .blue : .gray)
+                }
             }
-            .padding(.leading, 20)
-            .padding(.trailing, 20)
-            .padding(.top, 10)
-            .onAppear {
-                print ("CALLED ON APPEAR ON SOLO SLIDER")
-                print ("Model fine tune slider value = \(model.fineTuneSoundLevel)")
-                print ("Solo fineTuneSoundLevel = \(fineTuneSoundLevel)")
-                fineTuneSoundLevel = model.fineTuneSoundLevel
-               // refreshState()
+            
+            if model.showSubtleVolumeSlider {
+                
+                HStack {
+                    Image(systemName: "speaker.wave.2")
+                        .foregroundColor((model.songList.isEmpty || model.demoIsPlaying) ? .gray : .blue)
+                        .font(.callout)
+                    
+                    Slider(value: $fineTuneSoundLevel, in: 0...100, onEditingChanged: { editing in
+                        model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
+                        model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
+                        model.fineTuneSoundLevel = fineTuneSoundLevel
+                        soundLevelIsEditing = editing
+                    })
+                }
+                .padding(.leading, 20)
+                .padding(.trailing, 20)
+                .padding(.top, 10)
+                .onAppear {
+                    print ("CALLED ON APPEAR ON SOLO SLIDER")
+                    print ("Model fine tune slider value = \(model.fineTuneSoundLevel)")
+                    print ("Solo fineTuneSoundLevel = \(fineTuneSoundLevel)")
+                    fineTuneSoundLevel = model.fineTuneSoundLevel
+                    // refreshState()
+                }
             }
             
             HStack (spacing: 30) {

@@ -32,6 +32,40 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var currentSongTime: TimeInterval = 0
     @Published var currentSongTimeStatic: TimeInterval = 0
     @Published var currentSongDuration: TimeInterval = 0
+    
+    // Settings
+    
+    @Published var showPlaytimeSlider = true {
+        willSet {
+            userDefaults.set(newValue, forKey: "showPlaytimeSlider")
+        }
+    }
+    @Published var showSpexToggle = true {
+        willSet {
+            userDefaults.set(newValue, forKey: "showSpexToggle")
+        }
+    }
+    @Published var showSubtleVolumeSlider = true {
+        willSet {
+            userDefaults.set(newValue, forKey: "showSubtleVolumeSlider")
+        }
+    }
+    @Published var showDemoSongButtons = true {
+        willSet {
+            userDefaults.set(newValue, forKey: "showDemoSongButtons")
+        }
+    }
+    @Published var showManualAdjustmentsButton = true {
+        willSet {
+            userDefaults.set(newValue, forKey: "showManualAdjustmentsButton")
+        }
+    }
+    @Published var showSongInformation = true {
+        willSet {
+            userDefaults.set(newValue, forKey: "showSongInformation")
+        }
+    }
+    
      
      func updateSongMetadata () {
          let size = CGSize(width: 1284, height: 1284)
@@ -338,7 +372,13 @@ class Model: ObservableObject, RemoteCommandHandler {
         userDefaults.register(
             defaults: [
                 "equalizerIsActive": true,
-                "manualAdjustmentsAreActive": true
+                "manualAdjustmentsAreActive": true,
+                "showPlaytimeSlider": true,
+                "showSpexToggle": true,
+                "showSubtleVolumeSlider": true,
+                "showDemoSongButtons": true,
+                "showManualAdjustmentsButton": true,
+                "showSongInformation": true
             ]
         )
     }
@@ -351,6 +391,12 @@ class Model: ObservableObject, RemoteCommandHandler {
         manualAdjustmentsAreActive = userDefaults.bool(forKey: "manualAdjustmentsAreActive")
         currentUserProfileName = userDefaults.string(forKey: "currentUserProfileName") ?? "There is no name"
         fineTuneSoundLevel = userDefaults.float(forKey: "fineTuneSoundLevel")
+        showPlaytimeSlider = userDefaults.bool(forKey: "showPlaytimeSlider")
+        showSpexToggle = userDefaults.bool(forKey: "showSpexToggle")
+        showSubtleVolumeSlider = userDefaults.bool(forKey: "showSubtleVolumeSlider")
+        showDemoSongButtons = userDefaults.bool(forKey: "showDemoSongButtons")
+        showManualAdjustmentsButton = userDefaults.bool(forKey: "showManualAdjustmentsButton")
+        showSongInformation = userDefaults.bool(forKey: "showSongInformation")
         print ("Equalizer is active = \(equalizerIsActive)")
     }
     
@@ -1048,6 +1094,7 @@ class Model: ObservableObject, RemoteCommandHandler {
                  print ("Catching Audio Engine Error")
             }
         }
+        guard audioEngine.isRunning else {return}
         audioPlayerNodeL1.play(at: audioTime)
         audioPlayerNodeR1.play(at: audioTime)
         playState = .playing

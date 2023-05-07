@@ -36,6 +36,16 @@ struct PlaylistView: View {
         return filteredMPMediaItemCollection
     }
     
+    @State private var searchText = ""
+    
+    var searchResults: [MPMediaItemCollection] {
+        if searchText.isEmpty {
+            return allPlaylistsFiltered
+        } else {
+            return allPlaylistsFiltered.filter {  ($0.value(forProperty: MPMediaPlaylistPropertyName) as! String).lowercased().contains(searchText.lowercased()) }
+        }
+    }
+    
    // @State var refreshState = UUID()
        
     
@@ -49,7 +59,7 @@ struct PlaylistView: View {
     
     var body: some View {
         
-        List (allPlaylistsFiltered, id: \.self) { playlist in
+        List (searchResults, id: \.self) { playlist in
             let playlistName = playlist.value(forProperty: MPMediaPlaylistPropertyName) as? String
             let size = CGSize(width: 30, height: 30)
            // let songName = item.title ?? "Unknown title"
@@ -72,6 +82,8 @@ struct PlaylistView: View {
                 .contentShape(Rectangle())
             }
         }
+        .searchable(text: $searchText)
+        .disableAutocorrection(true)
         .listStyle(PlainListStyle())
 //        .refreshable {
 //            let updatedAllPlaylists = allPlaylists

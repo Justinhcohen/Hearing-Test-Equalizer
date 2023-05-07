@@ -22,7 +22,7 @@ struct ArtistView: View {
         if searchText.isEmpty {
             return allArtists
         } else {
-            return allArtists.filter { ($0.representativeItem!.artist ?? "Unknown Artist").contains(searchText) }
+            return allArtists.filter { ($0.representativeItem!.artist ?? "Unknown Artist").lowercased().contains(searchText.lowercased()) }
         }
     }
     
@@ -54,6 +54,7 @@ struct ArtistView: View {
             
         }
         .searchable(text: $searchText)
+        .disableAutocorrection(true)
         .listStyle(PlainListStyle())
 //        .refreshable {
 //            refreshState = UUID()

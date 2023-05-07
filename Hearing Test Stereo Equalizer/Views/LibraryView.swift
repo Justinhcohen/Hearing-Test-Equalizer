@@ -26,6 +26,7 @@ struct LibraryView: View {
     @State var shouldShowUnlockLibraryAlert = false
     @State var libraryAccessIsPurchased = false 
     @State var shouldShowInstructionsViewModal = false
+    @State var shouldShowSettingsViewModal = false
     
     func runStartupItems () {
         print ("CALLED RUN STARTUP ITEMS")
@@ -159,6 +160,10 @@ struct LibraryView: View {
         shouldShowInstructionsViewModal = true
     }
     
+    func showSettingsViewModal () {
+        shouldShowSettingsViewModal = true
+    }
+    
     func dismiss() {
         
     }
@@ -178,6 +183,12 @@ struct LibraryView: View {
                             runStartupItems()
                         }
                     HStack {
+                        Button (action: showSettingsViewModal) {
+                            Image(systemName: "gearshape")
+                        }
+                        .sheet(isPresented: $shouldShowSettingsViewModal, onDismiss: dismiss) {
+                            SettingsView()
+                        }
                         Spacer()
                         Button (action: showInstructionsViewModal) {
                             Image(systemName: "questionmark.circle")
