@@ -83,37 +83,47 @@ struct PlayerViewSoloSong: View {
                 }
             }
             
-            HStack (spacing: 30) {
-                Button (action: model.playPreviousTrack) {
-                    Image(systemName: "backward.fill")
-                }
-                .disabled(model.songList.isEmpty || model.demoIsPlaying)
-                
-                Button (action: model.playOrPauseCurrentTrack) {
-                    if model.playState == .stopped || model.playState == .paused {
-                        Image(systemName: "play.fill")
-                    } else {
-                        Image(systemName: "pause.fill")
+            ZStack {
+                if model.showAirPlayButton {
+                    HStack {
+                        AirPlayButton().frame(width: 40, height: 40)
+                        Spacer()
                     }
+                    .padding()
                 }
-                .disabled(model.songList.isEmpty || model.demoIsPlaying)
                 
-                Button (action: model.playNextTrack) {
-                    Image(systemName: "forward.fill")
+                HStack (spacing: 30) {
+                    Button (action: model.playPreviousTrack) {
+                        Image(systemName: "backward.fill")
+                    }
+                    .disabled(model.songList.isEmpty || model.demoIsPlaying)
+                    
+                    Button (action: model.playOrPauseCurrentTrack) {
+                        if model.playState == .stopped || model.playState == .paused {
+                            Image(systemName: "play.fill")
+                        } else {
+                            Image(systemName: "pause.fill")
+                        }
+                    }
+                    .disabled(model.songList.isEmpty || model.demoIsPlaying)
+                    
+                    Button (action: model.playNextTrack) {
+                        Image(systemName: "forward.fill")
+                    }
+                    .disabled(model.songList.isEmpty || model.demoIsPlaying)
+                    
                 }
-                .disabled(model.songList.isEmpty || model.demoIsPlaying)
+                
+                .font(.largeTitle)
+                .padding()
                 
             }
-            
-            .font(.largeTitle)
-            .padding()
-            
         }
     }
 }
 
-struct PlayerViewSoloSong_Previews: PreviewProvider {
-    static var previews: some View {
-        PlayerViewSoloSong()
-    }
-}
+//struct PlayerViewSoloSong_Previews: PreviewProvider {
+//    static var previews: some View {
+//        PlayerViewSoloSong()
+//    }
+//}

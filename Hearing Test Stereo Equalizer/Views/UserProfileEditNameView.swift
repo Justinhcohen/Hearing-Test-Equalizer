@@ -95,7 +95,7 @@ struct UserProfileEditNameView: View {
                 Capsule(style: .continuous)
                     .stroke(Color.blue, lineWidth: 5)
             )
-            .alert("C'mon - you need at least one character.", isPresented: $shouldShowNamingAlert) {
+            .alert("C'mon - you need at least one character. : )", isPresented: $shouldShowNamingAlert) {
                 Button("Ok", role: .cancel) { }
             }
         }

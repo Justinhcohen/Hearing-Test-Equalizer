@@ -32,6 +32,7 @@
 		0D8762A32947CEC50089B138 /* Band60.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629B2947CEC50089B138 /* Band60.mp3 */; };
 		0D8762A42947CEC50089B138 /* Band5400.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629C2947CEC50089B138 /* Band5400.mp3 */; };
 		0D8762A52947CEC50089B138 /* Band12000.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629D2947CEC50089B138 /* Band12000.mp3 */; };
+		0DBA9CD62A0967EC008FE103 /* twinsmusic-dancinginthesand.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0DBA9CD52A0967EC008FE103 /* twinsmusic-dancinginthesand.mp3 */; };
 		0DC1213929762AAD00736FA6 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC1213829762AAD00736FA6 /* Player.swift */; };
 		0DCB0E2E2964FF8800083DB4 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */; };
 		0DCB0E33296504E000083DB4 /* SongsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCB0E32296504E000083DB4 /* SongsView.swift */; };
@@ -85,6 +86,7 @@
 		0D87629B2947CEC50089B138 /* Band60.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band60.mp3; sourceTree = "<group>"; };
 		0D87629C2947CEC50089B138 /* Band5400.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band5400.mp3; sourceTree = "<group>"; };
 		0D87629D2947CEC50089B138 /* Band12000.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band12000.mp3; sourceTree = "<group>"; };
+		0DBA9CD52A0967EC008FE103 /* twinsmusic-dancinginthesand.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "twinsmusic-dancinginthesand.mp3"; sourceTree = "<group>"; };
 		0DC1213829762AAD00736FA6 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		0DCB0E32296504E000083DB4 /* SongsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongsView.swift; sourceTree = "<group>"; };
@@ -254,6 +256,7 @@
 		0DD438F3293E9CAC00C9301E /* Tracks */ = {
 			isa = PBXGroup;
 			children = (
+				0DBA9CD52A0967EC008FE103 /* twinsmusic-dancinginthesand.mp3 */,
 				0DE36F322A01D70500AB44A8 /* indiebox-funkhouse.mp3 */,
 				0DE36F302A01D6F500AB44A8 /* Evert Zeevalkink - On The Roads.mp3 */,
 			);
@@ -320,6 +323,7 @@
 			files = (
 				0D87629F2947CEC50089B138 /* Band100.mp3 in Resources */,
 				0D8762A32947CEC50089B138 /* Band60.mp3 in Resources */,
+				0DBA9CD62A0967EC008FE103 /* twinsmusic-dancinginthesand.mp3 in Resources */,
 				0D8762A22947CEC50089B138 /* Band1100.mp3 in Resources */,
 				0D65ADA1293D14F40017E4F8 /* Preview Assets.xcassets in Resources */,
 				0D65AD9E293D14F40017E4F8 /* Assets.xcassets in Resources */,

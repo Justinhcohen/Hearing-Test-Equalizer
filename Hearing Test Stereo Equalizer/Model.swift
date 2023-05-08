@@ -32,6 +32,11 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var currentSongTime: TimeInterval = 0
     @Published var currentSongTimeStatic: TimeInterval = 0
     @Published var currentSongDuration: TimeInterval = 0
+    @Published var didTapSongName = false {
+        didSet {
+            print ("didTapSongName = \(didTapSongName)")
+        }
+    }
     
     // Settings
     
@@ -65,6 +70,17 @@ class Model: ObservableObject, RemoteCommandHandler {
             userDefaults.set(newValue, forKey: "showSongInformation")
         }
     }
+    @Published var showAirPlayButton = true {
+        willSet {
+            userDefaults.set(newValue, forKey: "showAirPlayButton")
+        }
+    }
+    @Published var practiceToneBeforeTest = false {
+        willSet {
+            userDefaults.set(newValue, forKey: "practiceToneBeforeTest")
+        }
+    }
+    
     
      
      func updateSongMetadata () {
@@ -378,7 +394,8 @@ class Model: ObservableObject, RemoteCommandHandler {
                 "showSubtleVolumeSlider": true,
                 "showDemoSongButtons": true,
                 "showManualAdjustmentsButton": true,
-                "showSongInformation": true
+                "showSongInformation": true,
+                "showAirPlayButton": true
             ]
         )
     }
@@ -397,6 +414,8 @@ class Model: ObservableObject, RemoteCommandHandler {
         showDemoSongButtons = userDefaults.bool(forKey: "showDemoSongButtons")
         showManualAdjustmentsButton = userDefaults.bool(forKey: "showManualAdjustmentsButton")
         showSongInformation = userDefaults.bool(forKey: "showSongInformation")
+        showAirPlayButton = userDefaults.bool(forKey: "showAirPlayButton")
+        practiceToneBeforeTest = userDefaults.bool(forKey: "practiceToneBeforeTest")
         print ("Equalizer is active = \(equalizerIsActive)")
     }
     
@@ -452,7 +471,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     var fadeOutSoundLevel: Float = 0.0
     @Published var currentVolume: Float = 0.0
     @Published var systemVolume = AVAudioSession.sharedInstance().outputVolume
-    var currentMediaItem = MPMediaItem()
+    @Published var currentMediaItem = MPMediaItem()
    // var currentAppleMusicTrack = Track.song(<#Song#>)
     let audioEngine: AVAudioEngine = AVAudioEngine()
     var mixerL1 = AVAudioMixerNode()
@@ -478,6 +497,9 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     func playbackTimer(){
         updateSongMetadata()
+        if didTapSongName {
+            didTapSongName = false
+        }
      
         if currentSongTime >= audioFile.duration {
             playNextTrack()
@@ -932,11 +954,12 @@ class Model: ObservableObject, RemoteCommandHandler {
     
   
     enum DemoTrack {
-        case trackOne, trackTwo
+        case trackOne, trackTwo, trackThree
     }
     var demoTrack = DemoTrack.trackOne
     @Published var isPlayingDemoOne = false
     @Published var isPlayingDemoTwo = false
+    @Published var isPlayingDemoThree = false
     
     func playDemoTrack () {
         print ("CALLED PLAY DEMO TRACK")
@@ -946,11 +969,14 @@ class Model: ObservableObject, RemoteCommandHandler {
         var demoTrackName = ""
         switch demoTrack {
         case .trackOne:
-            demoTrackName = "Evert Zeevalkink - On The Roads"
+            demoTrackName = "twinsmusic-dancinginthesand"
             isPlayingDemoOne = true 
         case .trackTwo:
-            demoTrackName = "indiebox-funkhouse"
+            demoTrackName = "Evert Zeevalkink - On The Roads"
             isPlayingDemoTwo = true
+        case .trackThree:
+            demoTrackName = "indiebox-funkhouse"
+            isPlayingDemoThree = true
         }
         playQueue = [MPMediaItem]()
         songList = [MPMediaItem]()
@@ -997,6 +1023,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         print ("CALLED STOP DEMO TRACK")
         isPlayingDemoOne = false
         isPlayingDemoTwo = false
+        isPlayingDemoThree = false
         playQueue = [MPMediaItem]()
         songList = [MPMediaItem]()
         demoIsPlaying = false

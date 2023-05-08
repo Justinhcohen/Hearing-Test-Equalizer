@@ -57,7 +57,7 @@ struct AlbumSongsView: View {
                action: {
             model.cachedAudioFrame = nil
             model.cachedAudioTime = nil
-           // model.songList = model.songList.shuffled()
+            // model.songList = model.songList.shuffled()
             model.playQueue = model.songList.shuffled()
             model.queueIndex = 0
             model.startFadeInTimer()
@@ -75,40 +75,49 @@ struct AlbumSongsView: View {
             SoloSongView()
         }
         
-        List {
-            ForEach(searchResults, id: \.self) {item in 
-                let size = CGSize(width: 10, height: 10)
-                let songName = item.title
-                let mediatImage = item.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
-                let UIAlbumCover = mediatImage?.image(at: size)
-                let defaultUIImage = UIImage(systemName: "photo")!
-                let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
-                SongsRowView(albumCover: albumCover, songName: songName ?? "Title Unknown")
-         //       SongsRowView(songName: songName ?? "Title Unknown")
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        model.cachedAudioFrame = nil
-                        model.cachedAudioTime = nil
-                        model.playQueue = searchResults
-                        let index = getQueueIndex(songList: searchResults, currentMPMediaItem: item)
-                        model.queueIndex = index
-                        model.setVolumeToZero()
-                        model.startFadeInTimer()
-                        model.playTrack()
-                        showModalSoloSongView()
-                    } 
-                    .foregroundColor(item == model.currentMediaItem ? Color.green : colorScheme == .dark ? Color.white : Color.black) 
-               
+        ScrollViewReader { proxy in 
+            
+            List {
+                ForEach(searchResults, id: \.self) {item in 
+                    let size = CGSize(width: 10, height: 10)
+                    let songName = item.title
+                    let mediatImage = item.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
+                    let UIAlbumCover = mediatImage?.image(at: size)
+                    let defaultUIImage = UIImage(systemName: "photo")!
+                    let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
+                    SongsRowView(albumCover: albumCover, songName: songName ?? "Title Unknown")
+                    //       SongsRowView(songName: songName ?? "Title Unknown")
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            model.didTapSongName = true
+                            model.cachedAudioFrame = nil
+                            model.cachedAudioTime = nil
+                            model.playQueue = searchResults
+                            let index = getQueueIndex(songList: searchResults, currentMPMediaItem: item)
+                            model.queueIndex = index
+                            model.setVolumeToZero()
+                            model.startFadeInTimer()
+                            model.playTrack()
+                            showModalSoloSongView()
+                        } 
+                        .foregroundColor(item == model.currentMediaItem ? Color.green : colorScheme == .dark ? Color.white : Color.black) 
                     
+                    
+                }
             }
+            .searchable(text: $searchText)
+            .disableAutocorrection(true)
+            .onChange(of: model.songName, perform: {_ in
+                if !model.didTapSongName {
+                    proxy.scrollTo(model.currentMediaItem, anchor: .top)
+                }
+            })
+            .listStyle(PlainListStyle())
+            //        .refreshable {
+            //            refreshState = UUID()
+            //        }
+            .navigationTitle(albumName)
         }
-        .searchable(text: $searchText)
-        .disableAutocorrection(true)
-        .listStyle(PlainListStyle())
-//        .refreshable {
-//            refreshState = UUID()
-//        }
-        .navigationTitle(albumName)
     }
 }
 

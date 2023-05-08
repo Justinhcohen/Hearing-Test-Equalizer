@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import AVKit
 import MediaPlayer
+import MessageUI
 
 
 
@@ -87,3 +88,97 @@ extension TimeInterval {
             .init(string.dropFirst()) : string
     }
 }
+
+struct MailView: UIViewControllerRepresentable {
+
+    @Binding var isShowing: Bool
+    @Binding var result: Result<MFMailComposeResult, Error>?
+
+    class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
+
+        @Binding var isShowing: Bool
+        @Binding var result: Result<MFMailComposeResult, Error>?
+
+        init(isShowing: Binding<Bool>,
+             result: Binding<Result<MFMailComposeResult, Error>?>) {
+            _isShowing = isShowing
+            _result = result
+        }
+
+        func mailComposeController(_ controller: MFMailComposeViewController,
+                                   didFinishWith result: MFMailComposeResult,
+                                   error: Error?) {
+            defer {
+                isShowing = false
+            }
+            guard error == nil else {
+                self.result = .failure(error!)
+                return
+            }
+            self.result = .success(result)
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(isShowing: $isShowing,
+                           result: $result)
+    }
+
+    func makeUIViewController(context: UIViewControllerRepresentableContext<MailView>) -> MFMailComposeViewController {
+        let vc = MFMailComposeViewController()
+        vc.setSubject("Spex Feedback")
+        vc.setToRecipients(["Justin.H.Cohen@GMail.com"])
+        vc.mailComposeDelegate = context.coordinator
+        return vc
+    }
+
+    func updateUIViewController(_ uiViewController: MFMailComposeViewController,
+                                context: UIViewControllerRepresentableContext<MailView>) {
+
+    }
+}
+
+struct AirPlayButton: UIViewControllerRepresentable {
+    func makeUIViewController(context: UIViewControllerRepresentableContext<AirPlayButton>) -> UIViewController {
+        return AirPLayViewController()
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: UIViewControllerRepresentableContext<AirPlayButton>) {
+
+    }
+}
+
+class AirPLayViewController: UIViewController {
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        let isDarkMode = self.traitCollection.userInterfaceStyle == .dark
+
+        let button = UIButton()
+        let boldConfig = UIImage.SymbolConfiguration(scale: .large)
+        let boldSearch = UIImage(systemName: "airplayaudio", withConfiguration: boldConfig)
+
+        button.setImage(boldSearch, for: .normal)
+        button.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
+//        button.backgroundColor = .red
+//        button.tintColor = isDarkMode ? .white : .black
+
+        button.addTarget(self, action: #selector(self.showAirPlayMenu(_:)), for: .touchUpInside)
+        self.view.addSubview(button)
+    }
+
+    @objc func showAirPlayMenu(_ sender: UIButton){ // copied from https://stackoverflow.com/a/44909445/7974174
+        let rect = CGRect(x: 0, y: 0, width: 0, height: 0)
+        let airplayVolume = MPVolumeView(frame: rect)
+        airplayVolume.showsVolumeSlider = false
+        self.view.addSubview(airplayVolume)
+        for view: UIView in airplayVolume.subviews {
+            if let button = view as? UIButton {
+                button.sendActions(for: .touchUpInside)
+                break
+            }
+        }
+        airplayVolume.removeFromSuperview()
+    }
+}
+

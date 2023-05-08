@@ -93,10 +93,17 @@ struct PlaylistView: View {
             
         
         if allPlaylists.isEmpty {
-            HStack {
-                Text ("You have no playlists.")
-                Spacer()
+            VStack (spacing: 30) {
+                HStack {
+                    Text ("There are no playlists.")
+                    Spacer()
+                }
+                HStack {
+                    Text ("Tap the question mark in the upper right for tips on how to add playlists.")
+                    Spacer()
+                }
             }
+            .padding()
         }
     }
 }

@@ -468,13 +468,14 @@ struct TestView: View {
                         .onChange(of: volObserver.volume, perform: {value in
                             shouldShowVolumeChangedAlert = true
                         })
-                        .alert("Volume change detected. Test will restart.", isPresented: $shouldShowVolumeChangedAlert) {
-                            Button ("Got it.") {
+                        .alert("Volume change detected. Measurements will be impacted. Do you wish to restart the test?", isPresented: $shouldShowVolumeChangedAlert) {
+                            Button ("Restart Test", role: .destructive) {
                                 model.stopAndResetTest()
                                 toneProgress = 0
                                 tonesCompleted = 0
                                 model.tapStartTest()
                             }
+                            Button("Continue Test", role: .cancel) { }
                         }
                     
                     ProgressView("Progress", value: toneProgress, total: 9)
@@ -548,28 +549,36 @@ struct TestView: View {
                     
                     Spacer ()
                     
-                    Button {
-                        if !isShowingCompareSilence {
-                            model.stopTone()
-                        } else {
-                            model.resumeTone()
+                    ZStack {
+//                        HStack {
+//                            AirPlayButton().frame(width: 40, height: 40)
+//                            Spacer()
+//                        }
+//                        .padding()
+                        
+                        Button {
+                            if !isShowingCompareSilence {
+                                model.stopTone()
+                            } else {
+                                model.resumeTone()
+                            }
+                            isShowingCompareSilence.toggle()
+                        } label: {
+                            if !isShowingCompareSilence {
+                                Text("Compare Silence")
+                            } else {
+                                Text ("Back to Tone")
+                            }
                         }
-                        isShowingCompareSilence.toggle()
-                    } label: {
-                        if !isShowingCompareSilence {
-                            Text("Compare Silence")
-                        } else {
-                            Text ("Back to Tone")
-                        }
+                        .font(.title)
+                        .foregroundColor(.blue)
+                        .padding ()
+                        .overlay(
+                            Capsule(style: .continuous)
+                                .stroke(.blue, lineWidth: 5)
+                        )
+                        .padding (.bottom, 20)
                     }
-                    .font(.title)
-                    .foregroundColor(.blue)
-                    .padding ()
-                    .overlay(
-                        Capsule(style: .continuous)
-                            .stroke(.blue, lineWidth: 5)
-                    )
-                    .padding (.bottom, 20)
                 }
             case 50: 
                 VStack () {
@@ -611,10 +620,15 @@ struct TestView: View {
                         if model.audioPlayerNodeL1.isPlaying {
                             model.stopTrack()
                         }
-                        introStep = 40
-                        toneProgress = 0
-                        tonesCompleted = 0
-                        model.tapStartTest()
+                        if model.practiceToneBeforeTest {
+                            introStep = 10
+                        } else {
+                            introStep = 40
+                            toneProgress = 0
+                            tonesCompleted = 0
+                            model.tapStartTest()
+                        }
+                       
                     })
                     .font(.title)
                     .foregroundColor(.blue)

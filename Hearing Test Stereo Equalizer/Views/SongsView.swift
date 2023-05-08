@@ -68,63 +68,72 @@ struct SongsView: View {
                //SoloSongView(albumCover: albumCover, songName: songName, artistName: artistName)
                SoloSongView()
            }
-            
+        
+        
+        ScrollViewReader { proxy in
             List {
-                ForEach(searchResults, id: \.self) {item in 
-                    let size = CGSize(width: 30, height: 30)
-                    let songName = item.title ?? "Unknown title"
-                    let mediaImage = item.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
-                    let UIAlbumCover = mediaImage?.image(at: size)
-                    let defaultUIImage = UIImage(systemName: "photo")!
-                    let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
-                    SongsRowView(albumCover: albumCover, songName: songName)
-                  //  SongsRowView(songName: songName)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            model.cachedAudioFrame = nil
-                            model.cachedAudioTime = nil
-                            model.playQueue = searchResults
-                            let index = getQueueIndex(songList: model.songList, currentMPMediaItem: item)
-                            model.queueIndex = index
-                            model.setVolumeToZero()
-                            model.startFadeInTimer()
-                            model.playTrack()
-                            showModalSoloSongView()
-                        } 
-                        .foregroundColor(item == model.currentMediaItem ? Color.green : colorScheme == .dark ? Color.white : Color.black)
-                }
+                    ForEach(searchResults, id: \.self) {item in 
+                        let size = CGSize(width: 30, height: 30)
+                        let songName = item.title ?? "Unknown title"
+                        let mediaImage = item.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
+                        let UIAlbumCover = mediaImage?.image(at: size)
+                        let defaultUIImage = UIImage(systemName: "photo")!
+                        let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
+                        SongsRowView(albumCover: albumCover, songName: songName)
+                        //  SongsRowView(songName: songName)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                model.didTapSongName = true
+                                model.cachedAudioFrame = nil
+                                model.cachedAudioTime = nil
+                                model.playQueue = searchResults
+                                let index = getQueueIndex(songList: model.songList, currentMPMediaItem: item)
+                                model.queueIndex = index
+                                model.setVolumeToZero()
+                                model.startFadeInTimer()
+                                model.playTrack()
+                                showModalSoloSongView()
+                                
+                            } 
+                            .foregroundColor(item == model.currentMediaItem ? Color.green : colorScheme == .dark ? Color.white : Color.black)
+                    }
             }
             .searchable(text: $searchText)
             .disableAutocorrection(true)
+            .onChange(of: model.songName, perform: {_ in
+                if !model.didTapSongName {
+                    proxy.scrollTo(model.currentMediaItem, anchor: .top)
+                }
+            })
             .listStyle(PlainListStyle())
-//            .refreshable {
-//                refreshState = UUID()
-//            }
+            //            .refreshable {
+            //                refreshState = UUID()
+            //            }
             .navigationTitle("Songs")
-        
+            
+        }
+            
         if model.songList.isEmpty {
             VStack (spacing: 30) {
                 HStack {
                     Text ("Your music library is empty.")
                     Spacer()
                 }
-//                HStack {
-//                    Text ("Add MP3s to Apple Music and then sync them to your phone through Finder.")
-//                    Spacer()
-//                }
+                
                 HStack {
-                    Text ("As mentioned in the App Store description, for now, only local, unencrypted song files are supported. We hope to add support for streaming services in a future update.")
+                    Text ("Tap the question mark in the upper right for tips on how to add songs.")
                     Spacer()
                 }
             }
+            .padding()
         }
     }
 }
 
 
-struct SongsView_Previews: PreviewProvider {
-    static var previews: some View {
-        SongsView()
-            .environmentObject(Model())
-    }
-}
+//struct SongsView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        SongsView()
+//            .environmentObject(Model())
+//    }
+//}

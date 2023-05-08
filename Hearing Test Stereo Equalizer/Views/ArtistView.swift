@@ -62,10 +62,18 @@ struct ArtistView: View {
         .navigationTitle("Artists")
         
         if allArtists.isEmpty {
-            HStack {
-                Text ("You have no artists.")
-                Spacer()
+            VStack (spacing: 30) {
+                HStack {
+                    Text ("There are no artists.")
+                    Spacer()
+                }
+                HStack {
+                    Text ("Tap the question mark in the upper right for tips on how to add songs.")
+                    Spacer()
+                }
+                
             }
+            .padding()
         }
     }
 }

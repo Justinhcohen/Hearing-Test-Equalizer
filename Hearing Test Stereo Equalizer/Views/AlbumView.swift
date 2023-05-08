@@ -66,10 +66,17 @@ struct AlbumView: View {
         .navigationTitle("Albums")
         
         if allAlbums.isEmpty {
-            HStack {
-                Text ("You have no albums.")
-                Spacer()
+            VStack (spacing: 30) {
+                HStack {
+                    Text ("There are no albums.")
+                    Spacer()
+                }
+                HStack {
+                    Text ("Tap the question mark in the upper right for tips on how to add songs.")
+                    Spacer()
+                }
             }
+            .padding()
         }
     }
 }

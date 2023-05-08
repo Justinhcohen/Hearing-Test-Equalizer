@@ -155,14 +155,15 @@ struct EQView: View {
                             if !model.isPlayingDemoOne {
                                 model.playDemoTrack()
                                 model.isPlayingDemoTwo = false
+                                model.isPlayingDemoThree = false
                             } else {
                                 model.stopDemoTrack()
                             }
                         } label: {
                             if !model.isPlayingDemoOne {
-                                Text("Play Demo 1")
+                                Text("Play 1")
                             } else {
-                                Text ("Stop Demo 1")
+                                Text ("Stop 1")
                             }
                         }
                         .font(.title)
@@ -180,14 +181,15 @@ struct EQView: View {
                             if !model.isPlayingDemoTwo {
                                 model.playDemoTrack()
                                 model.isPlayingDemoOne = false
+                                model.isPlayingDemoThree = false
                             } else {
                                 model.stopDemoTrack()
                             }
                         } label: {
                             if !model.isPlayingDemoTwo {
-                                Text("Play Demo 2")
+                                Text("Play 2")
                             } else {
-                                Text ("Stop Demo 2")
+                                Text ("Stop 2")
                             }
                         }
                         .font(.title)
@@ -198,6 +200,32 @@ struct EQView: View {
                                 .stroke(model.isPlayingDemoTwo ? Color.green : Color.blue, lineWidth: 5)
                         )
                         .foregroundColor(model.isPlayingDemoTwo ? Color.green : Color.blue)
+                        .padding (.bottom, 20)
+                        
+                        Button {
+                            model.demoTrack = .trackThree
+                            if !model.isPlayingDemoThree {
+                                model.playDemoTrack()
+                                model.isPlayingDemoOne = false
+                                model.isPlayingDemoTwo = false
+                            } else {
+                                model.stopDemoTrack()
+                            }
+                        } label: {
+                            if !model.isPlayingDemoThree {
+                                Text("Play 3")
+                            } else {
+                                Text ("Stop 3")
+                            }
+                        }
+                        .font(.title)
+                        .padding ()
+                        .overlay(
+                            Capsule(style: .continuous)
+                            //  .stroke(.blue, lineWidth: 5)
+                                .stroke(model.isPlayingDemoThree ? Color.green : Color.blue, lineWidth: 5)
+                        )
+                        .foregroundColor(model.isPlayingDemoThree ? Color.green : Color.blue)
                         .padding (.bottom, 20)
                     }
                     
@@ -212,12 +240,15 @@ struct EQView: View {
                                     .foregroundColor(model.equalizerIsActive ? .green : .gray)
                                     .font(.title3)
                                     .padding()
-                                HStack {
-                                    Spacer ()
-                                    Text ("+M")
-                                        .foregroundColor((model.manualAdjustmentsAreActive && model.equalizerIsActive) ? .green : .gray)
-                                        .font(.title3)
-                                        .padding()
+                                
+                                if model.showManualAdjustmentsButton {
+                                    HStack {
+                                        Spacer ()
+                                        Text ("+M")
+                                            .foregroundColor((model.manualAdjustmentsAreActive && model.equalizerIsActive) ? .green : .gray)
+                                            .font(.title3)
+                                            .padding()
+                                    }
                                 }
                             }
                         ScrollView {
