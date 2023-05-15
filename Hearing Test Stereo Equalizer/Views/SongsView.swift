@@ -78,7 +78,8 @@ struct SongsView: View {
                         let UIAlbumCover = mediaImage?.image(at: size)
                         let defaultUIImage = UIImage(systemName: "photo")!
                         let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
-                        SongsRowView(albumCover: albumCover, songName: songName)
+                        // SongsRowView(albumCover: albumCover, songName: songName)
+                        CollectionRowView(collectionImage: albumCover, collectionName: songName)
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 model.tapSongToPlay(searchResults: searchResults, queueIndex: getQueueIndex(songList: searchResults, currentMPMediaItem: item), showModalView: showModalSoloSongView)

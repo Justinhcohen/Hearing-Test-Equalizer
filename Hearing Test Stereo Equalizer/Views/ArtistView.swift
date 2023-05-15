@@ -44,7 +44,7 @@ struct ArtistView: View {
                         .contentShape(Rectangle())
                 } label: {
                     HStack {
-                        ArtistRowView(albumCover: albumCover, artistName: artistName ?? "Unknown Artist")
+                        CollectionRowView(collectionImage: albumCover, collectionName: artistName ?? "Unknown name")
                         Spacer()
                     }
                 }  

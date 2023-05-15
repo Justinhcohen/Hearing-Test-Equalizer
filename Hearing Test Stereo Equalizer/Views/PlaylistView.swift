@@ -58,7 +58,7 @@ struct PlaylistView: View {
                 }
             } label: {
                 HStack {    
-                    PlaylistRowView(albumCover: albumCover, playlistName: playlistName ?? "Unknown Playlist Name")
+                    CollectionRowView(collectionImage: albumCover, collectionName: playlistName ?? "Unknown name")
                 }
                 .contentShape(Rectangle())
             }

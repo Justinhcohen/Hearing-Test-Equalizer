@@ -45,7 +45,7 @@ struct AlbumView: View {
                         .contentShape(Rectangle())
                 } label: {
                     HStack {
-                        AlbumRowView(albumCover: albumCover, albumName: combinedAlbumPlusArtist)
+                        CollectionRowView(collectionImage: albumCover, collectionName: combinedAlbumPlusArtist)
                         Spacer()
                     }
                 }  
