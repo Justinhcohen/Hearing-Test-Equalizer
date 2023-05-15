@@ -10,7 +10,6 @@ import SwiftUI
 struct AlbumRowView: View {
     
     var albumCover: Image
-    
     var albumName: String
     
     var body: some View {

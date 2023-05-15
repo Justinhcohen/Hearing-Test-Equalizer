@@ -12,13 +12,12 @@ struct SongsView: View {
     
     @EnvironmentObject var model: Model
     @Environment(\.colorScheme) var colorScheme
-    
-    
     @State private var searchText = ""
     @State private var shouldShowModalSoloSongView = false
+    var navigationTitleText = ""
     
     func dismiss() {
-        shouldShowModalSoloSongView = false
+       // shouldShowModalSoloSongView = false
     }
     
     func showModalSoloSongView () {
@@ -28,34 +27,35 @@ struct SongsView: View {
     func getQueueIndex (songList: [MPMediaItem], currentMPMediaItem: MPMediaItem) -> Int {
         for i in 0...songList.count - 1 {
             if songList[i] == currentMPMediaItem {
-                model.queueIndex = i
                 return i
             } 
         }
         return 0
     }
     
+//    var searchResults: [MPMediaItem] {
+//        if searchText.isEmpty {
+//            return model.songList
+//        } else {
+//            return model.songList.filter { ($0.title ?? "Unknown Title").lowercased().contains(searchText.lowercased()) }
+//        }
+//    }
+    
     var searchResults: [MPMediaItem] {
+        var filteredItems = model.songList
+        filteredItems.removeAll(where: {$0.hasProtectedAsset == true})
+        filteredItems.removeAll (where: {$0.isCloudItem == true})
         if searchText.isEmpty {
-            return model.songList
+            return filteredItems
         } else {
-            return model.songList.filter { ($0.title ?? "Unknown Title").lowercased().contains(searchText.lowercased()) }
+            return filteredItems.filter { ($0.title ?? "Unknown Title").lowercased().contains(searchText.lowercased()) }
         }
     }
-    
-  //  @State var refreshState = UUID()
     
     var body: some View {  
             Button("Shuffle Play", 
                    action: {
-                model.cachedAudioFrame = nil
-                model.cachedAudioTime = nil
-               // model.songList = model.songList.shuffled()
-                model.playQueue = model.songList.shuffled()
-                model.queueIndex = 0
-                model.startFadeInTimer()
-                model.playTrack()
-                showModalSoloSongView()
+                model.tapShufflePlay(searchResults: searchResults, showModalView: showModalSoloSongView)
             })
             .font(.title)
             .padding ()
@@ -65,7 +65,6 @@ struct SongsView: View {
             ) 
            .disabled(model.songList.isEmpty)
            .sheet(isPresented: $shouldShowModalSoloSongView, onDismiss: dismiss) {
-               //SoloSongView(albumCover: albumCover, songName: songName, artistName: artistName)
                SoloSongView()
            }
         
@@ -80,20 +79,9 @@ struct SongsView: View {
                         let defaultUIImage = UIImage(systemName: "photo")!
                         let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
                         SongsRowView(albumCover: albumCover, songName: songName)
-                        //  SongsRowView(songName: songName)
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                model.didTapSongName = true
-                                model.cachedAudioFrame = nil
-                                model.cachedAudioTime = nil
-                                model.playQueue = searchResults
-                                let index = getQueueIndex(songList: model.songList, currentMPMediaItem: item)
-                                model.queueIndex = index
-                                model.setVolumeToZero()
-                                model.startFadeInTimer()
-                                model.playTrack()
-                                showModalSoloSongView()
-                                
+                                model.tapSongToPlay(searchResults: searchResults, queueIndex: getQueueIndex(songList: searchResults, currentMPMediaItem: item), showModalView: showModalSoloSongView)
                             } 
                             .foregroundColor(item == model.currentMediaItem ? Color.green : colorScheme == .dark ? Color.white : Color.black)
                     }
@@ -106,20 +94,16 @@ struct SongsView: View {
                 }
             })
             .listStyle(PlainListStyle())
-            //            .refreshable {
-            //                refreshState = UUID()
-            //            }
-            .navigationTitle("Songs")
+            .navigationTitle(navigationTitleText)
             
         }
             
         if model.songList.isEmpty {
             VStack (spacing: 30) {
                 HStack {
-                    Text ("Your music library is empty.")
+                    Text ("There are no songs.")
                     Spacer()
                 }
-                
                 HStack {
                     Text ("Tap the question mark in the upper right for tips on how to add songs.")
                     Spacer()

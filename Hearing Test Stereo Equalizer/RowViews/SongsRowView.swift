@@ -11,7 +11,6 @@ import SwiftUI
 struct SongsRowView: View {
     
     var albumCover: Image
-    
     var songName: String
     
     var body: some View {

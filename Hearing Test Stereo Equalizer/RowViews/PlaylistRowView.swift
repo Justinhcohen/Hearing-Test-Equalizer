@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct PlaylistRowView: View {
-    var albumCover: Image
     
+    var albumCover: Image
     var playlistName: String
     
     var body: some View {

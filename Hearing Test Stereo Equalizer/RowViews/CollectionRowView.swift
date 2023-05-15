@@ -1,32 +1,31 @@
 //
-//  ArtistRowView.swift
+//  CollectionRowView.swift
 //  Hearing Test Stereo Equalizer
 //
-//  Created by Justin Cohen on 5/5/23.
+//  Created by Justin Cohen on 5/15/23.
 //
 
 import SwiftUI
 
-struct ArtistRowView: View {
-    
-    var albumCover: Image
-    var artistName: String
+struct CollectionRowView: View {
+    var collectionImage: Image
+    var collectionName: String
     
     var body: some View {
         HStack {
-            albumCover
+            collectionImage
                 .resizable()
                 .frame(width: 30, height: 30)
             
-            Text(artistName)
+            Text(collectionName)
             Spacer()
         }
         .contentShape(Rectangle())
     }
 }
-//
-//struct ArtistRowView_Previews: PreviewProvider {
+
+//struct CollectionRowView_Previews: PreviewProvider {
 //    static var previews: some View {
-//        ArtistRowView()
+//        CollectionRowView()
 //    }
 //}

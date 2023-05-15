@@ -14,48 +14,48 @@ import StoreKit
 struct LibraryView: View {
     
     @EnvironmentObject var model: Model
-    @State private var path = NavigationPath()
+    @Environment(\.requestReview) var requestReview
+ //   @State private var path = NavigationPath()
     let userDefaults = UserDefaults.standard
     @Binding var tabSelection: Int
     
     @FetchRequest(sortDescriptors: []) var userProfiles: FetchedResults<UserProfile>
     @Environment(\.managedObjectContext) var moc
-    @State var showUserProfilesModalView = false
     @State private var isShowingAlert = false
     @State var defaultUserProfileHasBeenSet = false 
     @State var shouldShowUnlockLibraryAlert = false
-    @State var libraryAccessIsPurchased = false 
+    @State var libraryAccessIsPurchased = false {
+        didSet {
+            userDefaults.set(libraryAccessIsPurchased, forKey: "libraryAccessIsPurchased")
+        }
+    }
     @State var shouldShowInstructionsViewModal = false
     @State var shouldShowSettingsViewModal = false
     
     func runStartupItems () {
-        print ("CALLED RUN STARTUP ITEMS")
-        let temp = userDefaults.bool(forKey: "defaultUserProfileHasBeenSet")
-        defaultUserProfileHasBeenSet = temp
+        defaultUserProfileHasBeenSet = userDefaults.bool(forKey: "defaultUserProfileHasBeenSet")
         libraryAccessIsPurchased = userDefaults.bool(forKey: "libraryAccessIsPurchased")
         setCurrentProfile()
-        model.setInitialVolumeToFineTuneSoundLevel()
-//        model.songList = allSongs
-//        model.playQueue = allSongs
-        print ("After reading from user defaults, default user profile has been set = \(defaultUserProfileHasBeenSet)")
-        print ("temp = \(temp)")
+        if !model.audioEngine.isRunning {
+            model.prepareAudioEngine()
+        }
+        model.timesLaunched += 1
+        if model.timesLaunched % 10 == 0 {
+            requestReview()
+        }
+        print ("Times Launched = \(model.timesLaunched)")
     }
     
     func setCurrentProfile () {
-        print ("CALLED SET CURRENT PROFILE")
-        print ("default user profile has been set = \(defaultUserProfileHasBeenSet)")
         if defaultUserProfileHasBeenSet {
             model.currentUserProfile = userProfiles.first {$0.isActive} ?? userProfiles.first!
             model.currentUserProfileName = model.currentUserProfile.name ?? "Peaches"
             model.currentIntensity = model.currentUserProfile.intensity
             model.setEQBands(for: model.currentUserProfile)
         } else {
-            print ("CREATING DEFAULT PROFILE")
             createDefaultProfile()
             defaultUserProfileHasBeenSet = true
             userDefaults.set(true, forKey: "defaultUserProfileHasBeenSet")
-            let temp = userDefaults.bool(forKey: "defaultUserProfileHasBeenSet")
-            print ("User defaults temp value = \(temp)")
         }
     }
     
@@ -69,7 +69,6 @@ struct LibraryView: View {
     }
     
     func checkMusicLibaryAuthorization () {
-        //  guard SKCloudServiceController.authorizationStatus() == .notDetermined else { return }
         SKCloudServiceController.requestAuthorization {(status: SKCloudServiceAuthorizationStatus) in
             switch status {
             case .denied, .restricted, .notDetermined: disableAppleMusicBasedFeatures()
@@ -85,21 +84,12 @@ struct LibraryView: View {
     }
     
     func enableAppleMusicBasedFeatures() {
-        print ("CALLED ENABLE APPLE MUSIC BASED FEATURES")
         model.libraryAccessIsGranted = true
-        setCurrentProfile()
-        //  setEnabledStatusOnRemoteCommands()
-        //  assignRemoteCommands()
-        model.setInitialVolumeToFineTuneSoundLevel()
-        //        if !allSongs.isEmpty {
-        //            model.songList = allSongs
-        //            model.playQueue = allSongs
-        //            model.currentMediaItem = model.playQueue[0]
-        //        }
+       // setCurrentProfile()
+      //  model.setInitialVolumeToFineTuneSoundLevel()
     }
     
     func createDefaultProfile () {
-        print ("CALLED CREATE DEFAULT PROFILE")
         let userProfile = UserProfile (context: moc)
         userProfile.name = "Default (Flat EQ)"
         userProfile.isActive = true
@@ -140,20 +130,18 @@ struct LibraryView: View {
         userProfile.left12000M = 0
         userProfile.right12000M = 0 
         
-        
-        
         model.currentUserProfile = userProfile
         model.currentUserProfileName = userProfile.name!
         model.currentIntensity = userProfile.intensity
-        for userProfile in userProfiles {
-            userProfile.isActive = false
-        }
+        
+//        for userProfile in userProfiles {
+//            userProfile.isActive = false
+//        }
         try? moc.save()
     }
     
     func provideLibraryAccess () {
         libraryAccessIsPurchased = true
-        userDefaults.set(true, forKey: "libraryAccessIsPurchased")
     }
     
     func showInstructionsViewModal () {
@@ -165,20 +153,15 @@ struct LibraryView: View {
     }
     
     func dismiss() {
-        
     }
     
     
     var body: some View {
-        
-        
-        
         VStack {
             
             if model.libraryAccessIsGranted {
                 ZStack {
                     UserProfileHeaderView()
-                    
                         .onAppear {
                             runStartupItems()
                         }
@@ -199,7 +182,6 @@ struct LibraryView: View {
                     }
                     .padding()
                 }
-                
                 if !libraryAccessIsPurchased {
                     VStack (spacing: 30)  {
                         Text ("Spex Lifetime")
@@ -228,11 +210,9 @@ struct LibraryView: View {
                                 }
                             }
                         }
-                        
                         Spacer ()
                         Button("Spex Lifetime", 
                                action: {
-                            //resetAllToZero()
                             shouldShowUnlockLibraryAlert = true
                         })
                         .font(.title)
@@ -247,7 +227,7 @@ struct LibraryView: View {
                             if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
                                 self.tabSelection = 3
                             }
-                            if model.equalizerL1 == nil {
+                            if !model.audioEngine.isRunning {
                                 model.prepareAudioEngine()
                             }
                         }
@@ -260,8 +240,6 @@ struct LibraryView: View {
                     }
                     .padding()
                 } else {
-                    
-                  //  UserProfileHeaderView()
                     
                     NavigationStack {
                         
@@ -283,9 +261,13 @@ struct LibraryView: View {
                             } label: {
                                 LibraryRowView(image: Image(systemName: "square.stack"), text: "Albums")
                             }
-                            
                             NavigationLink {
-                                SongsView().onAppear {
+                                GenreView()
+                            } label: {
+                                LibraryRowView(image: Image(systemName: "guitars"), text: "Genres")
+                            }
+                            NavigationLink {
+                                SongsView(navigationTitleText: "Songs").onAppear {
                                     model.songList = allSongs
                                 }
                             } label: {
@@ -299,17 +281,15 @@ struct LibraryView: View {
                         
                     }
                     .onAppear{
-                        print ("LIBRARY VIEW LIST APPEARED")
-                        print ("Song List Count = \(model.songList.count)")
-                        model.didViewMusicLibrary = true
-                        checkMusicLibaryAuthorization()
-                        if model.equalizerL1 == nil {
+                    //    model.didViewMusicLibrary = true
+                    //    checkMusicLibaryAuthorization()
+                        if !model.audioEngine.isRunning {
                             model.prepareAudioEngine()
                         }
                         if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
                             self.tabSelection = 3
                         }
-                        runStartupItems()
+                     //   runStartupItems()
                         if model.testStatus != .stopped {
                             model.stopAndResetTest()
                         }
@@ -318,21 +298,7 @@ struct LibraryView: View {
                         }
                         
                     }
-//                    Button("Temp Reset", 
-//                           action: {
-//                        //resetAllToZero()
-//                        libraryAccessIsPurchased = false
-//                    })
-//                    .font(.title)
-//                    .foregroundColor(.blue)
-//                    .padding ()
-//                    .overlay(
-//                        Capsule(style: .continuous)
-//                            .stroke( .blue, lineWidth: 5)
-//                    )
-                    
                     Spacer()
-                    
                     PlayerView()
                 }
             } else {
@@ -347,7 +313,7 @@ struct LibraryView: View {
                     .onAppear{
                         runStartupItems()
                         checkMusicLibaryAuthorization()
-                        if model.equalizerL1 == nil {
+                        if !model.audioEngine.isRunning {
                             model.prepareAudioEngine()
                         }
                         if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {

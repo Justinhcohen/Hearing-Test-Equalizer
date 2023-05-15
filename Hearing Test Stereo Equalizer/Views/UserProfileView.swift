@@ -8,12 +8,6 @@
 import SwiftUI
 
 struct UserProfileView: View {
-    
-    struct GainRow {
-        var leftGain = ""
-        var rightGain = ""
-    }
-    
     @EnvironmentObject var model: Model
     @FetchRequest(sortDescriptors: [NSSortDescriptor(key: "dateCreated", ascending: false)]) var userProfiles: FetchedResults<UserProfile>
     @Environment(\.managedObjectContext) var moc
@@ -25,11 +19,7 @@ struct UserProfileView: View {
     @State private var refreshID = UUID()
     @Binding var tabSelection: Int
     
-    
-    
-    
     func setCurrentProfile () {
-        print ("CALLED SET CURRENT PROFILE IN USER PROFILE VIEW")
         model.currentUserProfile = userProfiles.first {$0.isActive} ?? userProfiles.first!
         model.currentUserProfileName = model.currentUserProfile.name ?? "Taco"
         model.currentIntensity = model.currentUserProfile.intensity
@@ -38,7 +28,6 @@ struct UserProfileView: View {
     
     func refreshState () {
         refreshID = UUID()
-        print ("CALLED DID DISMISS ON USER PROFILE VIEW")
     }
     
     func createDefaultProfileIfNone () {
@@ -52,7 +41,6 @@ struct UserProfileView: View {
             let profile = userProfiles[index]
             if userProfiles.count > 1 {
                 moc.delete(profile)
-                
             }
             for profile in userProfiles {
                 profile.isActive = false
@@ -64,7 +52,6 @@ struct UserProfileView: View {
     }
     
     func setIsActiveStatus (userProfile: UserProfile) {
-        print ("setIsActiveStatus CALLED")
         userProfile.isActive = true
         let currentUUID = userProfile.iD
         for userProfile in userProfiles {
@@ -101,6 +88,30 @@ struct UserProfileView: View {
         userProfile.left12000 = 6.0
         userProfile.right12000 = 5.661972
         
+        userProfile.left60M = 0
+        userProfile.right60M = 0
+        userProfile.left100M = 0
+        userProfile.right100M = 0
+        userProfile.left230M = 0
+        userProfile.right230M = 0
+        userProfile.left500M = 0
+        userProfile.right500M = 0
+        userProfile.left1100M = 0
+        userProfile.right1100M = 0
+        userProfile.left2400M = 0
+        userProfile.right2400M = 0
+        userProfile.left5400M = 0 
+        userProfile.right5400M = 0
+        userProfile.left12000M = 0
+        userProfile.right12000M = 0 
+        
+        model.currentUserProfile = userProfile
+        model.currentUserProfileName = userProfile.name!
+        model.currentIntensity = userProfile.intensity
+        for userProfile in userProfiles {
+            userProfile.isActive = false
+        }
+        
         try? moc.save()
     }
     
@@ -110,7 +121,7 @@ struct UserProfileView: View {
         userProfile.isActive = true
         userProfile.iD = UUID()
         userProfile.dateCreated = Date.now
-        userProfile.intensity = 0
+        userProfile.intensity = 2
         userProfile.left60 = 0
         userProfile.right60 = 0
         userProfile.left100 = 0
@@ -159,8 +170,6 @@ struct UserProfileView: View {
     }
     
     var body: some View {
-        
-        
         VStack (spacing: 30) {
             ZStack {
                 Text ("Profiles")
@@ -171,13 +180,11 @@ struct UserProfileView: View {
                         goToTestTab()
                     }
                     .font(.largeTitle)
-                    
                 }
                 .padding()
             }
             
             if defaultProfileIsCreated {
-               
                     List  {
                         ForEach (userProfiles, id: \.id) { userProfile in
                             UserProfileRowView(userProfile: userProfile)
@@ -186,7 +193,6 @@ struct UserProfileView: View {
                                         model.equalizerIsActive = true
                                     }
                                     setIsActiveStatus(userProfile: userProfile)
-                               //     setCurrentProfile()
                                     refreshState()
                                 }
                                 .onLongPressGesture {
@@ -197,7 +203,6 @@ struct UserProfileView: View {
                                 .foregroundColor(userProfile.isActive ? model.equalizerIsActive ? .green : .gray : colorScheme == .dark ? Color.white : Color.black)
                         }
                         .onDelete(perform: delete)
-                        
                     }
                     .sheet(isPresented: $showUserProfileEditNameViewModal, onDismiss: refreshState) {
                         UserProfileEditNameView()
@@ -208,115 +213,6 @@ struct UserProfileView: View {
                     .onAppear {
                         refreshState()
                     }
-                
-//                VStack (spacing: 10) {
-//                    HStack {
-//                        Text ("Take a hearing test to create a new profile.")
-//                        Spacer ()
-//                    }
-//                    HStack {
-//                        Text ("Create a new profile for each set of earphones you use and tap the name to switch between them.")
-//                        Spacer ()
-//                    }
-//                    HStack {
-//                        Text ("Longpress to rename.")
-//                        Spacer ()
-//                    }
-//                    HStack {
-//                        Text ("Swipe left to delete.")
-//                        Spacer ()
-//                    }
-//               
-//                }
-//                .padding()
-                
-//                VStack {
-//                    Text ("Boost at 6.0 Intensity")
-//                        .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                        .font(.title3)
-//                        .padding()
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left60.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("60 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right60.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left100.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("100 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right100.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left230.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("230 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right230.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left500.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("500 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right500.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left1100.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("1100 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right1100.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left2400.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("2400 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right2400.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left5400.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("5400 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right5400.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    HStack {
-//                        Text("\(model.currentUserProfile.left12000.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                        Text("12000 Hz")
-//                            .frame(maxWidth: .infinity)
-//                        Text("\(model.currentUserProfile.right12000.decimals(2))")
-//                            .foregroundColor(model.equalizerIsActive ? .green : .gray)
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    
-//                }
             }
             
             

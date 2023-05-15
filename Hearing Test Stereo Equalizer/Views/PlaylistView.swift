@@ -12,68 +12,49 @@ import MusicKit
 struct PlaylistView: View {
     
     @EnvironmentObject var model: Model
- 
-    var allPlaylists: [MPMediaItemCollection] {
-        let query = MPMediaQuery.playlists()
-        return query.collections!
-    }
+    @State private var searchText = ""
+  
     
-    var allPlaylistsFiltered: [MPMediaItemCollection] {
+    var allCollectionsFiltered: [MPMediaItemCollection] {
         var filteredMPMediaItemCollection = [MPMediaItemCollection]()
         let query = MPMediaQuery.playlists()
-        let playlistsArray = query.collections! 
-        var playlistCounts = [Int]()
-        for playlist in playlistsArray {
-            var filteredPlaylistItems = playlist.items
-            filteredPlaylistItems.removeAll(where: {$0.hasProtectedAsset == true})
-            filteredPlaylistItems.removeAll(where: {$0.isCloudItem == true})
-            playlistCounts.append (filteredPlaylistItems.count)
-            if filteredPlaylistItems.count > 0 {
-                filteredMPMediaItemCollection.append (playlist)
+        let collectionsArray = query.collections! 
+        var collectionCounts = [Int]()
+        for collection in collectionsArray {
+            var filteredCollectionItems = collection.items
+            filteredCollectionItems.removeAll(where: {$0.hasProtectedAsset == true})
+            filteredCollectionItems.removeAll(where: {$0.isCloudItem == true})
+            collectionCounts.append (filteredCollectionItems.count)
+            if filteredCollectionItems.count > 0 {
+                filteredMPMediaItemCollection.append (collection)
             }
         } 
-      //  print (playlistCounts)
         return filteredMPMediaItemCollection
     }
-    
-    @State private var searchText = ""
-    
     var searchResults: [MPMediaItemCollection] {
         if searchText.isEmpty {
-            return allPlaylistsFiltered
+            return allCollectionsFiltered
         } else {
-            return allPlaylistsFiltered.filter {  ($0.value(forProperty: MPMediaPlaylistPropertyName) as! String).lowercased().contains(searchText.lowercased()) }
+            return allCollectionsFiltered.filter {($0.value(forProperty: MPMediaPlaylistPropertyName) as! String).lowercased().contains(searchText.lowercased())}
         }
     }
     
-   // @State var refreshState = UUID()
-       
-    
-//    func loadLibraryPlaylists () async throws {
-//        let request = MusicLibraryRequest<Playlist>()
-//        let response = try await request.response()
-//        self.response = response
-//    }
-    
- 
-    
     var body: some View {
-        
-        List (searchResults, id: \.self) { playlist in
-            let playlistName = playlist.value(forProperty: MPMediaPlaylistPropertyName) as? String
+        List (searchResults, id: \.self) { collection in
+            let firstTrack = collection.items[0]
+            let playlistName = collection.value(forProperty: MPMediaPlaylistPropertyName) as? String
             let size = CGSize(width: 30, height: 30)
-           // let songName = item.title ?? "Unknown title"
-            let firstTrack = playlist.items[0]
-            let artist = firstTrack.artist ?? "Unknown Artist"
             let mediaImage = firstTrack.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
             let UIAlbumCover = mediaImage?.image(at: size)
             let defaultUIImage = UIImage(systemName: "photo")!
             let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
             NavigationLink {
-                
-                PlaylistSongsView(playlistName: playlistName ?? "No Name").onAppear {
-                   
-                    model.songList = playlist.items
+//                PlaylistSongsView(playlistName: playlistName ?? "No Name").onAppear {
+//                    model.songList = playlist.items
+//                }
+              
+                SongsView(navigationTitleText: playlistName ?? "Unknown Name").onAppear {
+                    model.songList = collection.items
                 }
             } label: {
                 HStack {    
@@ -85,14 +66,9 @@ struct PlaylistView: View {
         .searchable(text: $searchText)
         .disableAutocorrection(true)
         .listStyle(PlainListStyle())
-//        .refreshable {
-//            let updatedAllPlaylists = allPlaylists
-//            let updatedAllPlaylistsFiltered = allPlaylistsFiltered
-//        }
         .navigationTitle("Playlists")
-            
         
-        if allPlaylists.isEmpty {
+        if allCollectionsFiltered.isEmpty {
             VStack (spacing: 30) {
                 HStack {
                     Text ("There are no playlists.")
@@ -108,8 +84,8 @@ struct PlaylistView: View {
     }
 }
 
-struct PlaylistView_Previews: PreviewProvider {
-    static var previews: some View {
-        PlaylistView()
-    }
-}
+//struct PlaylistView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        PlaylistView()
+//    }
+//}

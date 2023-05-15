@@ -12,14 +12,7 @@ struct PlayerViewSoloSong: View {
     @ObservedObject private var volObserver = VolumeObserver() 
     
     @State var soundLevelIsEditing = false
-    @State private var fineTuneSoundLevel: Float = 0 {
-        willSet {
-          //  model.fineTuneSoundLevel =  (0.7 + (fineTuneSoundLevel * 0.003))
-         //   model.fineTuneSoundLevel = fineTuneSoundLevel
-            print ("New solo fine tune sound level = \(newValue)")
-            print ("fine tune sound level = \(fineTuneSoundLevel)")
-        }
-    }
+    @State private var fineTuneSoundLevel: Float = 0 
     @State private var shouldShowEQViewModal = false
     
     func showEQViewModal () {
@@ -27,7 +20,6 @@ struct PlayerViewSoloSong: View {
     }
     
     func dismiss () {
-        
     }
     
     
@@ -75,11 +67,7 @@ struct PlayerViewSoloSong: View {
                 .padding(.trailing, 20)
                 .padding(.top, 10)
                 .onAppear {
-                    print ("CALLED ON APPEAR ON SOLO SLIDER")
-                    print ("Model fine tune slider value = \(model.fineTuneSoundLevel)")
-                    print ("Solo fineTuneSoundLevel = \(fineTuneSoundLevel)")
                     fineTuneSoundLevel = model.fineTuneSoundLevel
-                    // refreshState()
                 }
             }
             

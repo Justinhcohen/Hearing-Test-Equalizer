@@ -13,8 +13,6 @@ struct ManualEQView: View {
     @Environment(\.managedObjectContext) var moc
     @State private var sliderIsEditing = false
     @State private var shouldShowAlert = false
-    
-    
     @State private var left60M = 0.0
     @State private var left100M = 0.0
     @State private var left230M = 0.0
@@ -31,7 +29,6 @@ struct ManualEQView: View {
     @State private var right2400M = 0.0
     @State private var right5400M = 0.0
     @State private var right12000M = 0.0
-    
     func saveManualAdjustments () {
         if !model.manualAdjustmentsAreActive {
             model.manualAdjustmentsAreActive = true
@@ -57,7 +54,6 @@ struct ManualEQView: View {
         activeUser.right12000M = Float(right12000M)
         try? moc.save()
     }
-    
     func populateManualAdjustmentsOnAppear() {
         left60M = Double (model.currentUserProfile.left60M)
         left100M = Double (model.currentUserProfile.left100M)
@@ -77,7 +73,6 @@ struct ManualEQView: View {
         right12000M = Double (model.currentUserProfile.right12000M)
         
     }
-    
     func resetAllToZero () {
         left60M = 0
         left100M = 0
@@ -95,7 +90,6 @@ struct ManualEQView: View {
         right2400M = 0
         right5400M = 0
         right12000M = 0
-        
         let activeUser = userProfiles.first {
             $0.isActive
         }!
@@ -116,13 +110,10 @@ struct ManualEQView: View {
         activeUser.right5400M = 0
         activeUser.right12000M = 0
         try? moc.save()
-        
         model.setEQBands(for: model.currentUserProfile)
     }
     
-    
     var body: some View {
-        
         Group {
             ZStack {
                 Text ("Manual EQ Adjustment")
@@ -136,22 +127,18 @@ struct ManualEQView: View {
                     .padding(.trailing)
                     .padding(.leading)
             }
-//            HStack {
-//                Text ("Left")
-//                    .frame(maxWidth: .infinity)
-//                    .foregroundColor(.blue)
-//                Text ("")
-//                    .frame(maxWidth: .infinity)
-//                Text ("Right")
-//                    .frame(maxWidth: .infinity)
-//                    .foregroundColor(.blue)
-//            }
-            
-            
             ScrollView {
                 HStack {
+                    Text("Left")
+                        .frame (maxWidth: .infinity)
+                    Text("Right")
+                        .frame (maxWidth: .infinity)
+                    
+                }
+                .padding(.bottom, 10)
+                HStack {
                     VStack {
-                        Text("Left 60 Hz: \(left60M.decimals(2))")
+                        Text("60 Hz: \(left60M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $left60M, in: -10.0...10.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left60M = Float(left60M)
@@ -163,12 +150,8 @@ struct ManualEQView: View {
                             populateManualAdjustmentsOnAppear()
                         }
                     }
-                    
-//                    Text("60 Hz")
-//                        .frame(maxWidth: .infinity)
-                    
                     VStack {
-                        Text("Right 60 Hz: \(right60M.decimals(2))")
+                        Text("60 Hz: \(right60M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $right60M, in: -10.0...10.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right60M = Float(right60M)
@@ -180,7 +163,7 @@ struct ManualEQView: View {
                 }
                 HStack {
                     VStack {
-                        Text("Left 100 Hz: \(left100M.decimals(2))")
+                        Text("100 Hz: \(left100M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $left100M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left100M = Float(left100M)
@@ -189,12 +172,8 @@ struct ManualEQView: View {
                             sliderIsEditing = editing
                         })
                     }
-                    
-//                    Text("100 Hz")
-//                        .frame(maxWidth: .infinity)
-                    
                     VStack {
-                        Text("Right 100 Hz: \(right100M.decimals(2))")
+                        Text("100 Hz: \(right100M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $right100M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right100M = Float(right100M)
@@ -206,7 +185,7 @@ struct ManualEQView: View {
                 }
                 HStack {
                     VStack {
-                        Text("Left 230 Hz: \(left230M.decimals(2))")
+                        Text("230 Hz: \(left230M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $left230M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left230M = Float(left230M)
@@ -215,12 +194,8 @@ struct ManualEQView: View {
                             sliderIsEditing = editing
                         })
                     }
-                    
-//                    Text("230 Hz")
-//                        .frame(maxWidth: .infinity)
-                    
                     VStack {
-                        Text("Right 230 Hz: \(right230M.decimals(2))")
+                        Text("230 Hz: \(right230M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $right230M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right230M = Float(right230M)
@@ -232,7 +207,7 @@ struct ManualEQView: View {
                 }
                 HStack {
                     VStack {
-                        Text("Left 500 Hz: \(left500M.decimals(2))")
+                        Text("500 Hz: \(left500M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $left500M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left500M = Float(left500M)
@@ -240,13 +215,9 @@ struct ManualEQView: View {
                             saveManualAdjustments()
                             sliderIsEditing = editing
                         })
-                    }
-                    
-//                    Text("500 Hz")
-//                        .frame(maxWidth: .infinity)
-//                    
+                    }               
                     VStack {
-                        Text("Right 500 Hz: \(right500M.decimals(2))")
+                        Text("500 Hz: \(right500M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $right500M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right500M = Float(right500M)
@@ -258,7 +229,7 @@ struct ManualEQView: View {
                 }
                 HStack {
                     VStack {
-                        Text("Left 1100 Hz: \(left1100M.decimals(2))")
+                        Text("1100 Hz: \(left1100M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $left1100M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left1100M = Float(left1100M)
@@ -267,12 +238,8 @@ struct ManualEQView: View {
                             sliderIsEditing = editing
                         })
                     }
-                    
-//                    Text("1100 Hz")
-//                        .frame(maxWidth: .infinity)
-                    
                     VStack {
-                        Text("Right 1100 Hz: \(right1100M.decimals(2))")
+                        Text("1100 Hz: \(right1100M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $right1100M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right1100M = Float(right1100M)
@@ -284,7 +251,7 @@ struct ManualEQView: View {
                 }
                 HStack {
                     VStack {
-                        Text("Left 2400 Hz: \(left2400M.decimals(2))")
+                        Text("2400 Hz: \(left2400M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $left2400M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left2400M = Float(left2400M)
@@ -293,12 +260,8 @@ struct ManualEQView: View {
                             sliderIsEditing = editing
                         })
                     }
-                    
-//                    Text("2400 Hz")
-//                        .frame(maxWidth: .infinity)
-                    
                     VStack {
-                        Text("Right 2400 Hz: \(right2400M.decimals(2))")
+                        Text("2400 Hz: \(right2400M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $right2400M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right2400M = Float(right2400M)
@@ -310,7 +273,7 @@ struct ManualEQView: View {
                 }
                 HStack {
                     VStack {
-                        Text("Left 5400 Hz: \(left5400M.decimals(2))")
+                        Text("5400 Hz: \(left5400M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $left5400M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left5400M = Float(left5400M)
@@ -319,12 +282,8 @@ struct ManualEQView: View {
                             sliderIsEditing = editing
                         })
                     }
-                    
-//                    Text("5400 Hz")
-//                        .frame(maxWidth: .infinity)
-                    
                     VStack {
-                        Text("Right 5400 Hz: \(right5400M.decimals(2))")
+                        Text("5400 Hz: \(right5400M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $right5400M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right5400M = Float(right5400M)
@@ -336,7 +295,7 @@ struct ManualEQView: View {
                 }
                 HStack {
                     VStack {
-                        Text("Left 12000 Hz: \(left12000M.decimals(2))")
+                        Text("12000 Hz: \(left12000M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $left12000M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.left12000M = Float(left12000M)
@@ -345,12 +304,8 @@ struct ManualEQView: View {
                             sliderIsEditing = editing
                         })
                     }
-                    
-//                    Text("12000 Hz")
-//                        .frame(maxWidth: .infinity)
-                    
                     VStack {
-                        Text("Right 12000 Hz: \(right12000M.decimals(2))")
+                        Text("12000 Hz: \(right12000M.decimals(2))")
                             .foregroundColor(model.manualAdjustmentsAreActive ? .green : .gray)
                         Slider (value: $right12000M, in: -6.0...6.0, step: 0.25, onEditingChanged: { editing in
                             model.currentUserProfile.right12000M = Float(right12000M)
@@ -360,11 +315,9 @@ struct ManualEQView: View {
                         })
                     }
                 }
-                
             }
             Button("Reset All", 
                    action: {
-                //resetAllToZero()
                 shouldShowAlert = true
             })
             .font(.title)

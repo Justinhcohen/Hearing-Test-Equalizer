@@ -108,36 +108,29 @@ struct TestView: View {
         for userProfile in userProfiles {
             userProfile.isActive = false
         }
-        print ("CALLED SAVE PROFILE AFTER TEST")
         let newUserProfile = UserProfile (context: moc)
         var minValue = 0.0
         var maxValue = -160.0
         for i in 0...model.lowestAudibleDecibelBands.count - 1 {
             if model.lowestAudibleDecibelBands[i] == 0 {
-                print ("Round \(i): Couldn't hear - should continue")
                 continue
             }
             if model.lowestAudibleDecibelBands[i] < minValue {
                 minValue = model.lowestAudibleDecibelBands[i]
-                print ("Round \(i): The new minValue = \(minValue)")
             }
             if model.lowestAudibleDecibelBands[i] > maxValue {
                 maxValue = model.lowestAudibleDecibelBands[i]
-                print ("Round \(i): The new maxValue = \(maxValue)")
             }
         }
         if abs (minValue - maxValue) < 1 {
             minValue = maxValue - 1 // Avoiding dividing by zero.
         }
         let multiplier: Double = min(6.0 / abs(minValue - maxValue), 1.0)
-        print ("The multipler = \(multiplier)")
         
         var workingBandsGain = [Float]()
         for i in 0...model.lowestAudibleDecibelBands.count - 1 {
             let eqBoost = min (multiplier * abs(minValue - model.lowestAudibleDecibelBands[i]), 6)
-            print ("The eqBoost for \(model.lowestAudibleDecibelBands[i]) = \(eqBoost)")
             workingBandsGain.insert (Float(eqBoost), at: i)
-          //  workingBandsGain.insert(Float(multiplier * abs(minValue - model.lowestAudibleDecibelBands[i]) ), at: i)
         }
         newUserProfile.left60 = workingBandsGain[0]
         newUserProfile.left100 = workingBandsGain[1]
@@ -209,7 +202,7 @@ struct TestView: View {
                                 Spacer()
                             }
                             HStack {
-                                Text ("After the hearing test, you'll see which frequencies Spex is boosting and by how much. It will apply zero boost to the frequency you hear the best, max boost to the frequency you hear ther worst, and relative boosts to all the frequencies inbetween. In addition to seeing the boosts, you'll hear how these boosts focus the demo songs. Toggle Spex on and off while listening to determine if Spex is for you.")
+                                Text ("After the hearing test, you'll see which frequencies Spex is boosting and by how much. It will apply zero boost to the frequency you hear the best, max boost to the frequency you hear ther worst, and relative boosts to all the frequencies inbetween. In addition to seeing the boosts, you'll hear how these boosts bring the demo songs into focus. Toggle Spex on and off while listening to determine if Spex is for you.")
                                 Spacer()
                             }
                             HStack {
@@ -504,7 +497,6 @@ struct TestView: View {
                     .onChange(of: model.testStatus, perform: {value in
                         if model.testStatus == .testCompleted {
                             saveProfileAfterTest()
-                            print ("Should Show Modal View")
                             showTestResultsView = true
                             introStep = 50
                             tonesCompleted = 0
@@ -550,11 +542,6 @@ struct TestView: View {
                     Spacer ()
                     
                     ZStack {
-//                        HStack {
-//                            AirPlayButton().frame(width: 40, height: 40)
-//                            Spacer()
-//                        }
-//                        .padding()
                         
                         Button {
                             if !isShowingCompareSilence {

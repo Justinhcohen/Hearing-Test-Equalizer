@@ -40,9 +40,7 @@ struct SettingsView: View {
                                 model.manualAdjustmentsAreActive = false
                             }
                         }
-                    
                     Toggle("Practice Tone Before Test", isOn: $model.practiceToneBeforeTest)
-                    
                     HStack {
                         if MFMailComposeViewController.canSendMail() {
                             Button("Report Issue") {
@@ -51,17 +49,11 @@ struct SettingsView: View {
                         } else {
                             Text("Can't send emails from this device")
                         }
-//                        if result != nil {
-//                            Text("Result: \(String(describing: result))")
-//                                .lineLimit(nil)
-//                        }
                         Spacer()
                     }
                     .sheet(isPresented: $isShowingMailView) {
                         MailView(isShowing: self.$isShowingMailView, result: self.$result)
                     }
-                    
-                    
                 }
                 .padding(20)
             }

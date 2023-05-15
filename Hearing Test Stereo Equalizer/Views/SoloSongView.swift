@@ -15,68 +15,59 @@ struct SoloSongView: View {
     @State var currentTimeRemaining: TimeInterval = 0
     @State var soloViewPlaybackTimer: Timer?
     
-    func soloViewPlaybackTimerAction () {
-        currentTime = model.currentSongTimeStatic
-        currentTimeRemaining = model.audioFile.duration - model.currentSongTimeStatic
-//        let formatter = DateComponentsFormatter()
-//        formatter.unitsStyle = .positional
-//        let formattedTime = currentTime.positionalTime
-//        let formattedTimeRemaining = currentTimeRemaining.positionalTime
-//        print (formattedTime as Any)
-//        print (formattedTimeRemaining as Any)
+    func updatePlaybackTime () {
+        currentTime = model.currentSongTime
+        currentTimeRemaining = model.audioFile.duration - model.currentSongTime
     }
     
     func startPlaybackTimer () {
-        print ("START TIMER CALLED")
         if soloViewPlaybackTimer == nil {
             soloViewPlaybackTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { _ in
-                self.soloViewPlaybackTimerAction()
+                self.updatePlaybackTime()
             })
             soloViewPlaybackTimer?.fire()
         } 
     }
     
-//   @State var albumCover: Image
-//    @State var songName: String
-//   @State var artistName: String
-//    
-//    func updateMetadata () {
-//        let size = CGSize(width: 300, height: 300)
-//         songName = model.currentMediaItem.title ?? "Unknown title"
-//         artistName = model.currentMediaItem.artist ?? "Unknown artist"
-//        let mediaImage = model.currentMediaItem.value(forProperty: MPMediaItemPropertyArtwork) as? MPMediaItemArtwork
-//        let UIAlbumCover = mediaImage?.image(at: size)
-//        let defaultUIImage = UIImage(systemName: "photo")!
-//         albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
-//    }
+    func stopPlayBackTimer () {
+        if soloViewPlaybackTimer != nil {
+            soloViewPlaybackTimer?.invalidate()
+            soloViewPlaybackTimer = nil
+            }
+    }
+    
+    func respondToChangeInPlayState () {
+        switch model.playState {
+        case .stopped, .paused:
+            stopPlayBackTimer()
+            updatePlaybackTime()
+        case .playing:
+            startPlaybackTimer()
+        }
+    }
+    
+   
     
     var body: some View {
-        
         UserProfileHeaderView()
             .padding(.top, 10)
-        
         VStack (spacing: 20) {
             model.albumCover
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(15)
                 .padding(10)
-            
-           
             if model.showPlaytimeSlider {
-                
                 VStack {
-                    
                     Slider(value: $currentTime, in: 0...model.audioFile.duration, onEditingChanged: { editing in
-                        let sampleRateSong = model.audioFile.processingFormat.sampleRate
-                        model.cachedAudioFrame = Int64 (Double(currentTime) * Double(sampleRateSong))
-                        model.cachedAudioTime = currentTime
-                        model.currentSongTimeStatic = currentTime
-                        model.playTrackAfterSeek()
-                        //                model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                        //                model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-                        //                model.fineTuneSoundLevel = fineTuneSoundLevel
-                        //                soundLevelIsEditing = editing
+                        model.cachedAudioFrame = Int64 (Double(currentTime) * Double(model.audioFile.processingFormat.sampleRate))
+                        switch model.playState {
+                        case .paused, .stopped:
+                            break
+                        case .playing:
+                            model.playTrack()
+                        }
+                        updatePlaybackTime()
                     })
                     .padding(.leading, 10)
                     .padding(.trailing, 10)
@@ -129,8 +120,13 @@ struct SoloSongView: View {
             Spacer()
             PlayerViewSoloSong()
         }
+        .onChange(of: model.playState, perform: { _ in
+            respondToChangeInPlayState()
+        })
+        .onChange(of: model.songName, perform: { _ in 
+            updatePlaybackTime()
+        })
         .onAppear {
-            model.updateSongMetadata()
             startPlaybackTimer()
         }
     }

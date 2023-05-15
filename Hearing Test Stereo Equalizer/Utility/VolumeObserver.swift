@@ -33,9 +33,7 @@ final class VolumeObserver: ObservableObject {
         progressObserver = session.observe(\.outputVolume) { [self] (session, value) in
             DispatchQueue.main.async {
                 self.volume = session.outputVolume
-//                print ("System Volume Changed")
-//                let notification = Notification(name: Notification.Name(rawValue: "systemVolumeChanged"), object: nil, userInfo: nil)
-//                NotificationCenter.default.post(notification)
+
             }
         }
     }

@@ -26,8 +26,6 @@ struct ArtistView: View {
         }
     }
     
- //   @State var refreshState = UUID()
-    
     var body: some View {
         
         List {
@@ -40,7 +38,7 @@ struct ArtistView: View {
                 let defaultUIImage = UIImage(systemName: "photo")!
                 let albumCover = Image(uiImage: UIAlbumCover ?? defaultUIImage)
                 NavigationLink {
-                    ArtistSongsView(artistName: artistName ?? "No Name").onAppear {
+                    SongsView(navigationTitleText: artistName ?? "Unknown name").onAppear {
                         model.songList = artist.items
                     }
                         .contentShape(Rectangle())
@@ -56,9 +54,6 @@ struct ArtistView: View {
         .searchable(text: $searchText)
         .disableAutocorrection(true)
         .listStyle(PlainListStyle())
-//        .refreshable {
-//            refreshState = UUID()
-//        }
         .navigationTitle("Artists")
         
         if allArtists.isEmpty {
@@ -71,7 +66,6 @@ struct ArtistView: View {
                     Text ("Tap the question mark in the upper right for tips on how to add songs.")
                     Spacer()
                 }
-                
             }
             .padding()
         }

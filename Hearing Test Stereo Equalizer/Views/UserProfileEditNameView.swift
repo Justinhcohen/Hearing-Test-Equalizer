@@ -12,14 +12,12 @@ struct UserProfileEditNameView: View {
     @FetchRequest(sortDescriptors: [NSSortDescriptor(key: "dateCreated", ascending: false)]) var userProfiles: FetchedResults<UserProfile>
     @Environment(\.managedObjectContext) var moc
     @Environment(\.dismiss) private var dismiss
-//    var currentUserProfile: UserProfile {
-//        userProfiles.first {
-//            $0.isActive
-//        }!
-//    } 
     @State private var newProfileName = ""
     @State private var shouldShowNamingAlert = false
     @FocusState private var focusedField: FocusedField?
+    enum FocusedField {
+        case textField
+    }
     
     func saveNewProfileName (){
         if newProfileName.isEmpty {
@@ -32,43 +30,11 @@ struct UserProfileEditNameView: View {
         try? moc.save()
         dismiss()
     }
-        
-    
-    
-    enum FocusedField {
-        case textField
-    }
-    
+
     var body: some View {
         VStack (spacing: 30) {
             Text ("Update Name")
                 .font(.largeTitle)
-            //            HStack {
-            //                Text ("Every time you provide a fresh set of hearing measurements, you will associate them with a hearing profile.")
-            //                Spacer()
-            //            }
-//            ScrollView {
-//                VStack (spacing: 30) {
-//                    HStack {
-//                        Text ("If you want to create profiles for more than one set of headphones, you may want to include the name of the headphones in the profile name.")
-//                        Spacer()
-//                    }
-//                    HStack {
-//                        Text ("You can always change it later so no pressure.")
-//                        Spacer()
-//                    }
-//                }
-//            }
-            
-            //            HStack {
-            //                Text ("You can always long-press the name in the Profile Manager to change it so no need to get hung up on it now.")
-            //                Spacer()
-            //            }
-            
-            //            HStack {
-            //                Text ("You can also slide to delete unwanted profiles in the Profile Manager but you must always have at least one.")
-            //                Spacer()
-            //            }
             HStack {
                 Text ("Current Name: \(model.currentUserProfileName)")
                 Spacer()

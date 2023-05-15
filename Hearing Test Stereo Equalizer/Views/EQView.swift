@@ -11,10 +11,7 @@ import MediaPlayer
 
 
 struct EQView: View {
-    
-    
     @EnvironmentObject var model: Model
-    @EnvironmentObject var player: Player
     @Environment(\.isPresented) private var isPresented
     @FetchRequest(sortDescriptors: []) var userProfiles: FetchedResults<UserProfile>
     @Environment(\.managedObjectContext) var moc
@@ -26,76 +23,37 @@ struct EQView: View {
         }
     }
     @Environment(\.colorScheme) var colorScheme
-    
     @ObservedObject private var volObserver = VolumeObserver() 
-    
-    // let timer = Timer.publish(every: 0.05, on: .main, in: .common).autoconnect()
-    
-    
     @State private var intensity: Double = 6.0
-    @State private var bassBoost: Double = 0.0
-    @State private var reverb: Double = 0.0
-//    @State private var fineTuneSoundLevel: Float = 0 {
-//        didSet {
-//            model.fineTuneSoundLevel =  (0.7 + (fineTuneSoundLevel * 0.003))
-//        }
-//    }
-    @State private var slider = RepresentedMPVolumeView()
-    @State private var systemSoundLevel: Float = 0.2
     @State private var soundLevelIsEditing = false
     @State private var intensityIsEditing = false
     @State private var sliderDidEdit = false
     @State private var showUserProfilesModalView = false
     @State private var showManualControlsView = false
-    @State private var isPlayingDemoOne = false
-    @State private var isPlayingDemoTwo = false
-    
-    let session = AVAudioSession.sharedInstance()
-    
-    var volumeFineTuneMin: Float {
-        return session.outputVolume - 0.03
-    }
-    var volumeFineTuneMax: Float {
-        return session.outputVolume + 0.03
-    }
     
     func didDismiss () {
-        intensity = model.currentIntensity
+        //  intensity = model.currentIntensity
     }
     
     func saveIntensity () {
-        print ("Called Save Intensity")
         let activeUser = userProfiles.first {
             $0.isActive
         }!
         activeUser.intensity = intensity
         try? moc.save()
     }
-    
-    func toggleShouldShowText () {
-        print ("Tapped Toggle Should Show Text")
-        shouldShowText = !shouldShowText
-    }
-    
-    func setCurrentProfileV2 () {
-        print ("CALLED SET CURRENT PROFILE in EQVIEW")
-        model.currentUserProfile = userProfiles.first {
-            $0.isActive
-        }!
+    func setCurrentProfile () {
+        model.currentUserProfile = userProfiles.first {$0.isActive} ?? userProfiles.first!
         model.currentUserProfileName = model.currentUserProfile.name ?? "Strawberries"
         model.currentIntensity = model.currentUserProfile.intensity
         intensity = model.currentUserProfile.intensity
         model.setEQBands(for: model.currentUserProfile)
-        
     }
     
     var body: some View {
         VStack {
             VStack {
-                // User Profile Header View at the top
                 UserProfileHeaderView()    
-                
-                // A ZStack that has the owl and the toggle
                 ZStack {
                     if model.equalizerIsActive {
                         Image("SpexOwl1024")
@@ -115,14 +73,11 @@ struct EQView: View {
                         .font(.title3)
                         .foregroundColor(model.equalizerIsActive ? .blue : .gray)
                 }
-                
-                // The intensity text above the slider and the intensity slider
                 Text ("Intensity: \(intensity.decimals(2))")
                     .foregroundColor(intensityIsEditing ? .gray : model.equalizerIsActive ? .blue : .gray)
                     .font(.title3)
-                
                 Slider (value: $intensity, in: 2.0...20.0, step: 0.25, onEditingChanged: { editing in
-                    model.currentUserProfile.intensity = intensity
+                    // model.currentUserProfile.intensity = intensity
                     model.currentIntensity = intensity
                     model.setEQBands(for: model.currentUserProfile)
                     saveIntensity()
@@ -130,10 +85,8 @@ struct EQView: View {
                 })
                 .disabled (!model.equalizerIsActive)
                 .onAppear{
-                    setCurrentProfileV2()
-                    print ("Model current intensity = \(model.currentIntensity)")
-                    print ("User intensity = \(model.currentUserProfile.intensity)")
-                    if model.equalizerL1 == nil {
+                    setCurrentProfile()
+                    if !model.audioEngine.isRunning {
                         model.prepareAudioEngine()
                     }
                     if !model.initialHearingTestHasBeenCompleted && model.libraryAccessIsGranted {
@@ -144,12 +97,8 @@ struct EQView: View {
                     }
                 }
                 
-                // The play demo button just below the slider
-                
                 if model.showDemoSongButtons {
-                    
                     HStack (spacing: 30) {
-                        
                         Button {
                             model.demoTrack = .trackOne
                             if !model.isPlayingDemoOne {
@@ -170,12 +119,10 @@ struct EQView: View {
                         .padding ()
                         .overlay(
                             Capsule(style: .continuous)
-                            //  .stroke(.blue, lineWidth: 5)
                                 .stroke(model.isPlayingDemoOne ? Color.green : Color.blue, lineWidth: 5)
                         )
                         .foregroundColor(model.isPlayingDemoOne ? Color.green : Color.blue)
                         .padding (.bottom, 20)
-                        
                         Button {
                             model.demoTrack = .trackTwo
                             if !model.isPlayingDemoTwo {
@@ -196,12 +143,10 @@ struct EQView: View {
                         .padding ()
                         .overlay(
                             Capsule(style: .continuous)
-                            //  .stroke(.blue, lineWidth: 5)
                                 .stroke(model.isPlayingDemoTwo ? Color.green : Color.blue, lineWidth: 5)
                         )
                         .foregroundColor(model.isPlayingDemoTwo ? Color.green : Color.blue)
                         .padding (.bottom, 20)
-                        
                         Button {
                             model.demoTrack = .trackThree
                             if !model.isPlayingDemoThree {
@@ -222,7 +167,6 @@ struct EQView: View {
                         .padding ()
                         .overlay(
                             Capsule(style: .continuous)
-                            //  .stroke(.blue, lineWidth: 5)
                                 .stroke(model.isPlayingDemoThree ? Color.green : Color.blue, lineWidth: 5)
                         )
                         .foregroundColor(model.isPlayingDemoThree ? Color.green : Color.blue)
@@ -230,27 +174,23 @@ struct EQView: View {
                     }
                     
                 }
-                
-                // The listing of EQ Boosts
                 VStack {
                     Group {
-                        
-                            ZStack {
-                                Text ("Spex Stereo EQ Boost")
-                                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                                    .font(.title3)
-                                    .padding()
-                                
-                                if model.showManualAdjustmentsButton {
-                                    HStack {
-                                        Spacer ()
-                                        Text ("+M")
-                                            .foregroundColor((model.manualAdjustmentsAreActive && model.equalizerIsActive) ? .green : .gray)
-                                            .font(.title3)
-                                            .padding()
-                                    }
+                        ZStack {
+                            Text ("Spex Stereo EQ Boost")
+                                .foregroundColor(model.equalizerIsActive ? .green : .gray)
+                                .font(.title3)
+                                .padding()
+                            if model.showManualAdjustmentsButton {
+                                HStack {
+                                    Spacer ()
+                                    Text ("+M")
+                                        .foregroundColor((model.manualAdjustmentsAreActive && model.equalizerIsActive) ? .green : .gray)
+                                        .font(.title3)
+                                        .padding()
                                 }
                             }
+                        }
                         ScrollView {
                             HStack {
                                 let left60 = model.currentUserProfile.left60 * Float(intensity / 6.0)
@@ -347,23 +287,14 @@ struct EQView: View {
                                 Text("\(right12000.decimals(2))")
                                     .foregroundColor(model.equalizerIsActive ? .green : .gray)
                                     .frame(maxWidth: .infinity)
-                                
                             }
-                            
-                            
                         }
                     }
                 }
             }
             
-            // The Manual Adjustments Button
-            
-            
-            
             VStack {
-                
                 if model.showManualAdjustmentsButton {
-                    
                     Button("Manual Adjustments", 
                            action: {
                         showManualControlsView = true
@@ -379,15 +310,10 @@ struct EQView: View {
                         ManualEQView()
                     }
                     .disabled(!model.equalizerIsActive)
-                    
                 }
-                
-                // The Player
-                
                 PlayerView()
             }
         }
-        
     }
 }
 

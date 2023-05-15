@@ -11,18 +11,10 @@ import MediaPlayer
 struct PlayerView: View {
     
     @EnvironmentObject var model: Model
-    @ObservedObject private var volObserver = VolumeObserver() 
-    
-    @State var soundLevelIsEditing = false
-    @State private var fineTuneSoundLevel: Float = 0 {
-        didSet {
-            model.fineTuneSoundLevel =  (0.7 + (fineTuneSoundLevel * 0.003))
-        }
-    }
     @State private var shouldShowModalSoloSongView = false
     
     func dismiss() {
-        shouldShowModalSoloSongView = false
+
     }
     
     func showModalSoloSongView () {
@@ -31,27 +23,6 @@ struct PlayerView: View {
     
     var body: some View {
         VStack {
-//            HStack {
-//                Image(systemName: "speaker.wave.2")
-//                    .foregroundColor((model.songList.isEmpty || model.demoIsPlaying) ? .gray : .blue)
-//                    .font(.callout)
-//                
-//                Slider(value: $fineTuneSoundLevel, in: 0...100, onEditingChanged: { editing in
-//                    model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-//                    model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-//                    soundLevelIsEditing = editing
-//                })
-//                // .padding()
-//                .onChange(of: volObserver.volume, perform: {value in
-//                    fineTuneSoundLevel = 0.0
-//                    model.audioPlayerNodeL1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-//                    model.audioPlayerNodeR1.volume = 0.7 + (fineTuneSoundLevel * 0.003)
-//                })
-//                
-//            }
-//            .padding(.leading, 20)
-//            .padding(.trailing, 20)
-//            .padding(.top, 30)
             
             ZStack {
                 HStack (spacing: 30) {
@@ -83,7 +54,6 @@ struct PlayerView: View {
                     }
                     .disabled(!model.audioEngine.isRunning || model.songList.isEmpty || model.demoIsPlaying || !model.audioPlayerNodeL1.isPlaying)
                     .sheet(isPresented: $shouldShowModalSoloSongView, onDismiss: dismiss) {
-                        //SoloSongView(albumCover: albumCover, songName: songName, artistName: artistName)
                         SoloSongView()
                     }
                     
