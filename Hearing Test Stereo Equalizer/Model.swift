@@ -62,6 +62,8 @@ class Model: ObservableObject, RemoteCommandHandler {
         intensityAdjusted = userDefaults.integer(forKey: "intensityAdjusted")
         spexToggled = userDefaults.integer(forKey: "spexToggled")
         manualAdjustmentsToggled = userDefaults.integer(forKey: "manualAdjustmentsToggled")
+        tappedSpexLifetime = userDefaults.integer(forKey: "tappedSpexLifetime")
+        tappedUserProfile = userDefaults.integer(forKey: "tappedUserProfile")
     }
     
     
@@ -114,6 +116,16 @@ class Model: ObservableObject, RemoteCommandHandler {
     var manualAdjustmentsToggled = 0 {
         didSet {
             userDefaults.set(manualAdjustmentsToggled, forKey: "manualAdjustmentsToggled")
+        }
+    }
+    var tappedSpexLifetime = 0 {
+        didSet {
+            userDefaults.set(tappedSpexLifetime, forKey: "tappedSpexLifetime")
+        }
+    }
+    var tappedUserProfile = 0 {
+        didSet {
+            userDefaults.set(tappedUserProfile, forKey: "tappedUserProfile")
         }
     }
     

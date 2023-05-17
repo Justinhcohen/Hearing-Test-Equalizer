@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAnalytics
 
 struct UserProfileView: View {
     @EnvironmentObject var model: Model
@@ -28,12 +29,6 @@ struct UserProfileView: View {
     
     func refreshState () {
         refreshID = UUID()
-    }
-    
-    func createDefaultProfileIfNone () {
-        if userProfiles.isEmpty {
-            createDefaultProfile()
-        }
     }
     
     func delete(at offsets: IndexSet) {
@@ -163,6 +158,10 @@ struct UserProfileView: View {
             userProfile.isActive = false
         }
         try? moc.save()
+        
+        defaultProfileIsCreated = true
+        
+        FirebaseAnalytics.Analytics.logEvent("default_profile_created", parameters: nil)
     }
     
     func goToTestTab () {
@@ -185,47 +184,52 @@ struct UserProfileView: View {
             }
             
             if defaultProfileIsCreated {
-                    List  {
-                        ForEach (userProfiles, id: \.id) { userProfile in
-                            UserProfileRowView(userProfile: userProfile)
-                                .onTapGesture {
-                                    if !model.equalizerIsActive {
-                                        model.equalizerIsActive = true
-                                    }
-                                    setIsActiveStatus(userProfile: userProfile)
-                                    refreshState()
+                List  {
+                    ForEach (userProfiles, id: \.id) { userProfile in
+                        UserProfileRowView(userProfile: userProfile)
+                            .onTapGesture {
+                                if !model.equalizerIsActive {
+                                    model.equalizerIsActive = true
                                 }
-                                .onLongPressGesture {
-                                    setIsActiveStatus(userProfile: userProfile)
-                                    setCurrentProfile()
-                                    showUserProfileEditNameViewModal = true
-                                }
-                                .foregroundColor(userProfile.isActive ? model.equalizerIsActive ? .green : .gray : colorScheme == .dark ? Color.white : Color.black)
-                        }
-                        .onDelete(perform: delete)
+                                setIsActiveStatus(userProfile: userProfile)
+                                refreshState()
+                                FirebaseAnalytics.Analytics.logEvent("tap_user_profile", parameters: [
+                                    "tapped_user_profile" : model.tappedUserProfile
+                                ])
+                                
+                            }
+                            .onLongPressGesture {
+                                setIsActiveStatus(userProfile: userProfile)
+                                setCurrentProfile()
+                                showUserProfileEditNameViewModal = true
+                            }
+                            .foregroundColor(userProfile.isActive ? model.equalizerIsActive ? .green : .gray : colorScheme == .dark ? Color.white : Color.black)
                     }
-                    .sheet(isPresented: $showUserProfileEditNameViewModal, onDismiss: refreshState) {
-                        UserProfileEditNameView()
-                    }
-                    .listStyle(PlainListStyle())
-                    .id(refreshID)
-                    .font(.title3)
-                    .onAppear {
-                        refreshState()
-                    }
+                    .onDelete(perform: delete)
+                }
+                .sheet(isPresented: $showUserProfileEditNameViewModal, onDismiss: refreshState) {
+                    UserProfileEditNameView()
+                }
+                .listStyle(PlainListStyle())
+                .id(refreshID)
+                .font(.title3)
+                .onAppear {
+                    refreshState()
+                }
             }
             
             
-//            Button 	("Add Justin XM5") {
-//                addJustinXM5()
-//            }
-
+            //            Button 	("Add Justin XM5") {
+            //                addJustinXM5()
+            //            }
+            
             
         }
         .onAppear {
-            createDefaultProfileIfNone()
+            if userProfiles.isEmpty {
+                createDefaultProfile()
+            }
             setCurrentProfile()
-            defaultProfileIsCreated = true
             if !model.initialHearingTestHasBeenCompleted && model.libraryAccessIsGranted {
                 self.tabSelection = 3
             }

@@ -8,12 +8,13 @@
 import SwiftUI
 import MediaPlayer
 import StoreKit
+import FirebaseAnalytics
 
 struct LibraryView: View {
     
     @EnvironmentObject var model: Model
     @Environment(\.requestReview) var requestReview
- //   @State private var path = NavigationPath()
+    //   @State private var path = NavigationPath()
     let userDefaults = UserDefaults.standard
     @Binding var tabSelection: Int
     
@@ -82,8 +83,8 @@ struct LibraryView: View {
     
     func enableAppleMusicBasedFeatures() {
         model.libraryAccessIsGranted = true
-       // setCurrentProfile()
-      //  model.setInitialVolumeToFineTuneSoundLevel()
+        // setCurrentProfile()
+        //  model.setInitialVolumeToFineTuneSoundLevel()
     }
     
     func createDefaultProfile () {
@@ -131,10 +132,12 @@ struct LibraryView: View {
         model.currentUserProfileName = userProfile.name!
         model.currentIntensity = userProfile.intensity
         
-//        for userProfile in userProfiles {
-//            userProfile.isActive = false
-//        }
+        //        for userProfile in userProfiles {
+        //            userProfile.isActive = false
+        //        }
         try? moc.save()
+        
+        FirebaseAnalytics.Analytics.logEvent("default_profile_created", parameters: nil)
     }
     
     func provideLibraryAccess () {
@@ -143,10 +146,12 @@ struct LibraryView: View {
     
     func showInstructionsViewModal () {
         shouldShowInstructionsViewModal = true
+        FirebaseAnalytics.Analytics.logEvent("show_instructions", parameters: nil)
     }
     
     func showSettingsViewModal () {
         shouldShowSettingsViewModal = true
+        FirebaseAnalytics.Analytics.logEvent("show_settings", parameters: nil)
     }
     
     func dismiss() {
@@ -211,6 +216,10 @@ struct LibraryView: View {
                         Button("Spex Lifetime", 
                                action: {
                             shouldShowUnlockLibraryAlert = true
+                            model.tappedSpexLifetime += 1
+                            FirebaseAnalytics.Analytics.logEvent("spex_lifetime", parameters: [
+                                "tapped_spex_lifetime" : model.tappedSpexLifetime
+                            ])
                         })
                         .font(.title)
                         .foregroundColor(.blue)
@@ -278,15 +287,15 @@ struct LibraryView: View {
                         
                     }
                     .onAppear{
-                    //    model.didViewMusicLibrary = true
-                    //    checkMusicLibaryAuthorization()
+                        //    model.didViewMusicLibrary = true
+                        //    checkMusicLibaryAuthorization()
                         if !model.audioEngine.isRunning {
                             model.prepareAudioEngine()
                         }
                         if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
                             self.tabSelection = 3
                         }
-                     //   runStartupItems()
+                        //   runStartupItems()
                         if model.testStatus != .stopped {
                             model.stopAndResetTest()
                         }
