@@ -9,8 +9,6 @@ import SwiftUI
 import MediaPlayer
 import StoreKit
 
-
-
 struct LibraryView: View {
     
     @EnvironmentObject var model: Model
@@ -43,7 +41,6 @@ struct LibraryView: View {
         if model.timesLaunched % 10 == 0 {
             requestReview()
         }
-        print ("Times Launched = \(model.timesLaunched)")
     }
     
     func setCurrentProfile () {

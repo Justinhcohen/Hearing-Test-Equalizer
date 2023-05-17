@@ -8,6 +8,7 @@
 import SwiftUI
 import AVKit
 import MediaPlayer
+import FirebaseAnalytics
 
 
 struct EQView: View {
@@ -67,6 +68,11 @@ struct EQView: View {
                     Toggle("", isOn: $model.equalizerIsActive)
                         .onChange(of: model.equalizerIsActive) { value in
                             model.setEQBands(for: model.currentUserProfile)
+                            model.spexToggled += 1
+                            FirebaseAnalytics.Analytics.logEvent("toggle_spex", parameters: [
+                                "spex_toggled": model.spexToggled,
+                                "spex_status": "\(model.equalizerIsActive)"
+                            ])
                         }
                         .padding(.trailing)
                         .padding(.leading)
@@ -82,6 +88,11 @@ struct EQView: View {
                     model.setEQBands(for: model.currentUserProfile)
                     saveIntensity()
                     intensityIsEditing = editing
+                    model.intensityAdjusted += 1
+                    FirebaseAnalytics.Analytics.logEvent("adjust_intensity", parameters: [
+                        "intensity_adjusted": model.intensityAdjusted,
+                        "intensity": model.currentIntensity
+                    ])
                 })
                 .disabled (!model.equalizerIsActive)
                 .onAppear{

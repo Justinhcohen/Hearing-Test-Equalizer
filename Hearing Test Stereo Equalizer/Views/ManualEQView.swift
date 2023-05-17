@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAnalytics
 
 struct ManualEQView: View {
     @EnvironmentObject var model: Model	
@@ -123,6 +124,11 @@ struct ManualEQView: View {
                 Toggle("", isOn: $model.manualAdjustmentsAreActive)
                     .onChange(of: model.manualAdjustmentsAreActive) { value in
                         model.setEQBands(for: model.currentUserProfile)
+                        model.manualAdjustmentsToggled += 1
+                        FirebaseAnalytics.Analytics.logEvent("toggle_manual_adjustments", parameters: [
+                            "manual_adjustments_toggled": model.spexToggled,
+                            "manual_adjustments_status": "\(model.manualAdjustmentsAreActive)"
+                        ])
                     }
                     .padding(.trailing)
                     .padding(.leading)

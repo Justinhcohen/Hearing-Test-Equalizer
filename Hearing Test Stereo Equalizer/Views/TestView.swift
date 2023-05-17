@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AVKit
+import FirebaseAnalytics
 
 struct TestView: View {
     
@@ -33,11 +34,11 @@ struct TestView: View {
     }
     @State private var tonesCompleted = 0
     let userDefaults = UserDefaults.standard
-    @State private var tutorialCompleted = false {
-        willSet {
-            userDefaults.setValue(newValue, forKey: "tutorialCompleted")
-        }
-    }
+//    @State private var tutorialCompleted = false {
+//        willSet {
+//            userDefaults.setValue(newValue, forKey: "tutorialCompleted")
+//        }
+//    }
     
     var doYouHearIsShown: Bool {
         if isShowingCompareSilence {
@@ -176,6 +177,12 @@ struct TestView: View {
         model.currentUserProfileName = "My Profile"
         
         try? moc.save()
+        
+        model.profilesCreated += 1
+        
+        FirebaseAnalytics.Analytics.logEvent("profile_created", parameters: [
+            "profiles_created": model.profilesCreated
+        ])
     }
     
     var body: some View {
@@ -226,13 +233,15 @@ struct TestView: View {
                         if model.audioPlayerNodeL1.isPlaying {
                             model.stopTrack()
                         }
-                        tutorialCompleted = userDefaults.bool(forKey: "tutorialCompleted")
-                        if !tutorialCompleted {
-                            introStep = 10
-                        } else {
-                            introStep = 40
-                            model.testStatus = .testInProgress
-                        }
+                        introStep = 10
+                        FirebaseAnalytics.Analytics.logEvent("click_to_intro_step_10", parameters: nil)
+//                        tutorialCompleted = userDefaults.bool(forKey: "tutorialCompleted")
+//                        if !tutorialCompleted {
+//                            introStep = 10
+//                        } else {
+//                            introStep = 40
+//                            model.testStatus = .testInProgress
+//                        }
                     })
                     .font(.title)
                     .foregroundColor(.blue)
@@ -431,7 +440,7 @@ struct TestView: View {
                 Button("Let's Go!", 
                        action: {
                     introStep = 40
-                    tutorialCompleted = true
+                //    tutorialCompleted = true
                     toneProgress = 0
                     tonesCompleted = 0
                     model.tapStartTest()

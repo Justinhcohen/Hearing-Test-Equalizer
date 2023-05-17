@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D0486A82A1413C000396D1F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 0D0486A72A1413C000396D1F /* FirebaseAnalytics */; };
+		0D0486AA2A141BC100396D1F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0D0486A92A141BC100396D1F /* GoogleService-Info.plist */; };
 		0D19B1532955F3E600D17C16 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D19B1522955F3E600D17C16 /* Model.swift */; };
 		0D249C8B29723C760075FED3 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D249C8A29723C760075FED3 /* DataController.swift */; };
 		0D249C8E297242210075FED3 /* HearingTest.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0D249C8C297242210075FED3 /* HearingTest.xcdatamodeld */; };
@@ -53,6 +55,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0D0486A92A141BC100396D1F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0D19B1522955F3E600D17C16 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		0D249C8A29723C760075FED3 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		0D249C8D297242210075FED3 /* HearingTest.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = HearingTest.xcdatamodel; sourceTree = "<group>"; };
@@ -105,6 +108,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D0486A82A1413C000396D1F /* FirebaseAnalytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +189,7 @@
 			isa = PBXGroup;
 			children = (
 				0DE942D8296A63DA00FFA006 /* Hearing-Test-Stereo-Equalizer-Info.plist */,
+				0D0486A92A141BC100396D1F /* GoogleService-Info.plist */,
 				0D65AD99293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift */,
 				0D19B1522955F3E600D17C16 /* Model.swift */,
 				0D39F12029A5476A00987C02 /* RemoteCommandCenter.swift */,
@@ -258,6 +263,9 @@
 			dependencies = (
 			);
 			name = "Hearing Test Stereo Equalizer";
+			packageProductDependencies = (
+				0D0486A72A1413C000396D1F /* FirebaseAnalytics */,
+			);
 			productName = "Hearing Test Equalizer";
 			productReference = 0D65AD96293D14F10017E4F8 /* Hearing Test Stereo Equalizer.app */;
 			productType = "com.apple.product-type.application";
@@ -286,6 +294,9 @@
 				Base,
 			);
 			mainGroup = 0D65AD8D293D14F10017E4F8;
+			packageReferences = (
+				0D0486A62A1413C000396D1F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			productRefGroup = 0D65AD97293D14F10017E4F8 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -313,6 +324,7 @@
 				0DE36F332A01D70500AB44A8 /* indiebox-funkhouse.mp3 in Resources */,
 				0D8762A52947CEC50089B138 /* Band12000.mp3 in Resources */,
 				0DE36F312A01D6F500AB44A8 /* Evert Zeevalkink - On The Roads.mp3 in Resources */,
+				0D0486AA2A141BC100396D1F /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -570,6 +582,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		0D0486A62A1413C000396D1F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0D0486A72A1413C000396D1F /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0D0486A62A1413C000396D1F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		0D249C8C297242210075FED3 /* HearingTest.xcdatamodeld */ = {

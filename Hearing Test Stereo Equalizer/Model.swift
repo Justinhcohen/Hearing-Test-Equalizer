@@ -10,6 +10,7 @@ import AVKit
 import MediaPlayer
 import MusicKit
 import SwiftUI
+import FirebaseAnalytics
 
 class Model: ObservableObject, RemoteCommandHandler {
     
@@ -39,6 +40,8 @@ class Model: ObservableObject, RemoteCommandHandler {
         manualAdjustmentsAreActive = userDefaults.bool(forKey: "manualAdjustmentsAreActive")
         currentUserProfileName = userDefaults.string(forKey: "currentUserProfileName") ?? "There is no name"
         fineTuneSoundLevel = userDefaults.float(forKey: "fineTuneSoundLevel")
+        
+        // Settings
         showPlaytimeSlider = userDefaults.bool(forKey: "showPlaytimeSlider")
         showSpexToggle = userDefaults.bool(forKey: "showSpexToggle")
         showSubtleVolumeSlider = userDefaults.bool(forKey: "showSubtleVolumeSlider")
@@ -47,24 +50,75 @@ class Model: ObservableObject, RemoteCommandHandler {
         showSongInformation = userDefaults.bool(forKey: "showSongInformation")
         showAirPlayButton = userDefaults.bool(forKey: "showAirPlayButton")
         practiceToneBeforeTest = userDefaults.bool(forKey: "practiceToneBeforeTest")
+        
+        // Analytics
         timesLaunched = userDefaults.integer(forKey: "timesLaunched")
+        songsPlayed = userDefaults.integer(forKey: "songsPlayed")
+        hearingTestsStarted = userDefaults.integer(forKey: "hearingTestsStarted")
+        demoOnePlayed = userDefaults.integer(forKey: "demoOnePlayed")
+        demoTwoPlayed = userDefaults.integer(forKey: "demoTwoPlayed")
+        demoThreePlayed = userDefaults.integer(forKey: "demoThreePlayed")
+        profilesCreated = userDefaults.integer(forKey: "profilesCreated")
+        intensityAdjusted = userDefaults.integer(forKey: "intensityAdjusted")
+        spexToggled = userDefaults.integer(forKey: "spexToggled")
+        manualAdjustmentsToggled = userDefaults.integer(forKey: "manualAdjustmentsToggled")
     }
     
-    //    func setInitialVolumeToFineTuneSoundLevel () {
-    //        if !initialSoundLevelSet {
-    //            audioPlayerNodeL1.volume = 0.0
-    //            audioPlayerNodeR1.volume = 0.0
-    //            initialSoundLevelSet = true
-    //        }
-    //    }
     
-    // MARK: State
-    let userDefaults = UserDefaults.standard
+    // MARK: Analytics
     var timesLaunched = 0 {
         didSet {
             userDefaults.set(timesLaunched, forKey: "timesLaunched")
         }
     }
+    var songsPlayed = 0 {
+        didSet {
+            userDefaults.set(songsPlayed, forKey: "songsPlayed")
+        }
+    }
+    var hearingTestsStarted = 0 {
+        didSet {
+            userDefaults.set(hearingTestsStarted, forKey: "hearingTestsStarted")
+        }
+    }
+    var demoOnePlayed = 0 {
+        didSet {
+            userDefaults.set(demoOnePlayed, forKey: "demoOnePlayed")
+        }
+    }
+    var demoTwoPlayed = 0 {
+        didSet {
+            userDefaults.set(demoTwoPlayed, forKey: "demoTwoPlayed")
+        }
+    }
+    var demoThreePlayed = 0 {
+        didSet {
+            userDefaults.set(demoThreePlayed, forKey: "demoThreePlayed")
+        }
+    }
+    var profilesCreated = 0 {
+        didSet {
+            userDefaults.set(profilesCreated, forKey: "profilesCreated")
+        }
+    }
+    var intensityAdjusted = 0 {
+        didSet {
+            userDefaults.set(intensityAdjusted, forKey: "intensityAdjusted")
+        }
+    }
+    var spexToggled = 0 {
+        didSet {
+            userDefaults.set(spexToggled, forKey: "spexToggled")
+        }
+    }
+    var manualAdjustmentsToggled = 0 {
+        didSet {
+            userDefaults.set(manualAdjustmentsToggled, forKey: "manualAdjustmentsToggled")
+        }
+    }
+    
+    // MARK: State
+    let userDefaults = UserDefaults.standard
     @Published var demoIsPlaying = false
     //  @Published var didViewMusicLibrary = false
     @Published var didTapSongName = false 
@@ -538,6 +592,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         playTrack()
         showModalView()
         updateOnNewSong()
+        FirebaseAnalytics.Analytics.logEvent("tap_song_to_play", parameters: nil)
     }
     
     func tapShufflePlay (searchResults: [MPMediaItem], showModalView: ()->Void) {
@@ -548,11 +603,16 @@ class Model: ObservableObject, RemoteCommandHandler {
         playTrack()
         showModalView()
         updateOnNewSong()
+        FirebaseAnalytics.Analytics.logEvent("tap_shuffle_play", parameters: nil)
     }
     
     func playTrack () {
         guard !songList.isEmpty else {return} 
-        //  currentSongTimeStatic = 0
+        songsPlayed += 1
+        FirebaseAnalytics.Analytics.logEvent("play_track", parameters: [
+          "songs_played": songsPlayed,
+          "intensity": currentIntensity
+        ])
         isPlayingDemoOne = false
         isPlayingDemoTwo = false
         isPlayingDemoThree = false
@@ -731,12 +791,24 @@ class Model: ObservableObject, RemoteCommandHandler {
         case .trackOne:
             demoTrackName = "twinsmusic-dancinginthesand"
             isPlayingDemoOne = true 
+            demoOnePlayed += 1
+            FirebaseAnalytics.Analytics.logEvent("play_demo_one", parameters: [
+                "demo_one_played": demoOnePlayed
+            ])
         case .trackTwo:
             demoTrackName = "Evert Zeevalkink - On The Roads"
             isPlayingDemoTwo = true
+            demoTwoPlayed += 1
+            FirebaseAnalytics.Analytics.logEvent("play_demo_two", parameters: [
+                "demo_two_played": demoTwoPlayed
+            ])
         case .trackThree:
             demoTrackName = "indiebox-funkhouse"
             isPlayingDemoThree = true
+            demoThreePlayed += 1
+            FirebaseAnalytics.Analytics.logEvent("play_demo_three", parameters: [
+                "demo_three_played": demoThreePlayed
+            ])
         }
         playQueue = [MPMediaItem]()
         songList = [MPMediaItem]()
@@ -1011,6 +1083,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         toneIndex = 3
         currentVolume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
         playTone(volume: currentVolume)
+        FirebaseAnalytics.Analytics.logEvent("start_practice_test", parameters: nil)
     }
     
     func tapStartTest () {
@@ -1018,6 +1091,10 @@ class Model: ObservableObject, RemoteCommandHandler {
         toneIndex = 0
         currentVolume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
         playTone(volume: currentVolume)
+        hearingTestsStarted += 1
+        FirebaseAnalytics.Analytics.logEvent("start_hearing_test", parameters: [
+            "hearing_tests_started": hearingTestsStarted
+        ])
     }
     
     func stopAndResetTest () {
