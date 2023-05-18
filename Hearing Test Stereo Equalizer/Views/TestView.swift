@@ -235,13 +235,6 @@ struct TestView: View {
                         }
                         introStep = 10
                         FirebaseAnalytics.Analytics.logEvent("click_to_intro_step_10", parameters: nil)
-//                        tutorialCompleted = userDefaults.bool(forKey: "tutorialCompleted")
-//                        if !tutorialCompleted {
-//                            introStep = 10
-//                        } else {
-//                            introStep = 40
-//                            model.testStatus = .testInProgress
-//                        }
                     })
                     .font(.title)
                     .foregroundColor(.blue)

@@ -39,7 +39,7 @@ struct LibraryView: View {
             model.prepareAudioEngine()
         }
         model.timesLaunched += 1
-        if model.timesLaunched % 10 == 0 {
+        if model.timesLaunched % 20 == 0 {
             requestReview()
         }
     }
@@ -195,7 +195,7 @@ struct LibraryView: View {
                                     Spacer ()
                                 }
                                 HStack {
-                                    Text ("If you didn't notice an improvement when toggling Spex on and off while listening to the demo songs, Spex may not be for you.")
+                                    Text ("If you didn't notice an improvement when toggling Spex on and off while listening to the demo songs at various intensities, and manually tweaking the boosts didn't help, Spex may not be for you.")
                                     Spacer ()
                                 }
                                 HStack {
@@ -203,7 +203,7 @@ struct LibraryView: View {
                                     Spacer ()
                                 }
                                 HStack {
-                                    Text ("Spex will recognize playlists you create in the Music app on your Mac and sync to your iPhone through the Finder, subject to the restrictions mentioned above.")
+                                    Text ("Spex will recognize compatible songs and playlists you create in Apple's Music app and sync to your iPhone, subject to the restrictions mentioned above.")
                                     Spacer ()
                                 }
                                 HStack {

@@ -13,7 +13,7 @@ struct UserProfileView: View {
     @FetchRequest(sortDescriptors: [NSSortDescriptor(key: "dateCreated", ascending: false)]) var userProfiles: FetchedResults<UserProfile>
     @Environment(\.managedObjectContext) var moc
     @State var currentUserName = ""
-    @State var defaultProfileIsCreated = false
+   // @State var defaultProfileIsCreated = false
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) private var dismiss
     @State private var showUserProfileEditNameViewModal = false
@@ -110,59 +110,59 @@ struct UserProfileView: View {
         try? moc.save()
     }
     
-    func createDefaultProfile () {
-        let userProfile = UserProfile (context: moc)
-        userProfile.name = "Default (Flat EQ)"
-        userProfile.isActive = true
-        userProfile.iD = UUID()
-        userProfile.dateCreated = Date.now
-        userProfile.intensity = 2
-        userProfile.left60 = 0
-        userProfile.right60 = 0
-        userProfile.left100 = 0
-        userProfile.right100 = 0
-        userProfile.left230 = 0
-        userProfile.right230 = 0
-        userProfile.left500 = 0
-        userProfile.right500 = 0
-        userProfile.left1100 = 0
-        userProfile.right1100 = 0
-        userProfile.left2400 = 0
-        userProfile.right2400 = 0
-        userProfile.left5400 = 0
-        userProfile.right5400 = 0
-        userProfile.left12000 = 0
-        userProfile.right12000 = 0
-        
-        userProfile.left60M = 0
-        userProfile.right60M = 0
-        userProfile.left100M = 0
-        userProfile.right100M = 0
-        userProfile.left230M = 0
-        userProfile.right230M = 0
-        userProfile.left500M = 0
-        userProfile.right500M = 0
-        userProfile.left1100M = 0
-        userProfile.right1100M = 0
-        userProfile.left2400M = 0
-        userProfile.right2400M = 0
-        userProfile.left5400M = 0 
-        userProfile.right5400M = 0
-        userProfile.left12000M = 0
-        userProfile.right12000M = 0 
-        
-        model.currentUserProfile = userProfile
-        model.currentUserProfileName = userProfile.name!
-        model.currentIntensity = userProfile.intensity
-        for userProfile in userProfiles {
-            userProfile.isActive = false
-        }
-        try? moc.save()
-        
-        defaultProfileIsCreated = true
-        
-        FirebaseAnalytics.Analytics.logEvent("default_profile_created", parameters: nil)
-    }
+//    func createDefaultProfile () {
+//        let userProfile = UserProfile (context: moc)
+//        userProfile.name = "Default (Flat EQ)"
+//        userProfile.isActive = true
+//        userProfile.iD = UUID()
+//        userProfile.dateCreated = Date.now
+//        userProfile.intensity = 2
+//        userProfile.left60 = 0
+//        userProfile.right60 = 0
+//        userProfile.left100 = 0
+//        userProfile.right100 = 0
+//        userProfile.left230 = 0
+//        userProfile.right230 = 0
+//        userProfile.left500 = 0
+//        userProfile.right500 = 0
+//        userProfile.left1100 = 0
+//        userProfile.right1100 = 0
+//        userProfile.left2400 = 0
+//        userProfile.right2400 = 0
+//        userProfile.left5400 = 0
+//        userProfile.right5400 = 0
+//        userProfile.left12000 = 0
+//        userProfile.right12000 = 0
+//        
+//        userProfile.left60M = 0
+//        userProfile.right60M = 0
+//        userProfile.left100M = 0
+//        userProfile.right100M = 0
+//        userProfile.left230M = 0
+//        userProfile.right230M = 0
+//        userProfile.left500M = 0
+//        userProfile.right500M = 0
+//        userProfile.left1100M = 0
+//        userProfile.right1100M = 0
+//        userProfile.left2400M = 0
+//        userProfile.right2400M = 0
+//        userProfile.left5400M = 0 
+//        userProfile.right5400M = 0
+//        userProfile.left12000M = 0
+//        userProfile.right12000M = 0 
+//        
+//        model.currentUserProfile = userProfile
+//        model.currentUserProfileName = userProfile.name!
+//        model.currentIntensity = userProfile.intensity
+//        for userProfile in userProfiles {
+//            userProfile.isActive = false
+//        }
+//        try? moc.save()
+//        
+//   //     defaultProfileIsCreated = true
+//        
+//        FirebaseAnalytics.Analytics.logEvent("default_profile_created", parameters: nil)
+//    }
     
     func goToTestTab () {
         self.tabSelection = 3
@@ -183,7 +183,7 @@ struct UserProfileView: View {
                 .padding()
             }
             
-            if defaultProfileIsCreated {
+            if !userProfiles.isEmpty {
                 List  {
                     ForEach (userProfiles, id: \.id) { userProfile in
                         UserProfileRowView(userProfile: userProfile)
@@ -226,9 +226,7 @@ struct UserProfileView: View {
             
         }
         .onAppear {
-            if userProfiles.isEmpty {
-                createDefaultProfile()
-            }
+//           
             setCurrentProfile()
             if !model.initialHearingTestHasBeenCompleted && model.libraryAccessIsGranted {
                 self.tabSelection = 3

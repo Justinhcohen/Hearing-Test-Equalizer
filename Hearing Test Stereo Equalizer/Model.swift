@@ -360,6 +360,9 @@ class Model: ObservableObject, RemoteCommandHandler {
                     self.playTrack()
                 } 
             }
+            isPlayingDemoOne = false
+            isPlayingDemoTwo = false
+            isPlayingDemoThree = false 
             
             
         case .oldDeviceUnavailable: // Old device removed.
@@ -369,6 +372,9 @@ class Model: ObservableObject, RemoteCommandHandler {
             }
             cachedAudioFrame = runningAudioFrame
             stopTrack()
+            isPlayingDemoOne = false
+            isPlayingDemoTwo = false
+            isPlayingDemoThree = false 
             
         default:
             break
@@ -671,60 +677,8 @@ class Model: ObservableObject, RemoteCommandHandler {
         } catch {print ("ERROR ERROR ERROR")}
     }
     
-    func playTrackAfterSeek () {
-        isPlayingDemoOne = false
-        isPlayingDemoTwo = false
-        if playQueue.isEmpty {
-            playQueue = songList
-        }
-        currentMediaItem = playQueue[queueIndex]
-        if demoIsPlaying {
-            demoIsPlaying = false
-        }
-        if !audioEngine.isRunning {
-            prepareAudioEngine() 
-        }
-        setEQBands(for: currentUserProfile)
-        do {
-            if let currentURL = currentMediaItem.assetURL {
-                audioFile = try AVAudioFile(forReading: currentURL)
-                if !audioEngine.isRunning {
-                    prepareAudioEngine()
-                } 
-                let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
-                guard audioEngine.isRunning else {return}
-                switch playState {
-                case .stopped:
-                    break
-                case .paused:
-                    stopTrackAfterSeek()
-                case .playing: 
-                    stopTrackAfterSeek()
-                    playState = .playing
-                    startPlaybackTimer()
-                    // Left Ear Play
-                    audioPlayerNodeL1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
-                    audioPlayerNodeL1.pan = -1
-                    audioPlayerNodeL1.play()  
-                    // Right Ear Play
-                    audioPlayerNodeR1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
-                    audioPlayerNodeR1.pan = 1
-                    audioPlayerNodeR1.play()
-                }
-            }
-            
-        } catch {}
-    }
-    
     func stopTrack () {
         //    currentSongTimeStatic = 0
-        audioPlayerNodeL1.stop()
-        audioPlayerNodeR1.stop()
-        playState = .stopped
-        //  setNowPlayingMetadata()
-    }
-    
-    func stopTrackAfterSeek () {
         audioPlayerNodeL1.stop()
         audioPlayerNodeR1.stop()
         playState = .stopped
