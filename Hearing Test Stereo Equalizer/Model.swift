@@ -149,11 +149,8 @@ class Model: ObservableObject, RemoteCommandHandler {
     @Published var currentIntensity = 0.0
     @Published var playQueue = [MPMediaItem]()
     @Published var currentMediaItem = MPMediaItem()
-    @Published var queueIndex: Int = 0 {
-        didSet {
-            //   updateWhenTheQueueIndexIsSet()
-        }
-    }
+    @Published var queueIndex: Int = 0
+    
     func getQueueIndex (playQueue: [MPMediaItem], currentMPMediaItem: MPMediaItem) -> Int {
         for i in 0...playQueue.count - 1 {
             if playQueue[i].persistentID == currentMPMediaItem.persistentID {
@@ -164,7 +161,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         return 0
     }
     enum PlayState {
-        case playing, paused, stopped
+        case playing, paused, stopped, interrupted
     }
     @Published var playState: PlayState = .stopped 
     @Published var songList = [MPMediaItem]() 
@@ -308,11 +305,12 @@ class Model: ObservableObject, RemoteCommandHandler {
         case .began:
             cachedAudioFrame = runningAudioFrame
             switch playState {
-            case .stopped, .paused:
+            case .stopped, .paused, .interrupted:
                 break
             case .playing:
-                playState = .paused
+                playState = .interrupted
             }
+            
          
          
         case .ended:
@@ -324,9 +322,9 @@ class Model: ObservableObject, RemoteCommandHandler {
                     prepareAudioEngine()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                         switch self.playState {
-                        case .paused, .playing: 
+                        case .interrupted: 
                             self.playTrack()
-                        case .stopped:
+                        case .stopped, .paused, .playing:
                             break
                         }
                     } 
@@ -352,7 +350,7 @@ class Model: ObservableObject, RemoteCommandHandler {
             let session = AVAudioSession.sharedInstance()
             headphonesConnected = hasHeadphones(in: session.currentRoute)
             switch playState {
-            case .paused, .stopped:
+            case .paused, .stopped, .interrupted:
                 pauseTrack()
             case.playing:
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
@@ -591,6 +589,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         case .playing: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1.0
         case .paused: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
         case .stopped: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
+        case .interrupted: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
         }
         
         nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
@@ -639,7 +638,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         }
         currentMediaItem = playQueue[queueIndex]
         switch playState {
-        case .stopped, .paused:
+        case .stopped, .paused, .interrupted:
             startFadeInTimer()
         case .playing:
             stopTrack()
@@ -712,15 +711,15 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     func playOrPauseCurrentTrack () {
         guard !songList.isEmpty else {return}
-        if playState == .stopped {
+        switch playState {
+        case .stopped, .interrupted:
             startFadeInTimer()
             playTrack()
             startPlaybackTimer()
-            
-        } else if playState == .paused {
+        case .paused:
             startFadeInTimer()
             unPauseTrack()
-        } else {
+        case .playing:
             pauseTrack()
         }
     }

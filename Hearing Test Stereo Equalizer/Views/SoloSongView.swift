@@ -38,7 +38,7 @@ struct SoloSongView: View {
     
     func respondToChangeInPlayState () {
         switch model.playState {
-        case .stopped, .paused:
+        case .stopped, .paused, .interrupted:
             stopPlayBackTimer()
             updatePlaybackTime()
         case .playing:
@@ -62,7 +62,7 @@ struct SoloSongView: View {
                     Slider(value: $currentTime, in: 0...model.audioFile.duration, onEditingChanged: { editing in
                         model.cachedAudioFrame = Int64 (Double(currentTime) * Double(model.audioFile.processingFormat.sampleRate))
                         switch model.playState {
-                        case .paused, .stopped:
+                        case .paused, .stopped, .interrupted:
                             break
                         case .playing:
                             model.playTrack()

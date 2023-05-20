@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		0D0486A82A1413C000396D1F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 0D0486A72A1413C000396D1F /* FirebaseAnalytics */; };
 		0D0486AA2A141BC100396D1F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0D0486A92A141BC100396D1F /* GoogleService-Info.plist */; };
+		0D0486AC2A16BA9200396D1F /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D0486AB2A16BA9200396D1F /* StoreKit.framework */; };
+		0D0486AE2A17D71400396D1F /* StoreKitConfig.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 0D0486AD2A17D71400396D1F /* StoreKitConfig.storekit */; };
+		0D0486B02A17DBE600396D1F /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0486AF2A17DBE600396D1F /* PurchaseManager.swift */; };
 		0D19B1532955F3E600D17C16 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D19B1522955F3E600D17C16 /* Model.swift */; };
 		0D249C8B29723C760075FED3 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D249C8A29723C760075FED3 /* DataController.swift */; };
 		0D249C8E297242210075FED3 /* HearingTest.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0D249C8C297242210075FED3 /* HearingTest.xcdatamodeld */; };
@@ -56,6 +59,9 @@
 
 /* Begin PBXFileReference section */
 		0D0486A92A141BC100396D1F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		0D0486AB2A16BA9200396D1F /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		0D0486AD2A17D71400396D1F /* StoreKitConfig.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; name = StoreKitConfig.storekit; path = RowViews/StoreKitConfig.storekit; sourceTree = "<group>"; };
+		0D0486AF2A17DBE600396D1F /* PurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseManager.swift; sourceTree = "<group>"; };
 		0D19B1522955F3E600D17C16 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		0D249C8A29723C760075FED3 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		0D249C8D297242210075FED3 /* HearingTest.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = HearingTest.xcdatamodel; sourceTree = "<group>"; };
@@ -109,6 +115,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0D0486A82A1413C000396D1F /* FirebaseAnalytics in Frameworks */,
+				0D0486AC2A16BA9200396D1F /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -164,6 +171,7 @@
 		0D5D9D6E29E99380008CAB2C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0D0486AB2A16BA9200396D1F /* StoreKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -188,10 +196,12 @@
 		0D65AD98293D14F10017E4F8 /* Hearing Test Stereo Equalizer */ = {
 			isa = PBXGroup;
 			children = (
+				0D0486AD2A17D71400396D1F /* StoreKitConfig.storekit */,
 				0DE942D8296A63DA00FFA006 /* Hearing-Test-Stereo-Equalizer-Info.plist */,
 				0D0486A92A141BC100396D1F /* GoogleService-Info.plist */,
 				0D65AD99293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift */,
 				0D19B1522955F3E600D17C16 /* Model.swift */,
+				0D0486AF2A17DBE600396D1F /* PurchaseManager.swift */,
 				0D39F12029A5476A00987C02 /* RemoteCommandCenter.swift */,
 				0D249C8A29723C760075FED3 /* DataController.swift */,
 				0D0278572975F4BD00A5C994 /* Utility */,
@@ -317,6 +327,7 @@
 				0D8762A22947CEC50089B138 /* Band1100.mp3 in Resources */,
 				0D65ADA1293D14F40017E4F8 /* Preview Assets.xcassets in Resources */,
 				0D65AD9E293D14F40017E4F8 /* Assets.xcassets in Resources */,
+				0D0486AE2A17D71400396D1F /* StoreKitConfig.storekit in Resources */,
 				0D87629E2947CEC50089B138 /* Band500.mp3 in Resources */,
 				0D8762A12947CEC50089B138 /* Band230.mp3 in Resources */,
 				0D8762A42947CEC50089B138 /* Band5400.mp3 in Resources */,
@@ -365,6 +376,7 @@
 				0DE942D32968A71F00FFA006 /* LibraryRowView.swift in Sources */,
 				0DE36F352A028BF400AB44A8 /* SoloSongView.swift in Sources */,
 				0D71B327296B0C3C00C467FD /* VolumeObserver.swift in Sources */,
+				0D0486B02A17DBE600396D1F /* PurchaseManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

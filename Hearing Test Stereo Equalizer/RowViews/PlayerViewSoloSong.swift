@@ -87,7 +87,7 @@ struct PlayerViewSoloSong: View {
                     .disabled(model.songList.isEmpty || model.demoIsPlaying)
                     
                     Button (action: model.playOrPauseCurrentTrack) {
-                        if model.playState == .stopped || model.playState == .paused {
+                        if model.playState == .stopped || model.playState == .paused || model.playState == .interrupted {
                             Image(systemName: "play.fill")
                         } else {
                             Image(systemName: "pause.fill")
