@@ -205,11 +205,11 @@ struct TestView: View {
                                 Spacer()
                             }
                             HStack {
-                                Text ("Before we get started, please note that Spex only works with DRM-free audio files (MP3, AAC, ALAC, WAV and AIFF). It DOES NOT currently play tracks from paid subscription servcies such as Apple Music, Spotify and Tidal. If these services release compatible, public APIs, we will work to integrate them.")
+                                Text ("Before we get started, please note that Spex only works with DRM-free audio files (MP3, AAC, ALAC, WAV and AIFF). It DOES NOT currently play tracks from paid subscription services such as Apple Music, Spotify and Tidal. If these services release compatible, public APIs, we will work to integrate them.")
                                 Spacer()
                             }
                             HStack {
-                                Text ("After the hearing test, you'll see which frequencies Spex is boosting and by how much. It will apply zero boost to the frequency you hear the best, max boost to the frequency you hear ther worst, and relative boosts to all the frequencies inbetween. In addition to seeing the boosts, you'll hear how these boosts bring the demo songs into focus. Toggle Spex on and off while listening to determine if Spex is for you.")
+                                Text ("After the hearing test, you'll see which frequencies Spex is boosting and by how much. It will apply zero boost to the frequency you hear the best, max boost to the frequency you hear the worst, and relative boosts to all the frequencies in between. In addition to seeing the boosts, you'll hear how these boosts bring the demo songs into focus. Toggle Spex on and off while listening to determine if Spex is for you.")
                                 Spacer()
                             }
                             HStack {
@@ -468,7 +468,7 @@ struct TestView: View {
                         .onChange(of: volObserver.volume, perform: {value in
                             shouldShowVolumeChangedAlert = true
                         })
-                        .alert("Volume change detected. Measurements will be impacted. Do you wish to restart the test?", isPresented: $shouldShowVolumeChangedAlert) {
+                        .alert("Volume change detected. Measurements will be impacted. Do you wish to restart?", isPresented: $shouldShowVolumeChangedAlert) {
                             Button ("Restart Test", role: .destructive) {
                                 model.stopAndResetTest()
                                 toneProgress = 0
