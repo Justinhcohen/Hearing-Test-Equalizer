@@ -289,6 +289,11 @@ struct TestView: View {
                         Capsule(style: .continuous)
                             .stroke(.blue, lineWidth: 5)
                     )
+                    .onAppear {
+                        if model.demoIsPlaying {
+                            model.stopDemoTrack()
+                        }
+                    }
                     .padding()
                 }
             case 20:
@@ -626,6 +631,11 @@ struct TestView: View {
                         Capsule(style: .continuous)
                             .stroke(.blue, lineWidth: 5)
                     )
+                    .onAppear {
+                        if model.demoIsPlaying {
+                            model.stopDemoTrack()
+                        }
+                    }
                     .padding()
                 }
             default: VStack {}
