@@ -72,7 +72,7 @@ struct TestResultsView: View {
                             Spacer()
                         }
                         HStack {
-                            Text ("Head over to Spex Tab and move the Intensity slider to different positions while listening to the demo song to find your sweet spot.")
+                            Text ("Head over to Spex Tab and move the Intensity slider to different positions while listening to the demo songs to find your sweet spot.")
                             Spacer()
                         }
                         HStack {

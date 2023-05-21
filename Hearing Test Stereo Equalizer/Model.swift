@@ -23,7 +23,7 @@ class Model: ObservableObject, RemoteCommandHandler {
                 "manualAdjustmentsAreActive": true,
                 "showPlaytimeSlider": true,
                 "showSpexToggle": true,
-                "showSubtleVolumeSlider": true,
+                "showSubtleVolumeSlider": false,
                 "showDemoSongButtons": true,
                 "showManualAdjustmentsButton": true,
                 "showSongInformation": true,
@@ -444,6 +444,11 @@ class Model: ObservableObject, RemoteCommandHandler {
         if audioPlayerNodeL1.currentFrame + (cachedAudioFrame ?? 0) >= audioFile.length {
             updateOnNewSong()
             playNextTrack()
+            songsPlayed += 1
+            FirebaseAnalytics.Analytics.logEvent("song_completed", parameters: [
+              "songs_played": songsPlayed,
+              "intensity": currentIntensity
+            ])
         }
     }
     
@@ -625,11 +630,6 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     func playTrack () {
         guard !songList.isEmpty else {return} 
-        songsPlayed += 1
-        FirebaseAnalytics.Analytics.logEvent("play_track", parameters: [
-          "songs_played": songsPlayed,
-          "intensity": currentIntensity
-        ])
         isPlayingDemoOne = false
         isPlayingDemoTwo = false
         isPlayingDemoThree = false
@@ -674,6 +674,8 @@ class Model: ObservableObject, RemoteCommandHandler {
                 
             }
         } catch {print ("ERROR ERROR ERROR")}
+        
+        FirebaseAnalytics.Analytics.logEvent("play_track", parameters: nil)
     }
     
     func stopTrack () {
