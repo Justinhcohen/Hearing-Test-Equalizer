@@ -574,6 +574,7 @@ struct TestView: View {
                         .padding (.bottom, 20)
                     }
                 }
+                .padding()
             case 50: 
                 VStack () {
                     Text("Create Profile")
