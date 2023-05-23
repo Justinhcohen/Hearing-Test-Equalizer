@@ -333,6 +333,7 @@ struct ManualEQView: View {
                 Capsule(style: .continuous)
                     .stroke( .blue, lineWidth: 5)
             )
+            .padding ()
             .alert("Are you sure you want to reset all to zero?", isPresented: $shouldShowAlert) {
                 Button ("I'm sure", role: .destructive) {
                     resetAllToZero()

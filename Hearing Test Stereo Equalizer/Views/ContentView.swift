@@ -10,22 +10,23 @@ import AVKit
 
 struct ContentView: View {
     
+@EnvironmentObject var model: Model
 @State private var tabSelection = 1
     
 var body: some View {
 
         TabView (selection: $tabSelection) { 
             LibraryView(tabSelection: $tabSelection)
-                .tabItem({ Label("Library", systemImage: "music.note.list")})
+                .tabItem({ Label(!model.initialHearingTestHasBeenCompleted ? "" : "Library", systemImage: !model.initialHearingTestHasBeenCompleted ? "lock" : "music.note.list")})
                 .tag(1)
             EQView(tabSelection: $tabSelection)
-                .tabItem({ Label("Spex", systemImage: "sparkles") }) 
+                .tabItem({ Label(!model.initialHearingTestHasBeenCompleted ? "" : "Spex", systemImage: !model.initialHearingTestHasBeenCompleted ? "lock" : "sparkles") }) 
                 .tag (2)
             TestView(tabSelection: $tabSelection)
                 .tabItem({ Label("Test", systemImage: "ear.and.waveform") }) 
                 .tag (3)
             UserProfileView(tabSelection: $tabSelection)
-                .tabItem({ Label("Profiles", systemImage: "person.crop.circle")})
+                .tabItem({ Label(!model.initialHearingTestHasBeenCompleted ? "" : "Profiles", systemImage: !model.initialHearingTestHasBeenCompleted ? "lock" : "person.crop.circle")})
                 .tag (4)
         }
     }

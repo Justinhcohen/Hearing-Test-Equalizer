@@ -61,6 +61,7 @@ struct LibraryView: View {
     @State var shouldShowSettingsViewModal = false
     
     func runStartupItems () {
+        
         defaultUserProfileHasBeenSet = userDefaults.bool(forKey: "defaultUserProfileHasBeenSet")
         spexLifetimeIsPurchased = userDefaults.bool(forKey: "spexLifetimeIsPurchased")
         setCurrentProfile()
