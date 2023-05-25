@@ -7,11 +7,15 @@
 
 import SwiftUI
 import AVKit
+import StoreKit
 
 struct ContentView: View {
     
 @EnvironmentObject var model: Model
 @State private var tabSelection = 1
+    func onPurchase (_ product: Product) {
+        
+    }
     
 var body: some View {
 

@@ -10,8 +10,6 @@
 		0D0486A82A1413C000396D1F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 0D0486A72A1413C000396D1F /* FirebaseAnalytics */; };
 		0D0486AA2A141BC100396D1F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0D0486A92A141BC100396D1F /* GoogleService-Info.plist */; };
 		0D0486AC2A16BA9200396D1F /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D0486AB2A16BA9200396D1F /* StoreKit.framework */; };
-		0D0486AE2A17D71400396D1F /* StoreKitConfig.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 0D0486AD2A17D71400396D1F /* StoreKitConfig.storekit */; };
-		0D0486B02A17DBE600396D1F /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D0486AF2A17DBE600396D1F /* PurchaseManager.swift */; };
 		0D19B1532955F3E600D17C16 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D19B1522955F3E600D17C16 /* Model.swift */; };
 		0D249C8B29723C760075FED3 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D249C8A29723C760075FED3 /* DataController.swift */; };
 		0D249C8E297242210075FED3 /* HearingTest.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0D249C8C297242210075FED3 /* HearingTest.xcdatamodeld */; };
@@ -21,6 +19,8 @@
 		0D37678F29551DC100F3FF59 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D37678E29551DC100F3FF59 /* TestView.swift */; };
 		0D37679129551E0E00F3FF59 /* EQView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D37679029551E0E00F3FF59 /* EQView.swift */; };
 		0D39F12129A5476A00987C02 /* RemoteCommandCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D39F12029A5476A00987C02 /* RemoteCommandCenter.swift */; };
+		0D4235842A1E7E9500F203B9 /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D4235832A1E7E9500F203B9 /* PurchaseManager.swift */; };
+		0D4235862A1E9AC100F203B9 /* InAppPurchaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D4235852A1E9AC100F203B9 /* InAppPurchaseView.swift */; };
 		0D5CCEC42A1287BC00F69CF0 /* GenreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CCEC32A1287BC00F69CF0 /* GenreView.swift */; };
 		0D5CCEC62A12892200F69CF0 /* CollectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CCEC52A12892200F69CF0 /* CollectionRowView.swift */; };
 		0D6197C429A2C470003F3FE3 /* ArtistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D6197C329A2C470003F3FE3 /* ArtistView.swift */; };
@@ -60,8 +60,6 @@
 /* Begin PBXFileReference section */
 		0D0486A92A141BC100396D1F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0D0486AB2A16BA9200396D1F /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		0D0486AD2A17D71400396D1F /* StoreKitConfig.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; name = StoreKitConfig.storekit; path = RowViews/StoreKitConfig.storekit; sourceTree = "<group>"; };
-		0D0486AF2A17DBE600396D1F /* PurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseManager.swift; sourceTree = "<group>"; };
 		0D19B1522955F3E600D17C16 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		0D249C8A29723C760075FED3 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		0D249C8D297242210075FED3 /* HearingTest.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = HearingTest.xcdatamodel; sourceTree = "<group>"; };
@@ -71,6 +69,8 @@
 		0D37678E29551DC100F3FF59 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		0D37679029551E0E00F3FF59 /* EQView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EQView.swift; sourceTree = "<group>"; };
 		0D39F12029A5476A00987C02 /* RemoteCommandCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteCommandCenter.swift; sourceTree = "<group>"; };
+		0D4235832A1E7E9500F203B9 /* PurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseManager.swift; sourceTree = "<group>"; };
+		0D4235852A1E9AC100F203B9 /* InAppPurchaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseView.swift; sourceTree = "<group>"; };
 		0D5CCEC32A1287BC00F69CF0 /* GenreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreView.swift; sourceTree = "<group>"; };
 		0D5CCEC52A12892200F69CF0 /* CollectionRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionRowView.swift; sourceTree = "<group>"; };
 		0D6197C329A2C470003F3FE3 /* ArtistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistView.swift; sourceTree = "<group>"; };
@@ -128,6 +128,7 @@
 				0D65AD9B293D14F10017E4F8 /* ContentView.swift */,
 				0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */,
 				0DE36F382A02E18D00AB44A8 /* InstructionsView.swift */,
+				0D4235852A1E9AC100F203B9 /* InAppPurchaseView.swift */,
 				0DF1B8BA2A07E2D800DDA2D2 /* SettingsView.swift */,
 				0DE942D02968A5A100FFA006 /* PlaylistView.swift */,
 				0D6197C329A2C470003F3FE3 /* ArtistView.swift */,
@@ -196,12 +197,11 @@
 		0D65AD98293D14F10017E4F8 /* Hearing Test Stereo Equalizer */ = {
 			isa = PBXGroup;
 			children = (
-				0D0486AD2A17D71400396D1F /* StoreKitConfig.storekit */,
 				0DE942D8296A63DA00FFA006 /* Hearing-Test-Stereo-Equalizer-Info.plist */,
 				0D0486A92A141BC100396D1F /* GoogleService-Info.plist */,
 				0D65AD99293D14F10017E4F8 /* Hearing_Test_Stereo_EqualizerApp.swift */,
 				0D19B1522955F3E600D17C16 /* Model.swift */,
-				0D0486AF2A17DBE600396D1F /* PurchaseManager.swift */,
+				0D4235832A1E7E9500F203B9 /* PurchaseManager.swift */,
 				0D39F12029A5476A00987C02 /* RemoteCommandCenter.swift */,
 				0D249C8A29723C760075FED3 /* DataController.swift */,
 				0D0278572975F4BD00A5C994 /* Utility */,
@@ -327,7 +327,6 @@
 				0D8762A22947CEC50089B138 /* Band1100.mp3 in Resources */,
 				0D65ADA1293D14F40017E4F8 /* Preview Assets.xcassets in Resources */,
 				0D65AD9E293D14F40017E4F8 /* Assets.xcassets in Resources */,
-				0D0486AE2A17D71400396D1F /* StoreKitConfig.storekit in Resources */,
 				0D87629E2947CEC50089B138 /* Band500.mp3 in Resources */,
 				0D8762A12947CEC50089B138 /* Band230.mp3 in Resources */,
 				0D8762A42947CEC50089B138 /* Band5400.mp3 in Resources */,
@@ -346,6 +345,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D4235862A1E9AC100F203B9 /* InAppPurchaseView.swift in Sources */,
 				0DE36F372A029BC700AB44A8 /* PlayerViewSoloSong.swift in Sources */,
 				0D32338F29F57A0F00A3C4AE /* ManualEQView.swift in Sources */,
 				0DE5DE73299408AD006C8E7E /* UserProfileHeaderView.swift in Sources */,
@@ -373,10 +373,10 @@
 				0D5CCEC62A12892200F69CF0 /* CollectionRowView.swift in Sources */,
 				0DE5DE75299595C5006C8E7E /* UserProfileEditNameView.swift in Sources */,
 				0D2DCFCF2972EFC300BFFAD6 /* UserProfileRowView.swift in Sources */,
+				0D4235842A1E7E9500F203B9 /* PurchaseManager.swift in Sources */,
 				0DE942D32968A71F00FFA006 /* LibraryRowView.swift in Sources */,
 				0DE36F352A028BF400AB44A8 /* SoloSongView.swift in Sources */,
 				0D71B327296B0C3C00C467FD /* VolumeObserver.swift in Sources */,
-				0D0486B02A17DBE600396D1F /* PurchaseManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -503,7 +503,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 17;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;
@@ -541,7 +541,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 17;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;

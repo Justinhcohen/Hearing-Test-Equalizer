@@ -14,6 +14,14 @@ struct SettingsView: View {
     @EnvironmentObject var model: Model
     @State var result: Result<MFMailComposeResult, Error>? = nil
     @State var isShowingMailView = false
+    @State var shouldShowInAppPurchaseModal = false
+    
+    func showInAppPurchaseModal () {
+        shouldShowInAppPurchaseModal = true
+        FirebaseAnalytics.Analytics.logEvent("show_in_app_purchase", parameters: nil)
+    }
+    func dismiss() {
+    }
     
     
     var body: some View {
@@ -96,6 +104,16 @@ struct SettingsView: View {
                 .sheet(isPresented: $isShowingMailView) {
                     MailView(isShowing: self.$isShowingMailView, result: self.$result)
                 }
+                    HStack {
+                        Button("In-App Purchases") {
+                            showInAppPurchaseModal()
+                        }
+                        .sheet(isPresented: $shouldShowInAppPurchaseModal, onDismiss: dismiss) {
+                            InAppPurchaseView()
+                        }
+                        Spacer()
+                    }
+                    
             }
             .padding(20)
         }

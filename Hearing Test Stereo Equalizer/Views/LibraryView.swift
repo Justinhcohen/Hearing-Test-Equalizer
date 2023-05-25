@@ -13,7 +13,8 @@ import FirebaseAnalytics
 struct LibraryView: View {
     
     @EnvironmentObject var model: Model
-    @EnvironmentObject private var purchaseManager: PurchaseManager
+    @EnvironmentObject private var store: Store
+    
     //    let productIds = ["Spex_Lifetime_01"]
     //    private func loadProducts() async throws {
     //            self.products = try await Product.products(for: productIds)
@@ -52,18 +53,15 @@ struct LibraryView: View {
     @State private var isShowingAlert = false
     @State var defaultUserProfileHasBeenSet = false 
     @State var shouldShowUnlockLibraryAlert = false
-    @State var spexLifetimeIsPurchased = false {
-        didSet {
-            userDefaults.set(spexLifetimeIsPurchased, forKey: "spexLifetimeIsPurchased")
-        }
-    }
+    
     @State var shouldShowInstructionsViewModal = false
     @State var shouldShowSettingsViewModal = false
+    @State var shouldShowInAppPurchaseModal = false
     
     func runStartupItems () {
         
         defaultUserProfileHasBeenSet = userDefaults.bool(forKey: "defaultUserProfileHasBeenSet")
-        spexLifetimeIsPurchased = userDefaults.bool(forKey: "spexLifetimeIsPurchased")
+        model.spexLifetimeIsPurchased = userDefaults.bool(forKey: "spexLifetimeIsPurchased")
         setCurrentProfile()
         if !model.audioEngine.isRunning {
             model.prepareAudioEngine()
@@ -170,9 +168,9 @@ struct LibraryView: View {
         FirebaseAnalytics.Analytics.logEvent("default_profile_created", parameters: nil)
     }
     
-    func provideLibraryAccess () {
-        spexLifetimeIsPurchased = true
-    }
+//    func provideLibraryAccess () {
+//        spexLifetimeIsPurchased = true
+//    }
     
     func showInstructionsViewModal () {
         shouldShowInstructionsViewModal = true
@@ -182,6 +180,11 @@ struct LibraryView: View {
     func showSettingsViewModal () {
         shouldShowSettingsViewModal = true
         FirebaseAnalytics.Analytics.logEvent("show_settings", parameters: nil)
+    }
+    
+    func showInAppPurchaseModal () {
+        shouldShowInAppPurchaseModal = true
+        FirebaseAnalytics.Analytics.logEvent("show_in_app_purchase", parameters: nil)
     }
     
     func dismiss() {
@@ -214,7 +217,7 @@ struct LibraryView: View {
                     }
                     .padding()
                 }
-                if !purchaseManager.hasPurchasedSpexLifetime && !spexLifetimeIsPurchased {
+                if /* !store.hasPurchasedSpexLifetime && */ !model.spexLifetimeIsPurchased {
                     VStack (spacing: 30)  {
                         Text ("Spex Lifetime")
                             .font(.title)
@@ -242,60 +245,8 @@ struct LibraryView: View {
                                 }
                             }
                         }
-                        Spacer ()
-                        ForEach(purchaseManager.products) { product in
-                            Button {
-                                Task {
-                                    do {
-                                        try await purchaseManager.purchase(product)
-                                    } catch {
-                                        print(error)
-                                    }
-                                }
-                            } label: {
-                                Text("\(product.displayPrice) - \(product.displayName)")
-//                                    .foregroundColor(.white)
-//                                    .padding()
-//                                    .background(.blue)
-//                                    .clipShape(Capsule())
-                                    .font(.title)
-                                    .foregroundColor(.blue)
-                                    .padding ()
-                                    .overlay(
-                                        Capsule(style: .continuous)
-                                            .stroke( .blue, lineWidth: 5)
-                                    )
-                            }
-                        }
-                        Button {
-                            Task {
-                                do {
-                                    try await AppStore.sync()
-                                } catch {
-                                    print(error)
-                                }
-                            }
-                        } label: {
-                            Text("Restore Purchases")
-                        }
-                        
-//                        Button("Spex Lifetime", 
-//                               action: {
-//                            shouldShowUnlockLibraryAlert = true
-//                            model.tappedSpexLifetime += 1
-//                            FirebaseAnalytics.Analytics.logEvent("spex_lifetime", parameters: [
-//                                "tapped_spex_lifetime" : model.tappedSpexLifetime
-//                            ])
-//                        })
-//                        .font(.title)
-//                        .foregroundColor(.blue)
-//                        .padding ()
-//                        .overlay(
-//                            Capsule(style: .continuous)
-//                                .stroke( .blue, lineWidth: 5)
-//                        )
                         .onAppear {
-                         //   spexLifetimeIsPurchased = false
+                           
                             checkMusicLibaryAuthorization()
                             if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
                                 self.tabSelection = 3
@@ -303,25 +254,40 @@ struct LibraryView: View {
                             if !model.audioEngine.isRunning {
                                 model.prepareAudioEngine()
                             }
-                            
-                        }
-                        .alert("Purchase Spex Lifetime for $9.99? (Temp text, no purchase required)", isPresented: $shouldShowUnlockLibraryAlert) {
-                            Button ("Yes!") {
-                                provideLibraryAccess()
+                            if store.hasPurchasedSpexLifetime && !model.spexLifetimeIsPurchased {
+                                model.spexLifetimeIsPurchased = true
                             }
-                            Button("Cancel", role: .cancel) { }
-                        }
                     }
-                    .padding()
-                    .task {
-                                Task {
-                                    do {
-                                        try await purchaseManager.loadProducts()
-                                    } catch {
-                                        print(error)
+                        Spacer ()
+                        
+                        if !store.products.isEmpty {
+                            let product = store.products.first!
+                            Button("\(product.displayPrice) - Spex Lifetime") {
+                                showInAppPurchaseModal()
+                            }
+                            .sheet(isPresented: $shouldShowInAppPurchaseModal, onDismiss: dismiss) {
+                                InAppPurchaseView()
+                            }
+                            .font(.title3)
+                            .padding ()
+                            .overlay(
+                                Capsule(style: .continuous)
+                                    .stroke(.blue, lineWidth: 5)
+                            )
+                            .foregroundColor(.blue)
+                            .onChange(of: store.hasPurchasedSpexLifetime, perform: {newValue in
+                                if newValue == true {
+                                    if !model.spexLifetimeIsPurchased {
+                                        model.spexLifetimeIsPurchased = true
                                     }
                                 }
                             }
+                                      
+                            
+                            )
+                        }
+                    }
+                    .padding()
 
                 } else {
                     
@@ -329,17 +295,22 @@ struct LibraryView: View {
                         
                         List {
                             NavigationLink {
+                                SongsView(navigationTitleText: "Songs").onAppear {
+                                    model.songList = allSongs
+                                }
+                            } label: {
+                                LibraryRowView(image: Image(systemName: "music.note"), text: "Songs")
+                            }
+                            NavigationLink {
                                 PlaylistView()
                             } label: {
                                 LibraryRowView(image: Image(systemName: "music.note.list"), text: "Playlists")
                             }
-                            
                             NavigationLink {
                                 ArtistView()
                             } label: {
                                 LibraryRowView(image: Image(systemName: "music.mic"), text: "Artists")
                             }
-                            
                             NavigationLink {
                                 AlbumView()
                             } label: {
@@ -350,24 +321,18 @@ struct LibraryView: View {
                             } label: {
                                 LibraryRowView(image: Image(systemName: "guitars"), text: "Genres")
                             }
-                            NavigationLink {
-                                SongsView(navigationTitleText: "Songs").onAppear {
-                                    model.songList = allSongs
-                                }
-                            } label: {
-                                LibraryRowView(image: Image(systemName: "music.note"), text: "Songs")
-                            }
+                           
                             
                             
                         }
                         .listStyle(PlainListStyle())
                         .navigationTitle("Library")
                         .onAppear {
-                            if !spexLifetimeIsPurchased {
-                                spexLifetimeIsPurchased = true
-                                print ("SET SPEX LIFETIME IS PURCHASED TO: \(spexLifetimeIsPurchased)")
+                            if !model.spexLifetimeIsPurchased {
+                                model.spexLifetimeIsPurchased = true
+                                print ("SET SPEX LIFETIME IS PURCHASED TO: \(model.spexLifetimeIsPurchased)")
                             }
-                          //  spexLifetimeIsPurchased = false
+                          //	  spexLifetimeIsPurchased = false
                         }
                     }
                     
@@ -389,6 +354,11 @@ struct LibraryView: View {
                         }
                         
                     }
+                    
+//                    Button ("Set to False") {
+//                        model.spexLifetimeIsPurchased = false
+//                    }
+                    
                     Spacer()
                     PlayerView()
                 }

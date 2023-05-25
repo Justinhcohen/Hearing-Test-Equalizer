@@ -22,7 +22,7 @@ struct Hearing_Test_Stereo_EqualizerApp: App {
     
     @StateObject private var model = Model()
     @StateObject private var dataController = DataController()
-    @StateObject private var purchaseManager = PurchaseManager()
+    @StateObject private var store = Store()
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
     var body: some Scene {
@@ -30,9 +30,9 @@ struct Hearing_Test_Stereo_EqualizerApp: App {
             ContentView()
                 .environmentObject(model)
                 .environment(\.managedObjectContext, dataController.container.viewContext)
-                .environmentObject(purchaseManager)
+                .environmentObject(store)
                 .task {
-                    await purchaseManager.updatePurchasedProducts()
+                    await store.requestProducts()
                 }
         }
     }

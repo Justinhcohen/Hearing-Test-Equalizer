@@ -1,83 +1,136 @@
 //
-//  PurchaseManager.swift
-//  Hearing Test Stereo Equalizer
+//  Store.swift
+//  AdaptyPurchase
 //
-//  Created by Justin Cohen on 5/19/23.
-//
+//  Created by kondranton (Anton Kondrashov)
 
-import Foundation
 import StoreKit
 
-@MainActor
-class PurchaseManager: ObservableObject {
-
-    private let productIds = ["Spex_Lifetime_01"]
-
-    @Published private(set) var products: [Product] = []
-    private var productsLoaded = false
+class Store: ObservableObject {
+    private var productIDs = ["Spex_Lifetime_03"]
     
-    @Published
-       private(set) var purchasedProductIDs = Set<String>()
-
-       var hasPurchasedSpexLifetime: Bool {
-          return !self.purchasedProductIDs.isEmpty
-       }
-
-       func updatePurchasedProducts() async {
-           for await result in Transaction.currentEntitlements {
-               guard case .verified(let transaction) = result else {
-                   continue
-               }
-
-               if transaction.revocationDate == nil {
-                   self.purchasedProductIDs.insert(transaction.productID)
-               } else {
-                   self.purchasedProductIDs.remove(transaction.productID)
-               }
-           }
-       }
-
-    func loadProducts() async throws {
-        guard !self.productsLoaded else { return }
-        self.products = try await Product.products(for: productIds)
-        self.productsLoaded = true
-    }
-
-    func purchase(_ product: Product) async throws {
-        let result = try await product.purchase()
-
-        switch result {
-        case let .success(.verified(transaction)):
-            await transaction.finish()
-            await self.updatePurchasedProducts()
-        case .success(.unverified(_, _)):
-            break
-        case .pending:
-            break
-        case .userCancelled:
-            break
-        @unknown default:
-            break
+    @Published var products = [Product]()
+    
+    @Published var purchasedNonConsumables = Set<Product>()
+ //   @Published var purchasedNonRenewables = Set<Product>()
+    
+//    @Published var purchasedConsumables = [Product]()
+ //   @Published var purchasedSubscriptions = Set<Product>()
+    
+    @Published var entitlements = [Transaction]()
+    
+    @Published var hasPurchasedSpexLifetime = false {
+        didSet {
+            print ("HAS PURCHASED SPEX LIFETIME HAS BEEN SET TO - \(hasPurchasedSpexLifetime)")
         }
     }
     
-    private var updates: Task<Void, Never>? = nil
-
-       init() {
-           updates = observeTransactionUpdates()
-       }
-
-       deinit {
-           updates?.cancel()
-       }
-
-       private func observeTransactionUpdates() -> Task<Void, Never> {
-           Task(priority: .background) { [unowned self] in
-               for await _ in Transaction.updates {
-                   // Using verificationResult directly would be better
-                   // but this way works for this tutorial
-                   await self.updatePurchasedProducts()
-               }
-           }
-       }
+    var transacitonListener: Task<Void, Error>?
+    
+//    var tournamentEndDate: Date = {
+//        var components = DateComponents()
+//        components.year = 2033
+//        components.month = 2
+//        components.day = 1
+//        return Calendar.current.date(from: components)!
+//    }()
+    
+    init() {
+        transacitonListener = listenForTransactions()
+        
+        Task {
+            await requestProducts()
+            // Must be called after the products are already fetched
+            await updateCurrentEntitlements()
+        }
+    }
+    
+    @MainActor
+    func requestProducts() async {
+        print ("CALLED REQUEST PRODUCTS")
+        do {
+            products = try await Product.products(for: productIDs)
+        } catch {
+            print(error)
+        }
+    }
+    
+    @MainActor
+    func purchase(_ product: Product) async throws {
+        print ("CALLED PURCHASE")
+        let result = try await product.purchase()
+        
+        switch result {
+        case .success(let transacitonVerification):
+            await handle(transactionVerification: transacitonVerification)
+            print ("RESULT IS SUCCESS")
+        default:
+            return
+        }
+    }
+    
+    private func listenForTransactions() -> Task<Void, Error> {
+        print ("CALLED LISTEN FOR TRANSACTIONS")
+        return Task.detached {
+            for await result in Transaction.updates {
+                await self.handle(transactionVerification: result)
+            }
+        }
+    }
+    
+    @MainActor
+    @discardableResult
+    private func handle(transactionVerification result: VerificationResult<Transaction>) async -> Transaction? {
+        print ("CALLED HANDLE TRANSACTION VERIFICATION")
+        switch result {
+        case let .verified(transaction):
+            guard let product = self.products.first(where: { $0.id == transaction.productID}) else { return transaction }
+            
+            guard !transaction.isUpgraded else { return nil }
+            
+            self.addPurchased(product)
+            
+            print ("SETTING HAS PURCHASED SPEX LIFETIME TO TRUE")
+            hasPurchasedSpexLifetime = true
+            
+            await transaction.finish()
+            
+            return transaction
+        default:
+            return nil
+        }
+    }
+    
+    @MainActor
+    private func updateCurrentEntitlements() async {
+        print ("CALLED UPDATE CURRENT ENTITLEMENTS")
+        for await result in Transaction.currentEntitlements {
+            if let transaction = await self.handle(transactionVerification: result) {
+                entitlements.append(transaction)
+            }
+        }
+    }
+    
+    private func addPurchased(_ product: Product) {
+        print ("CALLED ADD PURCHASED")
+        switch product.type {
+        case .consumable:
+            break
+         //   purchasedConsumables.append(product)
+        //    Persistence.increaseConsumablesCount()
+        case .nonConsumable:
+            purchasedNonConsumables.insert(product)
+            print ("ADDING A NON-CONSUMABLE PURCHASE")
+        case .nonRenewable:
+            break
+//            if Date() <= tournamentEndDate {
+//                purchasedNonRenewables.insert(product)
+//            }
+        case .autoRenewable:
+            break
+            // purchasedSubscriptions.insert(product)
+        default:
+            return
+        }
+    }
 }

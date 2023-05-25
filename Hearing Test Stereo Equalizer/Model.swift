@@ -131,6 +131,12 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     // MARK: State
     let userDefaults = UserDefaults.standard
+    @Published var spexLifetimeIsPurchased = false {
+        didSet {
+            userDefaults.set(spexLifetimeIsPurchased, forKey: "spexLifetimeIsPurchased")
+            print ("DID SET SPEX LIFETIME IS PURCHASED to \(spexLifetimeIsPurchased)")
+        }
+    }
     @Published var demoIsPlaying = false
     //  @Published var didViewMusicLibrary = false
     @Published var didTapSongName = false 
