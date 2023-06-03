@@ -13,7 +13,7 @@ struct UserProfileView: View {
     @FetchRequest(sortDescriptors: [NSSortDescriptor(key: "dateCreated", ascending: false)]) var userProfiles: FetchedResults<UserProfile>
     @Environment(\.managedObjectContext) var moc
     @State var currentUserName = ""
-   // @State var defaultProfileIsCreated = false
+    // @State var defaultProfileIsCreated = false
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) private var dismiss
     @State private var showUserProfileEditNameViewModal = false
@@ -110,59 +110,110 @@ struct UserProfileView: View {
         try? moc.save()
     }
     
-//    func createDefaultProfile () {
-//        let userProfile = UserProfile (context: moc)
-//        userProfile.name = "Default (Flat EQ)"
-//        userProfile.isActive = true
-//        userProfile.iD = UUID()
-//        userProfile.dateCreated = Date.now
-//        userProfile.intensity = 2
-//        userProfile.left60 = 0
-//        userProfile.right60 = 0
-//        userProfile.left100 = 0
-//        userProfile.right100 = 0
-//        userProfile.left230 = 0
-//        userProfile.right230 = 0
-//        userProfile.left500 = 0
-//        userProfile.right500 = 0
-//        userProfile.left1100 = 0
-//        userProfile.right1100 = 0
-//        userProfile.left2400 = 0
-//        userProfile.right2400 = 0
-//        userProfile.left5400 = 0
-//        userProfile.right5400 = 0
-//        userProfile.left12000 = 0
-//        userProfile.right12000 = 0
-//        
-//        userProfile.left60M = 0
-//        userProfile.right60M = 0
-//        userProfile.left100M = 0
-//        userProfile.right100M = 0
-//        userProfile.left230M = 0
-//        userProfile.right230M = 0
-//        userProfile.left500M = 0
-//        userProfile.right500M = 0
-//        userProfile.left1100M = 0
-//        userProfile.right1100M = 0
-//        userProfile.left2400M = 0
-//        userProfile.right2400M = 0
-//        userProfile.left5400M = 0 
-//        userProfile.right5400M = 0
-//        userProfile.left12000M = 0
-//        userProfile.right12000M = 0 
-//        
-//        model.currentUserProfile = userProfile
-//        model.currentUserProfileName = userProfile.name!
-//        model.currentIntensity = userProfile.intensity
-//        for userProfile in userProfiles {
-//            userProfile.isActive = false
-//        }
-//        try? moc.save()
-//        
-//   //     defaultProfileIsCreated = true
-//        
-//        FirebaseAnalytics.Analytics.logEvent("default_profile_created", parameters: nil)
-//    }
+    func duplicate(activeProfile: UserProfile) {
+        let userProfile = UserProfile (context: moc)
+        userProfile.name = "\(activeProfile.name ?? "Unknown Name") - Dupe"
+        userProfile.iD = UUID()
+        userProfile.dateCreated = Date.now
+        userProfile.intensity = activeProfile.intensity
+        userProfile.left60 = activeProfile.left60
+        userProfile.right60 = activeProfile.right60
+        userProfile.left100 = activeProfile.left100
+        userProfile.right100 = activeProfile.right100
+        userProfile.left230 = activeProfile.left230
+        userProfile.right230 = activeProfile.right230
+        userProfile.left500 = activeProfile.left500
+        userProfile.right500 = activeProfile.right500
+        userProfile.left1100 = activeProfile.left1100
+        userProfile.right1100 = activeProfile.right1100
+        userProfile.left2400 = activeProfile.left2400
+        userProfile.right2400 = activeProfile.right2400
+        userProfile.left5400 = activeProfile.left5400
+        userProfile.right5400 = activeProfile.right5400
+        userProfile.left12000 = activeProfile.left12000
+        userProfile.right12000 = activeProfile.right12000
+        
+        userProfile.left60M = activeProfile.left60M
+        userProfile.right60M = activeProfile.right60M
+        userProfile.left100M = activeProfile.left100M
+        userProfile.right100M = activeProfile.right100M
+        userProfile.left230M = activeProfile.left230M
+        userProfile.right230M = activeProfile.right230M
+        userProfile.left500M = activeProfile.left500M
+        userProfile.right500M = activeProfile.right500M
+        userProfile.left1100M = activeProfile.left1100M
+        userProfile.right1100M = activeProfile.right1100M
+        userProfile.left2400M = activeProfile.left2400M
+        userProfile.right2400M = activeProfile.right2400M
+        userProfile.left5400M = activeProfile.left5400M
+        userProfile.right5400M = activeProfile.right5400M
+        userProfile.left12000M = activeProfile.left12000M
+        userProfile.right12000M = activeProfile.right12000M
+        
+        model.currentUserProfile = userProfile
+        model.currentUserProfileName = userProfile.name!
+        model.currentIntensity = userProfile.intensity
+        userProfile.isActive = true
+        for userProfile in userProfiles {
+            userProfile.isActive = false
+        }
+        
+        try? moc.save()
+    }
+    
+    //    func createDefaultProfile () {
+    //        let userProfile = UserProfile (context: moc)
+    //        userProfile.name = "Default (Flat EQ)"
+    //        userProfile.isActive = true
+    //        userProfile.iD = UUID()
+    //        userProfile.dateCreated = Date.now
+    //        userProfile.intensity = 2
+    //        userProfile.left60 = 0
+    //        userProfile.right60 = 0
+    //        userProfile.left100 = 0
+    //        userProfile.right100 = 0
+    //        userProfile.left230 = 0
+    //        userProfile.right230 = 0
+    //        userProfile.left500 = 0
+    //        userProfile.right500 = 0
+    //        userProfile.left1100 = 0
+    //        userProfile.right1100 = 0
+    //        userProfile.left2400 = 0
+    //        userProfile.right2400 = 0
+    //        userProfile.left5400 = 0
+    //        userProfile.right5400 = 0
+    //        userProfile.left12000 = 0
+    //        userProfile.right12000 = 0
+    //        
+    //        userProfile.left60M = 0
+    //        userProfile.right60M = 0
+    //        userProfile.left100M = 0
+    //        userProfile.right100M = 0
+    //        userProfile.left230M = 0
+    //        userProfile.right230M = 0
+    //        userProfile.left500M = 0
+    //        userProfile.right500M = 0
+    //        userProfile.left1100M = 0
+    //        userProfile.right1100M = 0
+    //        userProfile.left2400M = 0
+    //        userProfile.right2400M = 0
+    //        userProfile.left5400M = 0 
+    //        userProfile.right5400M = 0
+    //        userProfile.left12000M = 0
+    //        userProfile.right12000M = 0 
+    //        
+    //        model.currentUserProfile = userProfile
+    //        model.currentUserProfileName = userProfile.name!
+    //        model.currentIntensity = userProfile.intensity
+    //        for userProfile in userProfiles {
+    //            userProfile.isActive = false
+    //        }
+    //        try? moc.save()
+    //        
+    //   //     defaultProfileIsCreated = true
+    //        
+    //        FirebaseAnalytics.Analytics.logEvent("default_profile_created", parameters: nil)
+    //    }
     
     func goToTestTab () {
         self.tabSelection = 3
@@ -219,14 +270,22 @@ struct UserProfileView: View {
             }
             
             
-            //            Button 	("Add Justin XM5") {
-            //                addJustinXM5()
-            //            }
+            //                        Button 	("Add Justin XM5") {
+            //                            addJustinXM5()
+            //                        }
+            
+            Spacer()
+            
+            Button     ("Duplicate Active Profile") {
+                let activeProfile = userProfiles.first {$0.isActive} ?? userProfiles.first!
+                duplicate(activeProfile: activeProfile)
+            }
+            .padding()
             
             
         }
         .onAppear {
-//           
+            //           
             setCurrentProfile()
             if !model.initialHearingTestHasBeenCompleted && model.libraryAccessIsGranted {
                 self.tabSelection = 3

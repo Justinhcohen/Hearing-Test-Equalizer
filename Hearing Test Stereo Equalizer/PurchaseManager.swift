@@ -25,6 +25,10 @@ class Store: ObservableObject {
         }
     }
     
+    var hasPurchasedSpexLifetimeBackup: Bool {
+        !purchasedNonConsumables.isEmpty
+    }
+    
     var transacitonListener: Task<Void, Error>?
     
 //    var tournamentEndDate: Date = {

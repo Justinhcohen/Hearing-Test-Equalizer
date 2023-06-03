@@ -68,6 +68,9 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     
     // MARK: Analytics
+    
+    var spexVersion = 1.02
+    
     var timesLaunched = 0 {
         didSet {
             userDefaults.set(timesLaunched, forKey: "timesLaunched")
@@ -137,6 +140,7 @@ class Model: ObservableObject, RemoteCommandHandler {
             print ("DID SET SPEX LIFETIME IS PURCHASED to \(spexLifetimeIsPurchased)")
         }
     }
+    @Published var pauseTimer = 0
     @Published var demoIsPlaying = false
     //  @Published var didViewMusicLibrary = false
     @Published var didTapSongName = false 
@@ -443,7 +447,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     // MARK: Player Methods
     func playbackTimer(){
-        updateEverySecondInPlaybackTimer()
+        updateTenTimesPerSecondInPlaybackTimer()
         if didTapSongName {
             didTapSongName = false
         }
@@ -456,6 +460,10 @@ class Model: ObservableObject, RemoteCommandHandler {
               "intensity": currentIntensity
             ])
         }
+        if pauseTimer == 1200 && !spexLifetimeIsPurchased {
+            pauseTrack()
+        }
+        
     }
     
     func fadeInAudio () {
@@ -554,13 +562,19 @@ class Model: ObservableObject, RemoteCommandHandler {
         } catch {}
     } 
     
-    func updateEverySecondInPlaybackTimer() {
+    func updateTenTimesPerSecondInPlaybackTimer() {
         setNowPlayingMetadataEverySecond()
         runningAudioFrame = (cachedAudioFrame ?? 0) + audioPlayerNodeL1.currentFrame
+        if !spexLifetimeIsPurchased {
+            pauseTimer += 1
+        }
     }
     
     func updateOnNewSong() {
         updateSongMetadataOnNewSong()
+        if !spexLifetimeIsPurchased {
+            pauseTimer = 0
+        }
     }
     
     func updateSongMetadataOnNewSong () {
@@ -636,6 +650,9 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     func playTrack () {
         guard !songList.isEmpty else {return} 
+        if !spexLifetimeIsPurchased {
+            pauseTimer = 0
+        }
         isPlayingDemoOne = false
         isPlayingDemoTwo = false
         isPlayingDemoThree = false
@@ -693,6 +710,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     func playPreviousTrack () {
+        guard audioFile != nil else {return}
         if (Double((cachedAudioFrame ?? 0) + audioPlayerNodeL1.currentFrame) / audioFile.processingFormat.sampleRate) < 2.0 && queueIndex > 0 {
             queueIndex -= 1
         }
@@ -748,6 +766,9 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     func unPauseTrack () {
+        if !spexLifetimeIsPurchased {
+            pauseTimer = 0
+        }
         playState = .playing
         playTrack()
     } 
@@ -1029,6 +1050,9 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     func bandComplete () {
+        FirebaseAnalytics.Analytics.logEvent("band_complete", parameters: [
+            "completed_band" : toneArray[toneIndex]
+            ])
         assignMinHeardDecibels()
         resetMinMaxValues()
         if toneIndex < toneArray.count - 1 {
@@ -1041,6 +1065,7 @@ class Model: ObservableObject, RemoteCommandHandler {
             if !initialHearingTestHasBeenCompleted {
                 initialHearingTestHasBeenCompleted = true
                 userDefaults.set(true, forKey: "initialHearingTestHasBeenCompleted")
+                FirebaseAnalytics.Analytics.logEvent("first_hearing_test_completed", parameters: nil)
             }
         }
     }

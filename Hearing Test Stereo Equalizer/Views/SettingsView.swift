@@ -120,7 +120,7 @@ struct SettingsView: View {
         .font(.title3)
         Spacer()
         HStack {
-            Text ("Spex version 1.0")
+            Text ("Spex version 1.03")
                 .font(.body)
                 .opacity(0.5)
             Spacer()

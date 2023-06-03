@@ -201,19 +201,15 @@ struct TestView: View {
                         VStack (spacing: 30) {
                             
                             HStack {
-                                Text ("Spex will give you a hearing test and use the results to tune your music to your ears. If you have perfect hearing, Spex won't have anything to do. It's like if you have perfect vision, eye glasses won't help you. If you have less than perfect hearing, Spex will bring your music into focus. You can think of Spex as spectacles for your ears.")
+                                Text ("Spex will give you a hearing test and use the results to tune your music to your ears.")
                                 Spacer()
                             }
                             HStack {
-                                Text ("Before we get started, please note that Spex only works with DRM-free audio files (MP3, AAC, ALAC, WAV and AIFF). It DOES NOT currently play tracks from paid subscription services such as Apple Music, Spotify and Tidal. If these services release compatible, public APIs, we will work to integrate them.")
+                                Text ("Before we get started, please note that Spex only works with songs you own in your music library. It DOES NOT currently play tracks from paid subscription services such as Apple Music, Spotify and Tidal.")
                                 Spacer()
                             }
                             HStack {
-                                Text ("After the hearing test, you'll see which frequencies Spex is boosting and by how much. It will apply zero boost to the frequency you hear the best, max boost to the frequency you hear the worst, and relative boosts to all the frequencies in between. In addition to seeing the boosts, you'll hear how these boosts bring the demo songs into focus. Toggle Spex on and off while listening to determine if Spex is for you.")
-                                Spacer()
-                            }
-                            HStack {
-                                Text ("If you discover that Spex helps you, you'll have the option to make a one-time purchase that will unlock all features, including access to your owned Music Library.")
+                                Text ("After the hearing test, you'll hear how Spex brings into focus the demo songs and more importantly, your music.")
                                 Spacer()
                             }
                             HStack {

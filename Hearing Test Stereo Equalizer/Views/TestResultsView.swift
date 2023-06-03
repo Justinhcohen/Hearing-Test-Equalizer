@@ -74,11 +74,11 @@ struct TestResultsView: View {
                         HStack {
                             Text ("Head over to Spex Tab and move the Intensity slider to different positions while listening to the demo songs to find your sweet spot.")
                             Spacer()
-                        }
-                        HStack {
-                            Text ("If you can't get it just right, you'll have the option to tweak the boost of each frequency individually.")
-                            Spacer()
-                        }
+                      }
+//                        HStack {
+//                            Text ("If you can't get it just right, you'll have the option to tweak the boost of each frequency individually.")
+//                            Spacer()
+//                        }
                     }
                     
                 }

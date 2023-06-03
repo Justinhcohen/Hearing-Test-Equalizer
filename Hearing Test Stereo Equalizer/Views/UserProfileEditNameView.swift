@@ -46,6 +46,7 @@ struct UserProfileEditNameView: View {
                     onCommit: saveNewProfileName
                 )
                 .focused($focusedField, equals: .textField)
+                .disableAutocorrection(true)
                 .onAppear {
                     focusedField = .textField
                 }

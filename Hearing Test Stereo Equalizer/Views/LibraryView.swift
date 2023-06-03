@@ -57,10 +57,16 @@ struct LibraryView: View {
     @State var shouldShowInstructionsViewModal = false
     @State var shouldShowSettingsViewModal = false
     @State var shouldShowInAppPurchaseModal = false
+    @State var libraryNavigationStep = 0 {
+        didSet {
+            userDefaults.set(libraryNavigationStep, forKey: "libraryNavigationStep")
+        }
+    }
     
     func runStartupItems () {
         
         defaultUserProfileHasBeenSet = userDefaults.bool(forKey: "defaultUserProfileHasBeenSet")
+        libraryNavigationStep = userDefaults.integer(forKey: "libraryNavigationStep")
         model.spexLifetimeIsPurchased = userDefaults.bool(forKey: "spexLifetimeIsPurchased")
         setCurrentProfile()
         if !model.audioEngine.isRunning {
@@ -70,6 +76,9 @@ struct LibraryView: View {
         if model.timesLaunched % 20 == 0 {
             requestReview()
         }
+        FirebaseAnalytics.Analytics.logEvent("run_startup", parameters: [
+            "version": model.spexVersion
+        ])
     }
     
     func setCurrentProfile () {
@@ -168,9 +177,9 @@ struct LibraryView: View {
         FirebaseAnalytics.Analytics.logEvent("default_profile_created", parameters: nil)
     }
     
-//    func provideLibraryAccess () {
-//        spexLifetimeIsPurchased = true
-//    }
+    //    func provideLibraryAccess () {
+    //        spexLifetimeIsPurchased = true
+    //    }
     
     func showInstructionsViewModal () {
         shouldShowInstructionsViewModal = true
@@ -216,81 +225,67 @@ struct LibraryView: View {
                         }
                     }
                     .padding()
+                    .onAppear {
+                        
+                        checkMusicLibaryAuthorization()
+                        if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
+                            self.tabSelection = 3
+                        }
+                        if !model.audioEngine.isRunning {
+                            model.prepareAudioEngine()
+                        }
+                        if store.hasPurchasedSpexLifetime && !model.spexLifetimeIsPurchased {
+                            model.spexLifetimeIsPurchased = true
+                        }
+                        if model.demoIsPlaying {
+                            model.stopDemoTrack()
+                        }
+                    }
                 }
-                if /* !store.hasPurchasedSpexLifetime && */ !model.spexLifetimeIsPurchased {
-                    VStack (spacing: 30)  {
-                        Text ("Spex Lifetime")
+                
+                if libraryNavigationStep == 0 {
+                    VStack (spacing: 30) {
+                        Text ("Your Music")
                             .font(.title)
                         ScrollView {
                             VStack (spacing: 30) {
                                 HStack {
-                                    Text ("Were you able to find the sweet spot on the Intensity slider that increased your enjoyment of the demo songs?")
-                                    Spacer ()
+                                    Text("Hopefully you were able to find the sweet spot on the Intensity slider that maximized your enjoyment of the demo songs. Now let's try with your music.")
+                                    Spacer()
                                 }
                                 HStack {
-                                    Text ("If you didn't notice an improvement when toggling Spex on and off while listening to the demo songs at various intensities, and manually tweaking the boosts didn't help, Spex may not be for you.")
-                                    Spacer ()
+                                    Text("Click the button below to access all of the songs you own in your music library.")
+                                    Spacer()
                                 }
                                 HStack {
-                                    Text ("If you did notice an improvement, Spex may still not be for you because Spex only works with DRM-free audio files (MP3, AAC, ALAC, WAV and AIFF). It DOES NOT currently play tracks from paid subscription servcies such as Apple Music, Spotify and Tidal. If these services release compatible, public APIs, we will work to integrate them.")
-                                    Spacer ()
+                                    Text("This free version of Spex will pause playback 2 minutes into each song. Hopefully this will give you ample opportunity to decide whether Spex is for you.")
+                                    Spacer()
                                 }
                                 HStack {
-                                    Text ("Spex will recognize compatible songs and playlists you create in Apple's Music app and sync to your iPhone, subject to the restrictions mentioned above.")
-                                    Spacer ()
+                                    Text("If Spex improves your listening experience, you'll have the option to remove the pause timer with a one-time, in-app purchase. No subscription required.")
+                                    Spacer()
                                 }
                                 HStack {
-                                    Text ("If you would like to use Spex with your owned Music Library, you can make a one-time purchase of Spex Lifetime. Spex Lifetime will provide you with a lifetime of full access and free upgrades. No subscription required.")
-                                    Spacer ()
+                                    Text("Happy listening!")
+                                    Spacer()
                                 }
                             }
                         }
-                        .onAppear {
-                           
-                            checkMusicLibaryAuthorization()
-                            if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
-                                self.tabSelection = 3
-                            }
-                            if !model.audioEngine.isRunning {
-                                model.prepareAudioEngine()
-                            }
-                            if store.hasPurchasedSpexLifetime && !model.spexLifetimeIsPurchased {
-                                model.spexLifetimeIsPurchased = true
-                            }
-                    }
-                        Spacer ()
-                        
-                        if !store.products.isEmpty {
-                            let product = store.products.first!
-                            Button("\(product.displayPrice) - Spex Lifetime") {
-                                showInAppPurchaseModal()
-                            }
-                            .sheet(isPresented: $shouldShowInAppPurchaseModal, onDismiss: dismiss) {
-                                InAppPurchaseView()
-                            }
-                            .font(.title3)
-                            .padding ()
-                            .overlay(
-                                Capsule(style: .continuous)
-                                    .stroke(.blue, lineWidth: 5)
-                            )
-                            .foregroundColor(.blue)
-                            .onChange(of: store.hasPurchasedSpexLifetime, perform: {newValue in
-                                if newValue == true {
-                                    if !model.spexLifetimeIsPurchased {
-                                        model.spexLifetimeIsPurchased = true
-                                    }
-                                }
-                            }
-                                      
-                            
-                            )
+                        Button ("Music Library") {
+                            libraryNavigationStep = 10
+                            FirebaseAnalytics.Analytics.logEvent("tap_to_library", parameters: nil)
                         }
+                        .font(.title)
+                        .padding ()
+                        .overlay(
+                            Capsule(style: .continuous)
+                                .stroke(.blue, lineWidth: 5)
+                        )
+                        .foregroundColor(.blue)
                     }
                     .padding()
-
-                } else {
                     
+                } else if libraryNavigationStep == 10 {
                     NavigationStack {
                         
                         List {
@@ -321,47 +316,198 @@ struct LibraryView: View {
                             } label: {
                                 LibraryRowView(image: Image(systemName: "guitars"), text: "Genres")
                             }
-                           
+                            
                             
                             
                         }
                         .listStyle(PlainListStyle())
                         .navigationTitle("Library")
+                        .onChange(of: store.hasPurchasedSpexLifetime, perform: { newValue in
+                            if newValue == true {
+                                model.spexLifetimeIsPurchased = true
+                            }
+                            
+                        }
+                        )
                         .onAppear {
                             if !model.spexLifetimeIsPurchased {
-                                model.spexLifetimeIsPurchased = true
-                                print ("SET SPEX LIFETIME IS PURCHASED TO: \(model.spexLifetimeIsPurchased)")
+                                if store.hasPurchasedSpexLifetimeBackup {
+                                    model.spexLifetimeIsPurchased = true
+                                }
                             }
-                          //	  spexLifetimeIsPurchased = false
-                        }
                     }
-                    
-                    .onAppear{
-                        //    model.didViewMusicLibrary = true
-                        //    checkMusicLibaryAuthorization()
-                        if !model.audioEngine.isRunning {
-                            model.prepareAudioEngine()
-                        }
-                        if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
-                            self.tabSelection = 3
-                        }
-                        //   runStartupItems()
-                        if model.testStatus != .stopped {
-                            model.stopAndResetTest()
-                        }
-                        if model.demoIsPlaying {
-                            model.stopDemoTrack()
-                        }
-                        
-                    }
-                    
-//                    Button ("Set to False") {
-//                        model.spexLifetimeIsPurchased = false
-//                    }
-                    
-                    Spacer()
-                    PlayerView()
                 }
+                    Spacer ()
+                    VStack {
+                        if !model.spexLifetimeIsPurchased {
+                            Button("Remove Pause Timer") {
+                                showInAppPurchaseModal()
+                                FirebaseAnalytics.Analytics.logEvent("tap_remove_pause_timer", parameters: [
+                                    "songs_played": model.songsPlayed
+                                ])
+                            }
+                            .sheet(isPresented: $shouldShowInAppPurchaseModal, onDismiss: dismiss) {
+                                InAppPurchaseView()
+                            }
+                            .font(.title3)
+                            .padding ()
+                            .overlay(
+                                Capsule(style: .continuous)
+                                    .stroke(.blue, lineWidth: 5)
+                            )
+                            .foregroundColor(.blue)
+                        }
+                        PlayerView()
+                    }
+                    .padding()
+                    
+                }
+                //                
+                //                if /* !store.hasPurchasedSpexLifetime && */ !model.spexLifetimeIsPurchased {
+                //                    VStack (spacing: 30)  {
+                //                        Text ("Spex Lifetime")
+                //                            .font(.title)
+                //                        ScrollView {
+                //                            VStack (spacing: 30) {
+                //                                HStack {
+                //                                    Text ("Were you able to find the sweet spot on the Intensity slider that increased your enjoyment of the demo songs?")
+                //                                    Spacer ()
+                //                                }
+                //                                HStack {
+                //                                    Text ("If you didn't notice an improvement when toggling Spex on and off while listening to the demo songs at various intensities, and manually tweaking the boosts didn't help, Spex may not be for you.")
+                //                                    Spacer ()
+                //                                }
+                //                                HStack {
+                //                                    Text ("If you did notice an improvement, Spex may still not be for you because Spex only works with DRM-free audio files (MP3, AAC, ALAC, WAV and AIFF). It DOES NOT currently play tracks from paid subscription servcies such as Apple Music, Spotify and Tidal. If these services release compatible, public APIs, we will work to integrate them.")
+                //                                    Spacer ()
+                //                                }
+                //                                HStack {
+                //                                    Text ("Spex will recognize compatible songs and playlists you create in Apple's Music app and sync to your iPhone, subject to the restrictions mentioned above.")
+                //                                    Spacer ()
+                //                                }
+                //                                HStack {
+                //                                    Text ("If you would like to use Spex with your owned Music Library, you can make a one-time purchase of Spex Lifetime. Spex Lifetime will provide you with a lifetime of full access and free upgrades. No subscription required.")
+                //                                    Spacer ()
+                //                                }
+                //                            }
+                //                        }
+                ////                        .onAppear {
+                ////                           
+                ////                            checkMusicLibaryAuthorization()
+                ////                            if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
+                ////                                self.tabSelection = 3
+                ////                            }
+                ////                            if !model.audioEngine.isRunning {
+                ////                                model.prepareAudioEngine()
+                ////                            }
+                ////                            if store.hasPurchasedSpexLifetime && !model.spexLifetimeIsPurchased {
+                ////                                model.spexLifetimeIsPurchased = true
+                ////                            }
+                ////                    }
+                //                        Spacer ()
+                //                        
+                //                        if !store.products.isEmpty {
+                //                            let product = store.products.first!
+                //                            Button("\(product.displayPrice) - Spex Lifetime") {
+                //                                showInAppPurchaseModal()
+                //                            }
+                //                            .sheet(isPresented: $shouldShowInAppPurchaseModal, onDismiss: dismiss) {
+                //                                InAppPurchaseView()
+                //                            }
+                //                            .font(.title3)
+                //                            .padding ()
+                //                            .overlay(
+                //                                Capsule(style: .continuous)
+                //                                    .stroke(.blue, lineWidth: 5)
+                //                            )
+                //                            .foregroundColor(.blue)
+                //                            .onChange(of: store.hasPurchasedSpexLifetime, perform: {newValue in
+                //                                if newValue == true {
+                //                                    if !model.spexLifetimeIsPurchased {
+                //                                        model.spexLifetimeIsPurchased = true
+                //                                    }
+                //                                }
+                //                            }
+                //                                      
+                //                            
+                //                            )
+                //                        }
+                //                    }
+                //                    .padding()
+                
+                //                } else {
+                //                    
+                //                    NavigationStack {
+                //                        
+                //                        List {
+                //                            NavigationLink {
+                //                                SongsView(navigationTitleText: "Songs").onAppear {
+                //                                    model.songList = allSongs
+                //                                }
+                //                            } label: {
+                //                                LibraryRowView(image: Image(systemName: "music.note"), text: "Songs")
+                //                            }
+                //                            NavigationLink {
+                //                                PlaylistView()
+                //                            } label: {
+                //                                LibraryRowView(image: Image(systemName: "music.note.list"), text: "Playlists")
+                //                            }
+                //                            NavigationLink {
+                //                                ArtistView()
+                //                            } label: {
+                //                                LibraryRowView(image: Image(systemName: "music.mic"), text: "Artists")
+                //                            }
+                //                            NavigationLink {
+                //                                AlbumView()
+                //                            } label: {
+                //                                LibraryRowView(image: Image(systemName: "square.stack"), text: "Albums")
+                //                            }
+                //                            NavigationLink {
+                //                                GenreView()
+                //                            } label: {
+                //                                LibraryRowView(image: Image(systemName: "guitars"), text: "Genres")
+                //                            }
+                //                           
+                //                            
+                //                            
+                //                        }
+                //                        .listStyle(PlainListStyle())
+                //                        .navigationTitle("Library")
+                //                        .onAppear {
+                //                            if !model.spexLifetimeIsPurchased {
+                //                                model.spexLifetimeIsPurchased = true
+                //                                print ("SET SPEX LIFETIME IS PURCHASED TO: \(model.spexLifetimeIsPurchased)")
+                //                            }
+                //                          //	  spexLifetimeIsPurchased = false
+                //                        }
+                //                    }
+                //                    
+                //                    .onAppear{
+                //                        //    model.didViewMusicLibrary = true
+                //                        //    checkMusicLibaryAuthorization()
+                //                        if !model.audioEngine.isRunning {
+                //                            model.prepareAudioEngine()
+                //                        }
+                //                        if !model.initialHearingTestHasBeenCompleted  && model.libraryAccessIsGranted {
+                //                            self.tabSelection = 3
+                //                        }
+                //                        //   runStartupItems()
+                //                        if model.testStatus != .stopped {
+                //                            model.stopAndResetTest()
+                //                        }
+                //                        if model.demoIsPlaying {
+                //                            model.stopDemoTrack()
+                //                        }
+                //                        
+                //                    }
+                //                    
+                ////                    Button ("Set to False") {
+                ////                        model.spexLifetimeIsPurchased = false
+                ////                    }
+                //                    
+                //                    Spacer()
+                //                    PlayerView()
+                //                }
                 
             } else {
                 VStack (spacing: 30) {

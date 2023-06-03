@@ -21,6 +21,7 @@
 		0D39F12129A5476A00987C02 /* RemoteCommandCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D39F12029A5476A00987C02 /* RemoteCommandCenter.swift */; };
 		0D4235842A1E7E9500F203B9 /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D4235832A1E7E9500F203B9 /* PurchaseManager.swift */; };
 		0D4235862A1E9AC100F203B9 /* InAppPurchaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D4235852A1E9AC100F203B9 /* InAppPurchaseView.swift */; };
+		0D4235882A24F0F100F203B9 /* SwitchUserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D4235872A24F0F100F203B9 /* SwitchUserProfileView.swift */; };
 		0D5CCEC42A1287BC00F69CF0 /* GenreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CCEC32A1287BC00F69CF0 /* GenreView.swift */; };
 		0D5CCEC62A12892200F69CF0 /* CollectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5CCEC52A12892200F69CF0 /* CollectionRowView.swift */; };
 		0D6197C429A2C470003F3FE3 /* ArtistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D6197C329A2C470003F3FE3 /* ArtistView.swift */; };
@@ -71,6 +72,7 @@
 		0D39F12029A5476A00987C02 /* RemoteCommandCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteCommandCenter.swift; sourceTree = "<group>"; };
 		0D4235832A1E7E9500F203B9 /* PurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseManager.swift; sourceTree = "<group>"; };
 		0D4235852A1E9AC100F203B9 /* InAppPurchaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseView.swift; sourceTree = "<group>"; };
+		0D4235872A24F0F100F203B9 /* SwitchUserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchUserProfileView.swift; sourceTree = "<group>"; };
 		0D5CCEC32A1287BC00F69CF0 /* GenreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreView.swift; sourceTree = "<group>"; };
 		0D5CCEC52A12892200F69CF0 /* CollectionRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionRowView.swift; sourceTree = "<group>"; };
 		0D6197C329A2C470003F3FE3 /* ArtistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistView.swift; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 				0DCB0E32296504E000083DB4 /* SongsView.swift */,
 				0DE36F342A028BF400AB44A8 /* SoloSongView.swift */,
 				0D249C8F2972447C0075FED3 /* UserProfileView.swift */,
+				0D4235872A24F0F100F203B9 /* SwitchUserProfileView.swift */,
 				0DE5DE74299595C5006C8E7E /* UserProfileEditNameView.swift */,
 				0D37679029551E0E00F3FF59 /* EQView.swift */,
 				0D32338E29F57A0F00A3C4AE /* ManualEQView.swift */,
@@ -371,6 +374,7 @@
 				0D249C8B29723C760075FED3 /* DataController.swift in Sources */,
 				0DE942D52969F3DC00FFA006 /* Extensions.swift in Sources */,
 				0D5CCEC62A12892200F69CF0 /* CollectionRowView.swift in Sources */,
+				0D4235882A24F0F100F203B9 /* SwitchUserProfileView.swift in Sources */,
 				0DE5DE75299595C5006C8E7E /* UserProfileEditNameView.swift in Sources */,
 				0D2DCFCF2972EFC300BFFAD6 /* UserProfileRowView.swift in Sources */,
 				0D4235842A1E7E9500F203B9 /* PurchaseManager.swift in Sources */,
@@ -503,7 +507,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 24;
 				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;
@@ -522,7 +526,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.03;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jcohenmusic.Spex;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -541,7 +545,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 24;
 				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;
@@ -559,7 +563,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.03;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jcohenmusic.Spex;
 				PRODUCT_NAME = "$(TARGET_NAME)";

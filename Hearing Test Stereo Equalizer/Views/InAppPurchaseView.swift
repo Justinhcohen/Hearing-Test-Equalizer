@@ -7,6 +7,7 @@
 
 import SwiftUI
 import StoreKit
+import FirebaseAnalytics
 
 struct InAppPurchaseView: View {
     
@@ -19,7 +20,7 @@ struct InAppPurchaseView: View {
             Text ("Spex Lifetime")
                 .font(.largeTitle)
             HStack {
-                Text ("Spex Lifetime will provide you with a lifetime of full access and free upgrades. No subscription required.")
+                Text ("Spex Lifetime removes the pause timer and provides you with a lifetime of full access and free upgrades. No subscription required.")
                     .font(.body)
                 Spacer()
             }
@@ -43,6 +44,9 @@ struct InAppPurchaseView: View {
                     Task {
                         try await store.purchase(product)
                     }
+                    FirebaseAnalytics.Analytics.logEvent("tap_purchase_button", parameters: [
+                        "songs_played": model.songsPlayed
+                    ])
                 //    model.spexLifetimeIsPurchased = true
                 }
                 .font(.title3)

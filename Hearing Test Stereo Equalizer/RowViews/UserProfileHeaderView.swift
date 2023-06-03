@@ -11,13 +11,20 @@ struct UserProfileHeaderView: View {
     @EnvironmentObject var model: Model
     @FetchRequest(sortDescriptors: []) var userProfiles: FetchedResults<UserProfile>
     @State private var userProfileName = ""
-    @State private var showUserProfilesModalView = false
+    @State private var showSwitchUserProfileModalView = false
     @Environment(\.dismiss) private var dismiss
+    
+    
 
     var body: some View {
         HStack {
             Spacer()
-            Text(model.currentUserProfileName)
+            Button("\(model.currentUserProfileName)") {
+                showSwitchUserProfileModalView = true
+            }
+                .sheet(isPresented: $showSwitchUserProfileModalView) {
+                    SwitchUserProfileView()
+                }
             Spacer()
         }
         .foregroundColor(model.equalizerIsActive ? .green : .gray)
