@@ -24,7 +24,7 @@ struct EQView: View {
         }
     }
     @Environment(\.colorScheme) var colorScheme
-    @ObservedObject private var volObserver = VolumeObserver() 
+  //  @ObservedObject private var volObserver = VolumeObserver() 
     @State private var intensity: Double = 6.0
     @State private var soundLevelIsEditing = false
     @State private var intensityIsEditing = false

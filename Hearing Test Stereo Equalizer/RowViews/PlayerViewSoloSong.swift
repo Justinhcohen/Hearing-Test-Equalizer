@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PlayerViewSoloSong: View {
     @EnvironmentObject var model: Model
-    @ObservedObject private var volObserver = VolumeObserver() 
+ //   @ObservedObject private var volObserver = VolumeObserver() 
     
     @State var soundLevelIsEditing = false
     @State private var fineTuneSoundLevel: Float = 0 

@@ -12,7 +12,7 @@ import FirebaseAnalytics
 struct TestView: View {
     
     @EnvironmentObject var model: Model
-    @ObservedObject private var volObserver = VolumeObserver() 
+ //   @ObservedObject private var volObserver = VolumeObserver() 
     @FetchRequest(sortDescriptors: []) var userProfiles: FetchedResults<UserProfile>
     @Environment(\.managedObjectContext) var moc
     @Binding var tabSelection: Int
@@ -461,18 +461,18 @@ struct TestView: View {
                                 introStep = 50
                             }
                         }
-                        .onChange(of: volObserver.volume, perform: {value in
-                            shouldShowVolumeChangedAlert = true
-                        })
-                        .alert("Volume change detected. Measurements will be impacted. Do you wish to restart?", isPresented: $shouldShowVolumeChangedAlert) {
-                            Button ("Restart Test", role: .destructive) {
-                                model.stopAndResetTest()
-                                toneProgress = 0
-                                tonesCompleted = 0
-                                model.tapStartTest()
-                            }
-                            Button("Continue Test", role: .cancel) { }
-                        }
+//                        .onChange(of: volObserver.volume, perform: {value in
+//                            shouldShowVolumeChangedAlert = true
+//                        })
+//                        .alert("Volume change detected. Measurements will be impacted. Do you wish to restart?", isPresented: $shouldShowVolumeChangedAlert) {
+//                            Button ("Restart Test", role: .destructive) {
+//                                model.stopAndResetTest()
+//                                toneProgress = 0
+//                                tonesCompleted = 0
+//                                model.tapStartTest()
+//                            }
+//                            Button("Continue Test", role: .cancel) { }
+//                        }
                     
                     ProgressView("Progress", value: toneProgress, total: 9)
                     HStack {

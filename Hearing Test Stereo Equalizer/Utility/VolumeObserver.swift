@@ -23,6 +23,7 @@ final class VolumeObserver: ObservableObject {
     private var progressObserver: NSKeyValueObservation!
 
     func subscribe() {
+        print ("CALLED SUBSCRIBE TO VOLUME OBSERVER")
         do {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
             try session.setActive(true, options: .notifyOthersOnDeactivation)
@@ -39,10 +40,12 @@ final class VolumeObserver: ObservableObject {
     }
 
     func unsubscribe() {
+        print ("CALLED UNSUBSCRIBE ON VOLUME OBSERVER")
         self.progressObserver.invalidate()
     }
 
     init() {
+        print ("CALLED INIT ON VOLUME OBSERVER")
         subscribe()
     }
 }
