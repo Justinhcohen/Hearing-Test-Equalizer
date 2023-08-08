@@ -39,6 +39,10 @@ struct GenreView: View {
 //                    }
                     SongsView(navigationTitleText: genreName).onAppear {
                         model.songList = genre.items
+                        if !model.audioPlayerNodeL1.isPlaying {
+                            model.cachedAudioFrame = nil
+                            model.playQueue = [MPMediaItem]()
+                        }
                     }
                         .contentShape(Rectangle())
                 } label: {

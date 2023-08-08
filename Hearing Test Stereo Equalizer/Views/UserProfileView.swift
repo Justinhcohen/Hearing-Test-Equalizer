@@ -237,7 +237,7 @@ struct UserProfileView: View {
             if !userProfiles.isEmpty {
                 List  {
                     ForEach (userProfiles, id: \.id) { userProfile in
-                        UserProfileRowView(userProfile: userProfile)
+                        UserProfileRowView(userProfile: userProfile, intensity: userProfile.intensity)
                             .onTapGesture {
                                 if !model.equalizerIsActive {
                                     model.equalizerIsActive = true

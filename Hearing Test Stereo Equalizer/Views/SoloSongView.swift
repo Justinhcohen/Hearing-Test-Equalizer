@@ -11,6 +11,7 @@ import MediaPlayer
 struct SoloSongView: View {
     
     @EnvironmentObject var model: Model
+    @Environment(\.dismiss) var dismiss
     @State var currentTime: TimeInterval = 0
     @State var currentTimeRemaining: TimeInterval = 0
     @State var soloViewPlaybackTimer: Timer?
@@ -38,11 +39,15 @@ struct SoloSongView: View {
     
     func respondToChangeInPlayState () {
         switch model.playState {
-        case .stopped, .paused, .interrupted:
+        case .paused, .interrupted:
             stopPlayBackTimer()
             updatePlaybackTime()
         case .playing:
             startPlaybackTimer()
+        case .stopped:
+            stopPlayBackTimer()
+            updatePlaybackTime()
+            dismiss()
         }
     }
     

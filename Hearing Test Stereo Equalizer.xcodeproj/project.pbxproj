@@ -56,6 +56,7 @@
 		0DE942D32968A71F00FFA006 /* LibraryRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE942D22968A71F00FFA006 /* LibraryRowView.swift */; };
 		0DE942D52969F3DC00FFA006 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE942D42969F3DC00FFA006 /* Extensions.swift */; };
 		0DF1B8BB2A07E2D800DDA2D2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DF1B8BA2A07E2D800DDA2D2 /* SettingsView.swift */; };
+		0DFE75262A2F90590012CCC8 /* IntensityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DFE75252A2F90590012CCC8 /* IntensityView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -109,6 +110,7 @@
 		0DE942D42969F3DC00FFA006 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		0DE942D8296A63DA00FFA006 /* Hearing-Test-Stereo-Equalizer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Hearing-Test-Stereo-Equalizer-Info.plist"; sourceTree = SOURCE_ROOT; };
 		0DF1B8BA2A07E2D800DDA2D2 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		0DFE75252A2F90590012CCC8 /* IntensityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntensityView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,6 +142,7 @@
 				0DE36F342A028BF400AB44A8 /* SoloSongView.swift */,
 				0D249C8F2972447C0075FED3 /* UserProfileView.swift */,
 				0D4235872A24F0F100F203B9 /* SwitchUserProfileView.swift */,
+				0DFE75252A2F90590012CCC8 /* IntensityView.swift */,
 				0DE5DE74299595C5006C8E7E /* UserProfileEditNameView.swift */,
 				0D37679029551E0E00F3FF59 /* EQView.swift */,
 				0D32338E29F57A0F00A3C4AE /* ManualEQView.swift */,
@@ -153,10 +156,10 @@
 			isa = PBXGroup;
 			children = (
 				0D2DCFCE2972EFC300BFFAD6 /* UserProfileRowView.swift */,
+				0DE5DE72299408AD006C8E7E /* UserProfileHeaderView.swift */,
 				0DE942D22968A71F00FFA006 /* LibraryRowView.swift */,
 				0D5CCEC52A12892200F69CF0 /* CollectionRowView.swift */,
 				0DE5DE762996C122006C8E7E /* GainRowView.swift */,
-				0DE5DE72299408AD006C8E7E /* UserProfileHeaderView.swift */,
 				0DE5DE6E298ADBB8006C8E7E /* PlayerView.swift */,
 				0DE36F362A029BC700AB44A8 /* PlayerViewSoloSong.swift */,
 			);
@@ -356,6 +359,7 @@
 				0D19B1532955F3E600D17C16 /* Model.swift in Sources */,
 				0DF1B8BB2A07E2D800DDA2D2 /* SettingsView.swift in Sources */,
 				0DE5DE772996C122006C8E7E /* GainRowView.swift in Sources */,
+				0DFE75262A2F90590012CCC8 /* IntensityView.swift in Sources */,
 				0D249C902972447C0075FED3 /* UserProfileView.swift in Sources */,
 				0DE36F392A02E18D00AB44A8 /* InstructionsView.swift in Sources */,
 				0D39F12129A5476A00987C02 /* RemoteCommandCenter.swift in Sources */,
@@ -507,7 +511,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 30;
 				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;
@@ -526,7 +530,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.03;
+				MARKETING_VERSION = 1.08;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jcohenmusic.Spex;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -545,7 +549,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 30;
 				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;
@@ -563,7 +567,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.03;
+				MARKETING_VERSION = 1.08;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jcohenmusic.Spex;
 				PRODUCT_NAME = "$(TARGET_NAME)";

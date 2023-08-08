@@ -28,7 +28,10 @@ class Model: ObservableObject, RemoteCommandHandler {
                 "showManualAdjustmentsButton": true,
                 "showSongInformation": true,
                 "showAirPlayButton": true,
-                "fineTuneSoundLevel": 0.0
+                "fineTuneSoundLevel": 0.0,
+                "showIntensityWithProfile": false,
+                "repeatSetting": 0,
+                "showRepeatButton": true
             ]
         )
     }
@@ -50,6 +53,10 @@ class Model: ObservableObject, RemoteCommandHandler {
         showSongInformation = userDefaults.bool(forKey: "showSongInformation")
         showAirPlayButton = userDefaults.bool(forKey: "showAirPlayButton")
         practiceToneBeforeTest = userDefaults.bool(forKey: "practiceToneBeforeTest")
+        showIntensityWithProfile = userDefaults.bool(forKey: "showIntensityWithProfile")
+        let repeatSettingRawValue = userDefaults.integer(forKey: "repeatSetting")
+        repeatSetting = RepeatSetting (rawValue: repeatSettingRawValue) ?? .off
+        showRepeatButton = userDefaults.bool(forKey: "showRepeatButton")
         
         // Analytics
         timesLaunched = userDefaults.integer(forKey: "timesLaunched")
@@ -173,18 +180,21 @@ class Model: ObservableObject, RemoteCommandHandler {
     enum PlayState {
         case playing, paused, stopped, interrupted
     }
+    enum RepeatSetting: Int {
+        case off, on, one
+    }
     @Published var playState: PlayState = .stopped 
     @Published var songList = [MPMediaItem]() 
     var currentURL: URL = URL(fileURLWithPath: "")
     @Published var timer: Timer?
     @Published var fadeInTimer: Timer?
-  //  @Published var fadeOutTimer: Timer?
+    //  @Published var fadeOutTimer: Timer?
     @Published var fineTuneSoundLevel: Float = 0.0 {
         didSet {
             userDefaults.set(fineTuneSoundLevel, forKey: "fineTuneSoundLevel")
         }
     }
- //   var fadeOutSoundLevel: Float = 0.0
+    //   var fadeOutSoundLevel: Float = 0.0
     @Published var currentVolume: Float = 0.0
     @Published var systemVolume = AVAudioSession.sharedInstance().outputVolume
     let audioEngine: AVAudioEngine = AVAudioEngine()
@@ -277,6 +287,22 @@ class Model: ObservableObject, RemoteCommandHandler {
             userDefaults.set(newValue, forKey: "practiceToneBeforeTest")
         }
     }
+    @Published var showIntensityWithProfile = false {
+        willSet {
+            userDefaults.set(newValue, forKey: "showIntensityWithProfile")
+        }
+    }
+    @Published var repeatSetting = RepeatSetting.off {
+        willSet {
+            userDefaults.set(newValue.rawValue, forKey: "repeatSetting")
+        }
+    }
+    @Published var showRepeatButton = true {
+        willSet {
+            userDefaults.set(newValue, forKey: "showRepeatButton")
+        }
+    }
+    
     
     // MARK: Handlers
     enum NowPlayableInterruption {
@@ -304,7 +330,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     func handleAudioSessionInterruption(notification: Notification) {
- 
+        
         guard let userInfo = notification.userInfo,
               let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
               let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
@@ -321,8 +347,8 @@ class Model: ObservableObject, RemoteCommandHandler {
                 playState = .interrupted
             }
             
-         
-         
+            
+            
         case .ended:
             // An interruption ended. Resume playback, if appropriate.
             guard let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt else { return }
@@ -447,23 +473,60 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     // MARK: Player Methods
     func playbackTimer(){
-        updateTenTimesPerSecondInPlaybackTimer()
+        setNowPlayingMetadata()
+        runningAudioFrame = (cachedAudioFrame ?? 0) + audioPlayerNodeL1.currentFrame
+        if !spexLifetimeIsPurchased {
+            pauseTimer += 1
+        }
         if didTapSongName {
             didTapSongName = false
         }
         if audioPlayerNodeL1.currentFrame + (cachedAudioFrame ?? 0) >= audioFile.length {
             updateOnNewSong()
             playNextTrack()
-            songsPlayed += 1
-            FirebaseAnalytics.Analytics.logEvent("song_completed", parameters: [
-              "songs_played": songsPlayed,
-              "intensity": currentIntensity
-            ])
         }
         if pauseTimer == 1200 && !spexLifetimeIsPurchased {
             pauseTrack()
         }
+
+    }
+    
+//    func updateTenTimesPerSecondInPlaybackTimer() {
+//        setNowPlayingMetadata()
+//        runningAudioFrame = (cachedAudioFrame ?? 0) + audioPlayerNodeL1.currentFrame
+//        if !spexLifetimeIsPurchased {
+//            pauseTimer += 1
+//        }
+//    }
+    
+    func setNowPlayingMetadata() {
+        guard !songList.isEmpty else {return}
+        let nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
+        var nowPlayingInfo = [String: Any]()
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentSongTime
         
+        nowPlayingInfo[MPNowPlayingInfoPropertyAssetURL] = currentMediaItem.assetURL
+        nowPlayingInfo[MPNowPlayingInfoPropertyMediaType] = currentMediaItem.mediaType.rawValue
+        nowPlayingInfo[MPMediaItemPropertyTitle] = currentMediaItem.title ?? "Unknown title"
+        nowPlayingInfo[MPMediaItemPropertyArtist] = currentMediaItem.artist ?? "Unknown artist"
+        let defaultImage = UIImage(systemName: "photo")!
+        let defaultArtwork = MPMediaItemArtwork (boundsSize: defaultImage.size, requestHandler: { (size) -> UIImage in
+            return defaultImage
+        })
+        nowPlayingInfo[MPMediaItemPropertyArtwork] = currentMediaItem.artwork ?? defaultArtwork
+        nowPlayingInfo[MPMediaItemPropertyAlbumArtist] = currentMediaItem.albumArtist ?? "Uknown artist"
+        nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = currentMediaItem.albumTitle ?? "Unknown album title"
+        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = audioFile.duration
+        nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
+        
+        switch playState {
+        case .playing: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1.0
+        case .paused: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
+        case .stopped: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
+        case .interrupted: nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
+        }
+        
+        nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
     }
     
     func fadeInAudio () {
@@ -475,13 +538,13 @@ class Model: ObservableObject, RemoteCommandHandler {
         }
     }
     
-//    func fadeOutAudio () {
-//        audioPlayerNodeL1.volume = 0
-//        audioPlayerNodeR1.volume = 0
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-//            self.pauseTrack()
-//        }        
-//    }
+    //    func fadeOutAudio () {
+    //        audioPlayerNodeL1.volume = 0
+    //        audioPlayerNodeR1.volume = 0
+    //        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+    //            self.pauseTrack()
+    //        }        
+    //    }
     
     func startFadeInTimer () {
         if fadeInTimer == nil {
@@ -501,12 +564,12 @@ class Model: ObservableObject, RemoteCommandHandler {
         fadeInTimer = nil
     }
     
-//    func fadeOutComplete () {
-//        pauseTrack()
-//        playState = .paused
-//        fadeOutTimer?.invalidate()
-//        fadeOutTimer = nil
-//    }
+    //    func fadeOutComplete () {
+    //        pauseTrack()
+    //        playState = .paused
+    //        fadeOutTimer?.invalidate()
+    //        fadeOutTimer = nil
+    //    }
     
     func startPlaybackTimer () {
         if timer == nil {
@@ -523,7 +586,7 @@ class Model: ObservableObject, RemoteCommandHandler {
     }
     
     func prepareAudioEngine () {
-        
+        let session = AVAudioSession.sharedInstance()
         let bandwidth: Float = 0.5
         let freqs = [60, 100, 230, 500, 1100, 2400, 5400, 12000]
         // Left Ear 
@@ -559,16 +622,12 @@ class Model: ObservableObject, RemoteCommandHandler {
         
         do {
             try audioEngine.start()
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
+            try session.setActive(true, options: .notifyOthersOnDeactivation)
         } catch {}
     } 
     
-    func updateTenTimesPerSecondInPlaybackTimer() {
-        setNowPlayingMetadataEverySecond()
-        runningAudioFrame = (cachedAudioFrame ?? 0) + audioPlayerNodeL1.currentFrame
-        if !spexLifetimeIsPurchased {
-            pauseTimer += 1
-        }
-    }
+   
     
     func updateOnNewSong() {
         updateSongMetadataOnNewSong()
@@ -658,6 +717,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         isPlayingDemoThree = false
         if playQueue.isEmpty {
             playQueue = songList
+            queueIndex = 0
         }
         currentMediaItem = playQueue[queueIndex]
         switch playState {
@@ -697,8 +757,11 @@ class Model: ObservableObject, RemoteCommandHandler {
                 
             }
         } catch {print ("ERROR ERROR ERROR")}
-        
-        FirebaseAnalytics.Analytics.logEvent("play_track", parameters: nil)
+        songsPlayed += 1
+        FirebaseAnalytics.Analytics.logEvent("play_track", parameters: [
+            "songs_played": songsPlayed,
+            "intensity": currentIntensity
+        ])
     }
     
     func stopTrack () {
@@ -723,440 +786,479 @@ class Model: ObservableObject, RemoteCommandHandler {
     
     func playNextTrack () {
         cachedAudioFrame = nil
-        guard queueIndex < playQueue.count - 1 else {return}
-        queueIndex += 1
-        currentMediaItem = playQueue[queueIndex]
-        playTrack()
-        updateOnNewSong()
-    }
-    
-    func togglePlayPauseRemote () {
-        let togglePlayPauseRemoteCommand = RemoteCommand.togglePlayPause
-        performRemoteCommand(togglePlayPauseRemoteCommand)
-    }
-    
-    func playOrPauseCurrentTrack () {
-        guard !songList.isEmpty else {return}
-        switch playState {
-        case .stopped, .interrupted:
-            startFadeInTimer()
+        switch repeatSetting {
+        case .off:
+            if queueIndex < playQueue.count - 1 {
+                queueIndex += 1
+                currentMediaItem = playQueue[queueIndex]
+                playTrack()
+                updateOnNewSong()
+            } else {
+                onPlayQueueEnd()
+            }
+        case .on:
+            if queueIndex < playQueue.count - 1 {
+                queueIndex += 1
+                currentMediaItem = playQueue[queueIndex]
+                playTrack()
+                updateOnNewSong()
+            } else {
+                queueIndex = 0
+                currentMediaItem = playQueue[queueIndex]
+                playTrack()
+                updateOnNewSong()
+            }
+        case .one:
+            currentMediaItem = playQueue[queueIndex]
             playTrack()
-            startPlaybackTimer()
-        case .paused:
-            startFadeInTimer()
-            unPauseTrack()
-        case .playing:
-            pauseTrack()
+            updateOnNewSong()
         }
     }
     
-    func pauseTrack () {
-        lastAudioFrame = audioPlayerNodeL1.currentFrame
-        guard !songList.isEmpty else {return}
-        fadeInTimer?.invalidate()
-        fadeInTimer = nil
-        audioPlayerNodeL1.volume = 0
-        audioPlayerNodeR1.volume = 0
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            self.audioPlayerNodeL1.stop()
-            self.audioPlayerNodeR1.stop()
-            self.cachedAudioFrame = (self.cachedAudioFrame ?? 0) + (self.lastAudioFrame ?? 0)
-        } 
-        playState = .paused
-    }
-    
-    func unPauseTrack () {
-        if !spexLifetimeIsPurchased {
-            pauseTimer = 0
-        }
-        playState = .playing
-        playTrack()
-    } 
-    
-    
-    
-    
-    func playDemoTrack () {
-        playState = .stopped
+    func onPlayQueueEnd () {
         stopTrack()
-        stopDemoTrack()
-        var demoTrackName = ""
-        switch demoTrack {
-        case .trackOne:
-            demoTrackName = "twinsmusic-dancinginthesand"
-            isPlayingDemoOne = true 
-            demoOnePlayed += 1
-            FirebaseAnalytics.Analytics.logEvent("play_demo_one", parameters: [
-                "demo_one_played": demoOnePlayed
-            ])
-        case .trackTwo:
-            demoTrackName = "Evert Zeevalkink - On The Roads"
-            isPlayingDemoTwo = true
-            demoTwoPlayed += 1
-            FirebaseAnalytics.Analytics.logEvent("play_demo_two", parameters: [
-                "demo_two_played": demoTwoPlayed
-            ])
-        case .trackThree:
-            demoTrackName = "indiebox-funkhouse"
-            isPlayingDemoThree = true
-            demoThreePlayed += 1
-            FirebaseAnalytics.Analytics.logEvent("play_demo_three", parameters: [
-                "demo_three_played": demoThreePlayed
-            ])
+        stopTimer()
+    }
+    
+    func tapRepeatSetting () {
+        switch repeatSetting {
+        case .off:
+            repeatSetting = .on
+        case .on:
+            repeatSetting = .one
+        case .one:
+            repeatSetting = .off
         }
-        playQueue = [MPMediaItem]()
-        songList = [MPMediaItem]()
-        demoIsPlaying = true
-        prepareAudioEngine() 
+    }
         
-        if currentUserProfile != nil {
-            setEQBands(for: currentUserProfile)
+        func togglePlayPauseRemote () {
+            let togglePlayPauseRemoteCommand = RemoteCommand.togglePlayPause
+            performRemoteCommand(togglePlayPauseRemoteCommand)
         }
         
-        do {
-            let currentURL = Bundle.main.url(forResource: demoTrackName, withExtension: "mp3")
-            audioFile = try AVAudioFile(forReading: currentURL!)
-            audioEngine.prepare()
-            if !audioEngine.isRunning {
-                prepareAudioEngine()
+        func playOrPauseCurrentTrack () {
+            guard !songList.isEmpty else {return}
+            switch playState {
+            case .stopped, .interrupted:
+                startFadeInTimer()
+                playTrack()
+                startPlaybackTimer()
+            case .paused:
+                startFadeInTimer()
+                unPauseTrack()
+            case .playing:
+                pauseTrack()
+            }
+        }
+        
+        func pauseTrack () {
+            lastAudioFrame = audioPlayerNodeL1.currentFrame
+            guard !songList.isEmpty else {return}
+            fadeInTimer?.invalidate()
+            fadeInTimer = nil
+            audioPlayerNodeL1.volume = 0
+            audioPlayerNodeR1.volume = 0
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.audioPlayerNodeL1.stop()
+                self.audioPlayerNodeR1.stop()
+                self.cachedAudioFrame = (self.cachedAudioFrame ?? 0) + (self.lastAudioFrame ?? 0)
             } 
-            
-            guard audioEngine.isRunning else {return}
-            
-            let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
-            audioPlayerNodeL1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
-            audioPlayerNodeL1.pan = -1
-            audioPlayerNodeL1.play()  
-            
-            
-            audioPlayerNodeR1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
-            audioPlayerNodeR1.pan = 1
-            audioPlayerNodeR1.play()
-            
-            startFadeInTimer()
-        } catch _ {}
-    }
-    
-    func stopDemoTrack () {
-        isPlayingDemoOne = false
-        isPlayingDemoTwo = false
-        isPlayingDemoThree = false
-        playQueue = [MPMediaItem]()
-        songList = [MPMediaItem]()
-        demoIsPlaying = false
-        fadeInComplete()
-        audioPlayerNodeL1.stop()
-        audioPlayerNodeR1.stop()
-    }
-    
-    
-    func setEQBands (for currentUserProfile: UserProfile) {
-        let multiplier = Float (currentUserProfile.intensity / 6.0)
-        if equalizerL1 == nil {
-            prepareAudioEngine()
+            playState = .paused
         }
-        let bandsL = equalizerL1.bands
-        let bandsR = equalizerR1.bands
-        if equalizerIsActive && manualAdjustmentsAreActive {
-            bandsL[0].gain = (currentUserProfile.left60 * multiplier) + currentUserProfile.left60M
-            bandsL[1].gain = (currentUserProfile.left100 * multiplier) + currentUserProfile.left100M
-            bandsL[2].gain = (currentUserProfile.left230 * multiplier) + currentUserProfile.left230M
-            bandsL[3].gain = (currentUserProfile.left500 * multiplier) + currentUserProfile.left500M
-            bandsL[4].gain = (currentUserProfile.left1100 * multiplier) + currentUserProfile.left1100M
-            bandsL[5].gain = (currentUserProfile.left2400 * multiplier) + currentUserProfile.left2400M
-            bandsL[6].gain = (currentUserProfile.left5400 * multiplier) + currentUserProfile.left5400M
-            bandsL[7].gain = (currentUserProfile.left12000 * multiplier) + currentUserProfile.left12000M
-            bandsR[0].gain = (currentUserProfile.right60 * multiplier) + currentUserProfile.right60M
-            bandsR[1].gain = (currentUserProfile.right100 * multiplier) + currentUserProfile.right100M
-            bandsR[2].gain = (currentUserProfile.right230 * multiplier) + currentUserProfile.right230M
-            bandsR[3].gain = (currentUserProfile.right500 * multiplier) + currentUserProfile.right500M
-            bandsR[4].gain = (currentUserProfile.right1100 * multiplier) + currentUserProfile.right1100M
-            bandsR[5].gain = (currentUserProfile.right2400 * multiplier) + currentUserProfile.right2400M
-            bandsR[6].gain = (currentUserProfile.right5400 * multiplier) + currentUserProfile.right5400M
-            bandsR[7].gain = (currentUserProfile.right12000 * multiplier) + currentUserProfile.right12000M
-        }
-        else if equalizerIsActive {
-            bandsL[0].gain = currentUserProfile.left60 * multiplier
-            bandsL[1].gain = currentUserProfile.left100 * multiplier
-            bandsL[2].gain = currentUserProfile.left230 * multiplier
-            bandsL[3].gain = currentUserProfile.left500 * multiplier
-            bandsL[4].gain = currentUserProfile.left1100 * multiplier
-            bandsL[5].gain = currentUserProfile.left2400 * multiplier
-            bandsL[6].gain = currentUserProfile.left5400 * multiplier
-            bandsL[7].gain = currentUserProfile.left12000 * multiplier
-            bandsR[0].gain = currentUserProfile.right60 * multiplier
-            bandsR[1].gain = currentUserProfile.right100 * multiplier
-            bandsR[2].gain = currentUserProfile.right230 * multiplier
-            bandsR[3].gain = currentUserProfile.right500 * multiplier
-            bandsR[4].gain = currentUserProfile.right1100 * multiplier
-            bandsR[5].gain = currentUserProfile.right2400 * multiplier
-            bandsR[6].gain = currentUserProfile.right5400 * multiplier
-            bandsR[7].gain = currentUserProfile.right12000 * multiplier
-        } else {
-            bandsL[0].gain = 0.0
-            bandsL[1].gain = 0.0
-            bandsL[2].gain = 0.0
-            bandsL[3].gain = 0.0
-            bandsL[4].gain = 0.0
-            bandsL[5].gain = 0.0
-            bandsL[6].gain = 0.0
-            bandsL[7].gain = 0.0
-            bandsR[0].gain = 0.0
-            bandsR[1].gain = 0.0
-            bandsR[2].gain = 0.0
-            bandsR[3].gain = 0.0
-            bandsR[4].gain = 0.0
-            bandsR[5].gain = 0.0
-            bandsR[6].gain = 0.0
-            bandsR[7].gain = 0.0
-        }
-    }
-    
-    // MARK: Hearing Test 
-    
-    let bandNames = ["L60", "L100", "L230", "L500", "L1100", "L2400", "L5400", "R60", "R100", "R230", "R500", "R1100", "R2400", "R5400", "L12000", "R12000"]
-    enum TestStatus {
-        case testInProgress, testCompleted, practiceInProgress, practiceCompleted, stopped
-    }
-    
-    @Published var testStatus = TestStatus.stopped
-    @Published var tempURL: URL = URL(fileURLWithPath: "temp")
-    @Published var initialHearingTestHasBeenCompleted = false
-    var tonePlayer: AVAudioPlayer?
-    var currentTone = ""
-    var toneIndex = 0 
-    var maxUnheard: Double = -160
-    var minHeard: Double = 0.0
-    var lowestAudibleDecibelBand60L = -120.0
-    var lowestAudibleDecibelBand100L = -120.0
-    var lowestAudibleDecibelBand230L = -120.0
-    var lowestAudibleDecibelBand500L = -120.0
-    var lowestAudibleDecibelBand1100L = -120.0
-    var lowestAudibleDecibelBand2400L = -120.0
-    var lowestAudibleDecibelBand5400L = -120.0
-    var lowestAudibleDecibelBand12000L = -120.0
-    var lowestAudibleDecibelBand60R = -120.0 
-    var lowestAudibleDecibelBand100R = -120.0
-    var lowestAudibleDecibelBand230R = -120.0
-    var lowestAudibleDecibelBand500R = -120.0
-    var lowestAudibleDecibelBand1100R = -120.0
-    var lowestAudibleDecibelBand2400R = -120.0
-    var lowestAudibleDecibelBand5400R = -120.0
-    var lowestAudibleDecibelBand12000R = -120.0
-    var lowestAudibleDecibelBands: [Double] { [lowestAudibleDecibelBand60L, lowestAudibleDecibelBand100L, lowestAudibleDecibelBand230L, lowestAudibleDecibelBand500L, lowestAudibleDecibelBand1100L, lowestAudibleDecibelBand2400L, lowestAudibleDecibelBand5400L, lowestAudibleDecibelBand12000L, lowestAudibleDecibelBand60R, lowestAudibleDecibelBand100R, lowestAudibleDecibelBand230R, lowestAudibleDecibelBand500R, lowestAudibleDecibelBand1100R, lowestAudibleDecibelBand2400R, lowestAudibleDecibelBand5400R, lowestAudibleDecibelBand12000R]
-    }
-    
-    let toneArray = ["Band60L", "Band100L", "Band230L", "Band500L", "Band1100L", "Band2400L", "Band5400L", "Band12000L", "Band60R", "Band100R", "Band230R", "Band500R", "Band1100R", "Band2400R", "Band5400R", "Band12000R"]
-    
-    func getVolume (decibelReduction: Double) -> Double {
-        return (1 / pow(10,(-decibelReduction / 20)))
-    }
-    
-    func assignMinHeardDecibels () {
-        switch toneIndex {
-        case 0: lowestAudibleDecibelBand60L = minHeard
-        case 1: lowestAudibleDecibelBand100L = minHeard
-        case 2: lowestAudibleDecibelBand230L = minHeard
-        case 3: lowestAudibleDecibelBand500L = minHeard
-        case 4: lowestAudibleDecibelBand1100L = minHeard
-        case 5: lowestAudibleDecibelBand2400L = minHeard
-        case 6: lowestAudibleDecibelBand5400L = minHeard
-        case 7: lowestAudibleDecibelBand12000L = minHeard
-        case 8: lowestAudibleDecibelBand60R = minHeard
-        case 9: lowestAudibleDecibelBand100R = minHeard
-        case 10: lowestAudibleDecibelBand230R = minHeard
-        case 11: lowestAudibleDecibelBand500R = minHeard
-        case 12: lowestAudibleDecibelBand1100R = minHeard
-        case 13: lowestAudibleDecibelBand2400R = minHeard
-        case 14: lowestAudibleDecibelBand5400R = minHeard
-        case 15: lowestAudibleDecibelBand12000R = minHeard
-        default: break
-        }
-    }
-    
-    func setCurrentTone () {
-        switch toneIndex {
-        case 0: currentTone = "Band60"
-        case 1: currentTone = "Band100"
-        case 2: currentTone = "Band230"
-        case 3: currentTone = "Band500"
-        case 4: currentTone = "Band1100"
-        case 5: currentTone = "Band2400"
-        case 6: currentTone = "Band5400"
-        case 7: currentTone = "Band12000"
-        case 8: currentTone = "Band60"
-        case 9: currentTone = "Band100"
-        case 10: currentTone = "Band230"
-        case 11: currentTone = "Band500"
-        case 12: currentTone = "Band1100"
-        case 13: currentTone = "Band2400"
-        case 14: currentTone = "Band5400"
-        case 15: currentTone = "Band12000"
-        default: break
-        }
-    }
-    
-    
-    func playTone (volume: Float){
-        setCurrentTone()
-        guard let url = Bundle.main.url(forResource: currentTone, withExtension: "mp3") else { return }
-        do {
-            tonePlayer = try AVAudioPlayer(contentsOf: url)
-        } catch let error {
-            print(error.localizedDescription)
-        }
-        if let tonePlayer = tonePlayer {
-            tonePlayer.volume = volume
-            tonePlayer.numberOfLoops = -1
-            if toneIndex < 8 {
-                tonePlayer.pan = -1
-            } else {
-                tonePlayer.pan = 1
+        
+        func unPauseTrack () {
+            if !spexLifetimeIsPurchased {
+                pauseTimer = 0
             }
-            tonePlayer.play()
-        }
-    }
-    
-    func resumeTone () {
-        let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
-        setCurrentTone()
-        guard let url = Bundle.main.url(forResource: currentTone, withExtension: "mp3") else { return }
-        do {
-            tonePlayer = try AVAudioPlayer(contentsOf: url)
-        } catch let error {
-            print(error.localizedDescription)
-        }
-        if let tonePlayer = tonePlayer {
-            tonePlayer.volume = volume
-            tonePlayer.numberOfLoops = -1
-            if toneIndex < 8 {
-                tonePlayer.pan = -1
-            } else {
-                tonePlayer.pan = 1
+            playState = .playing
+            playTrack()
+        } 
+        
+        
+        
+        
+        func playDemoTrack () {
+            playState = .stopped
+            stopTrack()
+            stopDemoTrack()
+            var demoTrackName = ""
+            switch demoTrack {
+            case .trackOne:
+                demoTrackName = "twinsmusic-dancinginthesand"
+                isPlayingDemoOne = true 
+                demoOnePlayed += 1
+                FirebaseAnalytics.Analytics.logEvent("play_demo_one", parameters: [
+                    "demo_one_played": demoOnePlayed
+                ])
+            case .trackTwo:
+                demoTrackName = "Evert Zeevalkink - On The Roads"
+                isPlayingDemoTwo = true
+                demoTwoPlayed += 1
+                FirebaseAnalytics.Analytics.logEvent("play_demo_two", parameters: [
+                    "demo_two_played": demoTwoPlayed
+                ])
+            case .trackThree:
+                demoTrackName = "indiebox-funkhouse"
+                isPlayingDemoThree = true
+                demoThreePlayed += 1
+                FirebaseAnalytics.Analytics.logEvent("play_demo_three", parameters: [
+                    "demo_three_played": demoThreePlayed
+                ])
             }
-            tonePlayer.play()
+            playQueue = [MPMediaItem]()
+            songList = [MPMediaItem]()
+            demoIsPlaying = true
+            prepareAudioEngine() 
+            
+            if currentUserProfile != nil {
+                setEQBands(for: currentUserProfile)
+            }
+            
+            do {
+                let currentURL = Bundle.main.url(forResource: demoTrackName, withExtension: "mp3")
+                audioFile = try AVAudioFile(forReading: currentURL!)
+                audioEngine.prepare()
+                if !audioEngine.isRunning {
+                    prepareAudioEngine()
+                } 
+                
+                guard audioEngine.isRunning else {return}
+                
+                let audioTime = AVAudioTime(hostTime: mach_absolute_time() + UInt64(0.3))
+                audioPlayerNodeL1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
+                audioPlayerNodeL1.pan = -1
+                audioPlayerNodeL1.play()  
+                
+                
+                audioPlayerNodeR1.scheduleSegment(audioFile, startingFrame: cachedAudioFrame ?? 0, frameCount: UInt32(audioFile.length), at: audioTime, completionCallbackType: .dataPlayedBack, completionHandler: nil)
+                audioPlayerNodeR1.pan = 1
+                audioPlayerNodeR1.play()
+                
+                startFadeInTimer()
+            } catch _ {}
         }
-    }
-    
-    func stopTone () {
-        if let tonePlayer = tonePlayer {
-            tonePlayer.stop()
+        
+        func stopDemoTrack () {
+            isPlayingDemoOne = false
+            isPlayingDemoTwo = false
+            isPlayingDemoThree = false
+            playQueue = [MPMediaItem]()
+            songList = [MPMediaItem]()
+            demoIsPlaying = false
+            fadeInComplete()
+            audioPlayerNodeL1.stop()
+            audioPlayerNodeR1.stop()
         }
-    }
-    
-    func resetMinMaxValues () {
-        maxUnheard = -160
-        minHeard = 0.0
-    }
-    
-    func bandComplete () {
-        FirebaseAnalytics.Analytics.logEvent("band_complete", parameters: [
-            "completed_band" : toneArray[toneIndex]
+        
+        
+        func setEQBands (for currentUserProfile: UserProfile) {
+            let multiplier = Float (currentUserProfile.intensity / 6.0)
+            if equalizerL1 == nil {
+                prepareAudioEngine()
+            }
+            let bandsL = equalizerL1.bands
+            let bandsR = equalizerR1.bands
+            if equalizerIsActive && manualAdjustmentsAreActive {
+                bandsL[0].gain = (currentUserProfile.left60 * multiplier) + currentUserProfile.left60M
+                bandsL[1].gain = (currentUserProfile.left100 * multiplier) + currentUserProfile.left100M
+                bandsL[2].gain = (currentUserProfile.left230 * multiplier) + currentUserProfile.left230M
+                bandsL[3].gain = (currentUserProfile.left500 * multiplier) + currentUserProfile.left500M
+                bandsL[4].gain = (currentUserProfile.left1100 * multiplier) + currentUserProfile.left1100M
+                bandsL[5].gain = (currentUserProfile.left2400 * multiplier) + currentUserProfile.left2400M
+                bandsL[6].gain = (currentUserProfile.left5400 * multiplier) + currentUserProfile.left5400M
+                bandsL[7].gain = (currentUserProfile.left12000 * multiplier) + currentUserProfile.left12000M
+                bandsR[0].gain = (currentUserProfile.right60 * multiplier) + currentUserProfile.right60M
+                bandsR[1].gain = (currentUserProfile.right100 * multiplier) + currentUserProfile.right100M
+                bandsR[2].gain = (currentUserProfile.right230 * multiplier) + currentUserProfile.right230M
+                bandsR[3].gain = (currentUserProfile.right500 * multiplier) + currentUserProfile.right500M
+                bandsR[4].gain = (currentUserProfile.right1100 * multiplier) + currentUserProfile.right1100M
+                bandsR[5].gain = (currentUserProfile.right2400 * multiplier) + currentUserProfile.right2400M
+                bandsR[6].gain = (currentUserProfile.right5400 * multiplier) + currentUserProfile.right5400M
+                bandsR[7].gain = (currentUserProfile.right12000 * multiplier) + currentUserProfile.right12000M
+            }
+            else if equalizerIsActive {
+                bandsL[0].gain = currentUserProfile.left60 * multiplier
+                bandsL[1].gain = currentUserProfile.left100 * multiplier
+                bandsL[2].gain = currentUserProfile.left230 * multiplier
+                bandsL[3].gain = currentUserProfile.left500 * multiplier
+                bandsL[4].gain = currentUserProfile.left1100 * multiplier
+                bandsL[5].gain = currentUserProfile.left2400 * multiplier
+                bandsL[6].gain = currentUserProfile.left5400 * multiplier
+                bandsL[7].gain = currentUserProfile.left12000 * multiplier
+                bandsR[0].gain = currentUserProfile.right60 * multiplier
+                bandsR[1].gain = currentUserProfile.right100 * multiplier
+                bandsR[2].gain = currentUserProfile.right230 * multiplier
+                bandsR[3].gain = currentUserProfile.right500 * multiplier
+                bandsR[4].gain = currentUserProfile.right1100 * multiplier
+                bandsR[5].gain = currentUserProfile.right2400 * multiplier
+                bandsR[6].gain = currentUserProfile.right5400 * multiplier
+                bandsR[7].gain = currentUserProfile.right12000 * multiplier
+            } else {
+                bandsL[0].gain = 0.0
+                bandsL[1].gain = 0.0
+                bandsL[2].gain = 0.0
+                bandsL[3].gain = 0.0
+                bandsL[4].gain = 0.0
+                bandsL[5].gain = 0.0
+                bandsL[6].gain = 0.0
+                bandsL[7].gain = 0.0
+                bandsR[0].gain = 0.0
+                bandsR[1].gain = 0.0
+                bandsR[2].gain = 0.0
+                bandsR[3].gain = 0.0
+                bandsR[4].gain = 0.0
+                bandsR[5].gain = 0.0
+                bandsR[6].gain = 0.0
+                bandsR[7].gain = 0.0
+            }
+        }
+        
+        // MARK: Hearing Test 
+        
+        let bandNames = ["L60", "L100", "L230", "L500", "L1100", "L2400", "L5400", "R60", "R100", "R230", "R500", "R1100", "R2400", "R5400", "L12000", "R12000"]
+        enum TestStatus {
+            case testInProgress, testCompleted, practiceInProgress, practiceCompleted, stopped
+        }
+        
+        @Published var testStatus = TestStatus.stopped
+        @Published var tempURL: URL = URL(fileURLWithPath: "temp")
+        @Published var initialHearingTestHasBeenCompleted = false
+        var tonePlayer: AVAudioPlayer?
+        var currentTone = ""
+        var toneIndex = 0 
+        var maxUnheard: Double = -160
+        var minHeard: Double = 0.0
+        var lowestAudibleDecibelBand60L = -120.0
+        var lowestAudibleDecibelBand100L = -120.0
+        var lowestAudibleDecibelBand230L = -120.0
+        var lowestAudibleDecibelBand500L = -120.0
+        var lowestAudibleDecibelBand1100L = -120.0
+        var lowestAudibleDecibelBand2400L = -120.0
+        var lowestAudibleDecibelBand5400L = -120.0
+        var lowestAudibleDecibelBand12000L = -120.0
+        var lowestAudibleDecibelBand60R = -120.0 
+        var lowestAudibleDecibelBand100R = -120.0
+        var lowestAudibleDecibelBand230R = -120.0
+        var lowestAudibleDecibelBand500R = -120.0
+        var lowestAudibleDecibelBand1100R = -120.0
+        var lowestAudibleDecibelBand2400R = -120.0
+        var lowestAudibleDecibelBand5400R = -120.0
+        var lowestAudibleDecibelBand12000R = -120.0
+        var lowestAudibleDecibelBands: [Double] { [lowestAudibleDecibelBand60L, lowestAudibleDecibelBand100L, lowestAudibleDecibelBand230L, lowestAudibleDecibelBand500L, lowestAudibleDecibelBand1100L, lowestAudibleDecibelBand2400L, lowestAudibleDecibelBand5400L, lowestAudibleDecibelBand12000L, lowestAudibleDecibelBand60R, lowestAudibleDecibelBand100R, lowestAudibleDecibelBand230R, lowestAudibleDecibelBand500R, lowestAudibleDecibelBand1100R, lowestAudibleDecibelBand2400R, lowestAudibleDecibelBand5400R, lowestAudibleDecibelBand12000R]
+        }
+        
+        let toneArray = ["Band60L", "Band100L", "Band230L", "Band500L", "Band1100L", "Band2400L", "Band5400L", "Band12000L", "Band60R", "Band100R", "Band230R", "Band500R", "Band1100R", "Band2400R", "Band5400R", "Band12000R"]
+        
+        func getVolume (decibelReduction: Double) -> Double {
+            return (1 / pow(10,(-decibelReduction / 20)))
+        }
+        
+        func assignMinHeardDecibels () {
+            switch toneIndex {
+            case 0: lowestAudibleDecibelBand60L = minHeard
+            case 1: lowestAudibleDecibelBand100L = minHeard
+            case 2: lowestAudibleDecibelBand230L = minHeard
+            case 3: lowestAudibleDecibelBand500L = minHeard
+            case 4: lowestAudibleDecibelBand1100L = minHeard
+            case 5: lowestAudibleDecibelBand2400L = minHeard
+            case 6: lowestAudibleDecibelBand5400L = minHeard
+            case 7: lowestAudibleDecibelBand12000L = minHeard
+            case 8: lowestAudibleDecibelBand60R = minHeard
+            case 9: lowestAudibleDecibelBand100R = minHeard
+            case 10: lowestAudibleDecibelBand230R = minHeard
+            case 11: lowestAudibleDecibelBand500R = minHeard
+            case 12: lowestAudibleDecibelBand1100R = minHeard
+            case 13: lowestAudibleDecibelBand2400R = minHeard
+            case 14: lowestAudibleDecibelBand5400R = minHeard
+            case 15: lowestAudibleDecibelBand12000R = minHeard
+            default: break
+            }
+        }
+        
+        func setCurrentTone () {
+            switch toneIndex {
+            case 0: currentTone = "Band60"
+            case 1: currentTone = "Band100"
+            case 2: currentTone = "Band230"
+            case 3: currentTone = "Band500"
+            case 4: currentTone = "Band1100"
+            case 5: currentTone = "Band2400"
+            case 6: currentTone = "Band5400"
+            case 7: currentTone = "Band12000"
+            case 8: currentTone = "Band60"
+            case 9: currentTone = "Band100"
+            case 10: currentTone = "Band230"
+            case 11: currentTone = "Band500"
+            case 12: currentTone = "Band1100"
+            case 13: currentTone = "Band2400"
+            case 14: currentTone = "Band5400"
+            case 15: currentTone = "Band12000"
+            default: break
+            }
+        }
+        
+        
+        func playTone (volume: Float){
+            setCurrentTone()
+            guard let url = Bundle.main.url(forResource: currentTone, withExtension: "mp3") else { return }
+            do {
+                tonePlayer = try AVAudioPlayer(contentsOf: url)
+            } catch let error {
+                print(error.localizedDescription)
+            }
+            if let tonePlayer = tonePlayer {
+                tonePlayer.volume = volume
+                tonePlayer.numberOfLoops = -1
+                if toneIndex < 8 {
+                    tonePlayer.pan = -1
+                } else {
+                    tonePlayer.pan = 1
+                }
+                tonePlayer.play()
+            }
+        }
+        
+        func resumeTone () {
+            let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
+            setCurrentTone()
+            guard let url = Bundle.main.url(forResource: currentTone, withExtension: "mp3") else { return }
+            do {
+                tonePlayer = try AVAudioPlayer(contentsOf: url)
+            } catch let error {
+                print(error.localizedDescription)
+            }
+            if let tonePlayer = tonePlayer {
+                tonePlayer.volume = volume
+                tonePlayer.numberOfLoops = -1
+                if toneIndex < 8 {
+                    tonePlayer.pan = -1
+                } else {
+                    tonePlayer.pan = 1
+                }
+                tonePlayer.play()
+            }
+        }
+        
+        func stopTone () {
+            if let tonePlayer = tonePlayer {
+                tonePlayer.stop()
+            }
+        }
+        
+        func resetMinMaxValues () {
+            maxUnheard = -160
+            minHeard = 0.0
+        }
+        
+        func bandComplete () {
+            FirebaseAnalytics.Analytics.logEvent("band_complete", parameters: [
+                "completed_band" : toneArray[toneIndex]
             ])
-        assignMinHeardDecibels()
-        resetMinMaxValues()
-        if toneIndex < toneArray.count - 1 {
-            toneIndex += 1
-            playTone(volume: Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2))))
-            
-        } else {
-            stopTone()
-            testStatus = .testCompleted
-            if !initialHearingTestHasBeenCompleted {
-                initialHearingTestHasBeenCompleted = true
-                userDefaults.set(true, forKey: "initialHearingTestHasBeenCompleted")
-                FirebaseAnalytics.Analytics.logEvent("first_hearing_test_completed", parameters: nil)
+            assignMinHeardDecibels()
+            resetMinMaxValues()
+            if toneIndex < toneArray.count - 1 {
+                toneIndex += 1
+                playTone(volume: Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2))))
+                
+            } else {
+                stopTone()
+                testStatus = .testCompleted
+                if !initialHearingTestHasBeenCompleted {
+                    initialHearingTestHasBeenCompleted = true
+                    userDefaults.set(true, forKey: "initialHearingTestHasBeenCompleted")
+                    FirebaseAnalytics.Analytics.logEvent("first_hearing_test_completed", parameters: nil)
+                }
             }
         }
-    }
-    
-    func practiceBandComplete () {
-        resetMinMaxValues()
-        stopTone()
-        testStatus = .practiceCompleted
-    }
-    
-    func tapStartPracticeTest () {
-        testStatus = .practiceInProgress
-        toneIndex = 3
-        currentVolume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
-        playTone(volume: currentVolume)
-        FirebaseAnalytics.Analytics.logEvent("start_practice_test", parameters: nil)
-    }
-    
-    func tapStartTest () {
-        testStatus = .testInProgress
-        toneIndex = 0
-        currentVolume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
-        playTone(volume: currentVolume)
-        hearingTestsStarted += 1
-        FirebaseAnalytics.Analytics.logEvent("start_hearing_test", parameters: [
-            "hearing_tests_started": hearingTestsStarted
-        ])
-    }
-    
-    func stopAndResetTest () {
-        testStatus = .stopped
-        stopTone()
-        resetMinMaxValues()
-        toneIndex = 0
-    }
-    
-    func tapYesHeard () {
-        stopTone()
-        minHeard = (maxUnheard + minHeard) / 2
-        if abs (maxUnheard - minHeard) < 0.5 {
-            bandComplete()
-        } else {
-            let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
-            playTone(volume: volume)
+        
+        func practiceBandComplete () {
+            resetMinMaxValues()
+            stopTone()
+            testStatus = .practiceCompleted
         }
-    }
-    
-    func tapPracticeYesHeard () {
-        stopTone()
-        minHeard = (maxUnheard + minHeard) / 2
-        if abs (maxUnheard - minHeard) < 0.5 {
-            practiceBandComplete()
-        } else {
-            let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
-            playTone(volume: volume)
+        
+        func tapStartPracticeTest () {
+            testStatus = .practiceInProgress
+            toneIndex = 3
+            currentVolume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
+            playTone(volume: currentVolume)
+            FirebaseAnalytics.Analytics.logEvent("start_practice_test", parameters: nil)
         }
-    }
-    
-    func tapNoDidNotHear () {
-        stopTone()
-        maxUnheard = (maxUnheard + minHeard) / 2
-        if abs(maxUnheard - minHeard) < 0.5 {
-            bandComplete()
-        } else {
-            let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
-            playTone(volume: volume)
+        
+        func tapStartTest () {
+            testStatus = .testInProgress
+            toneIndex = 0
+            currentVolume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
+            playTone(volume: currentVolume)
+            hearingTestsStarted += 1
+            FirebaseAnalytics.Analytics.logEvent("start_hearing_test", parameters: [
+                "hearing_tests_started": hearingTestsStarted
+            ])
         }
-    }
-    
-    func tapPracticeNoDidNotHear () {
-        stopTone()
-        maxUnheard = (maxUnheard + minHeard) / 2
-        if abs(maxUnheard - minHeard) < 0.5 {
-            practiceBandComplete()
-        } else {
-            let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
-            playTone(volume: volume)
+        
+        func stopAndResetTest () {
+            testStatus = .stopped
+            stopTone()
+            resetMinMaxValues()
+            toneIndex = 0
         }
+        
+        func tapYesHeard () {
+            stopTone()
+            minHeard = (maxUnheard + minHeard) / 2
+            if abs (maxUnheard - minHeard) < 0.5 {
+                bandComplete()
+            } else {
+                let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
+                playTone(volume: volume)
+            }
+        }
+        
+        func tapPracticeYesHeard () {
+            stopTone()
+            minHeard = (maxUnheard + minHeard) / 2
+            if abs (maxUnheard - minHeard) < 0.5 {
+                practiceBandComplete()
+            } else {
+                let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
+                playTone(volume: volume)
+            }
+        }
+        
+        func tapNoDidNotHear () {
+            stopTone()
+            maxUnheard = (maxUnheard + minHeard) / 2
+            if abs(maxUnheard - minHeard) < 0.5 {
+                bandComplete()
+            } else {
+                let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
+                playTone(volume: volume)
+            }
+        }
+        
+        func tapPracticeNoDidNotHear () {
+            stopTone()
+            maxUnheard = (maxUnheard + minHeard) / 2
+            if abs(maxUnheard - minHeard) < 0.5 {
+                practiceBandComplete()
+            } else {
+                let volume = Float(getVolume(decibelReduction: ((maxUnheard + minHeard) / 2)))
+                playTone(volume: volume)
+            }
+        }
+        
+        init() {
+            registerUserDefaults()
+            setInterruptionObserver()
+            setRouteChangeObserver()
+            readFromUserDefaults()
+            setEnabledStatusOnRemoteCommands()
+            RemoteCommandCenter.handleRemoteCommands(using: self)
+        }
+        
     }
     
-    init() {
-        registerUserDefaults()
-        setInterruptionObserver()
-        setRouteChangeObserver()
-        readFromUserDefaults()
-        setEnabledStatusOnRemoteCommands()
-        RemoteCommandCenter.handleRemoteCommands(using: self)
-    }
     
-}
-
-
-
+    
+    
 

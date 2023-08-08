@@ -9,8 +9,8 @@ import SwiftUI
 
 struct UserProfileHeaderView: View {
     @EnvironmentObject var model: Model
-    @FetchRequest(sortDescriptors: []) var userProfiles: FetchedResults<UserProfile>
-    @State private var userProfileName = ""
+//    @FetchRequest(sortDescriptors: []) var userProfiles: FetchedResults<UserProfile>
+//    @State private var userProfileName = ""
     @State private var showSwitchUserProfileModalView = false
     @Environment(\.dismiss) private var dismiss
     
@@ -19,7 +19,7 @@ struct UserProfileHeaderView: View {
     var body: some View {
         HStack {
             Spacer()
-            Button("\(model.currentUserProfileName)") {
+            Button(model.showIntensityWithProfile ? "\(model.currentUserProfileName) - \(model.currentIntensity.decimals(2))" : "\(model.currentUserProfileName)") {
                 showSwitchUserProfileModalView = true
             }
                 .sheet(isPresented: $showSwitchUserProfileModalView) {

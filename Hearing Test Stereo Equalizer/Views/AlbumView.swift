@@ -41,6 +41,10 @@ struct AlbumView: View {
 //                    }
                     SongsView(navigationTitleText: combinedAlbumPlusArtist).onAppear {
                         model.songList = album.items
+                        if !model.audioPlayerNodeL1.isPlaying {
+                            model.cachedAudioFrame = nil
+                            model.playQueue = [MPMediaItem]()
+                        }
                     }
                         .contentShape(Rectangle())
                 } label: {

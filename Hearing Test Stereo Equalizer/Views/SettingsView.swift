@@ -31,79 +31,95 @@ struct SettingsView: View {
                 .padding(20)
             ScrollView {
                 VStack (spacing: 20) {
-                    Toggle("Show Song Progress", isOn: $model.showPlaytimeSlider)
-                        .onChange(of: model.showPlaytimeSlider) { value in
-                            FirebaseAnalytics.Analytics.logEvent("toggle_show_playtime_slider", parameters: [
-                                "playtime_slider_is_showing": "\(model.showPlaytimeSlider)"
-                            ])
-                        }
-                
-                Toggle("Show Song Information", isOn: $model.showSongInformation)
-                        .onChange(of: model.showSongInformation) { value in
-                            FirebaseAnalytics.Analytics.logEvent("toggle_show_song_information", parameters: [
-                                "song_information_is_showing": "\(model.showSongInformation)"
-                            ])
-                        }
-                
-                Toggle("Show Spex Toggle", isOn: $model.showSpexToggle)
-                        .onChange(of: model.showSpexToggle) { value in
-                            FirebaseAnalytics.Analytics.logEvent("toggle_show_spex_toggle", parameters: [
-                                "spex_toggle_is_showing": "\(model.showSpexToggle)"
-                            ])
-                        }
-                
-                Toggle("Show Subtle Volume Slider", isOn: $model.showSubtleVolumeSlider)
-                        .onChange(of: model.showSubtleVolumeSlider) { value in
-                            FirebaseAnalytics.Analytics.logEvent("toggle_show_subtle_volume_slider", parameters: [
-                                "subtle_volume_slider_is_showing": "\(model.showSubtleVolumeSlider)"
-                            ])
-                        }
-                
-                Toggle("Show AirPlay Button", isOn: $model.showAirPlayButton)
-                        .onChange(of: model.showAirPlayButton) { value in
-                            FirebaseAnalytics.Analytics.logEvent("toggle_show_airplay_button", parameters: [
-                                "airplay_button_is_showing": "\(model.showAirPlayButton)"
-                            ])
-                        }
-                
-                Toggle("Show Demo Song Buttons", isOn: $model.showDemoSongButtons)
-                        .onChange(of: model.showDemoSongButtons) { value in
-                            FirebaseAnalytics.Analytics.logEvent("toggle_show_demo_song_buttons", parameters: [
-                                "demo_song_buttons_are_showing": "\(model.showDemoSongButtons)"
-                            ])
-                        }
-                
-                Toggle("Show Manual Adjustments Button", isOn: $model.showManualAdjustmentsButton)
-                    .onChange(of: model.showManualAdjustmentsButton) { value in
-                        if model.manualAdjustmentsAreActive {
-                            model.manualAdjustmentsAreActive = false
-                        }
-                        FirebaseAnalytics.Analytics.logEvent("toggle_show_manual_adjustments_button", parameters: [
-                            "manual_adjustment_button_is_showing": "\(model.showManualAdjustmentsButton)"
-                        ])
+                    Group {
+                        Toggle("Show Song Progress", isOn: $model.showPlaytimeSlider)
+                            .onChange(of: model.showPlaytimeSlider) { value in
+                                FirebaseAnalytics.Analytics.logEvent("toggle_show_playtime_slider", parameters: [
+                                    "playtime_slider_is_showing": "\(model.showPlaytimeSlider)"
+                                ])
+                            }
                         
+                        Toggle("Show Song Information", isOn: $model.showSongInformation)
+                            .onChange(of: model.showSongInformation) { value in
+                                FirebaseAnalytics.Analytics.logEvent("toggle_show_song_information", parameters: [
+                                    "song_information_is_showing": "\(model.showSongInformation)"
+                                ])
+                            }
+                        
+                        Toggle("Show Repeat Button", isOn: $model.showRepeatButton)
+                            .onChange(of: model.showRepeatButton) { value in
+                                FirebaseAnalytics.Analytics.logEvent("toggle_show_repeat_button", parameters: [
+                                    "repeat_button_is_showing": "\(model.showRepeatButton)"
+                                ])
+                            }
+                        
+                        Toggle("Show Spex Toggle", isOn: $model.showSpexToggle)
+                            .onChange(of: model.showSpexToggle) { value in
+                                FirebaseAnalytics.Analytics.logEvent("toggle_show_spex_toggle", parameters: [
+                                    "spex_toggle_is_showing": "\(model.showSpexToggle)"
+                                ])
+                            }
+                        
+                        Toggle("Show Intensity with Profile", isOn: $model.showIntensityWithProfile)
+                            .onChange(of: model.showIntensityWithProfile) { value in
+                                FirebaseAnalytics.Analytics.logEvent("toggle_show_intensity_with_profile", parameters: [
+                                    "show_intensity_with_profile": "\(model.showIntensityWithProfile)"
+                                ])
+                            }
+                        
+                        Toggle("Show Subtle Volume Slider", isOn: $model.showSubtleVolumeSlider)
+                            .onChange(of: model.showSubtleVolumeSlider) { value in
+                                FirebaseAnalytics.Analytics.logEvent("toggle_show_subtle_volume_slider", parameters: [
+                                    "subtle_volume_slider_is_showing": "\(model.showSubtleVolumeSlider)"
+                                ])
+                            }
+                        
+                        Toggle("Show AirPlay Button", isOn: $model.showAirPlayButton)
+                            .onChange(of: model.showAirPlayButton) { value in
+                                FirebaseAnalytics.Analytics.logEvent("toggle_show_airplay_button", parameters: [
+                                    "airplay_button_is_showing": "\(model.showAirPlayButton)"
+                                ])
+                            }
+                        
+                        Toggle("Show Demo Song Buttons", isOn: $model.showDemoSongButtons)
+                            .onChange(of: model.showDemoSongButtons) { value in
+                                FirebaseAnalytics.Analytics.logEvent("toggle_show_demo_song_buttons", parameters: [
+                                    "demo_song_buttons_are_showing": "\(model.showDemoSongButtons)"
+                                ])
+                            }
+                        
+                        Toggle("Show Manual Adjustments Button", isOn: $model.showManualAdjustmentsButton)
+                            .onChange(of: model.showManualAdjustmentsButton) { value in
+                                if model.manualAdjustmentsAreActive {
+                                    model.manualAdjustmentsAreActive = false
+                                }
+                                FirebaseAnalytics.Analytics.logEvent("toggle_show_manual_adjustments_button", parameters: [
+                                    "manual_adjustment_button_is_showing": "\(model.showManualAdjustmentsButton)"
+                                ])
+                                
+                            }
                     }
-                Toggle("Practice Tone Before Test", isOn: $model.practiceToneBeforeTest)
+                    Toggle("Practice Tone Before Test", isOn: $model.practiceToneBeforeTest)
                         .onChange(of: model.practiceToneBeforeTest) { value in
                             FirebaseAnalytics.Analytics.logEvent("toggle_practice_tone_before_test", parameters: [
                                 "practice_tone_before_test": "\(model.practiceToneBeforeTest)"
                             ])
                         }
                     
-                HStack {
-                    if MFMailComposeViewController.canSendMail() {
-                        Button("Report Issue") {
-                            self.isShowingMailView = true
-                            FirebaseAnalytics.Analytics.logEvent("report_issue", parameters: nil)
+                    HStack {
+                        if MFMailComposeViewController.canSendMail() {
+                            Button("Report Issue") {
+                                self.isShowingMailView = true
+                                FirebaseAnalytics.Analytics.logEvent("report_issue", parameters: nil)
+                            }
+                        } else {
+                            Text("")
                         }
-                    } else {
-                        Text("")
+                        Spacer()
                     }
-                    Spacer()
-                }
-                .sheet(isPresented: $isShowingMailView) {
-                    MailView(isShowing: self.$isShowingMailView, result: self.$result)
-                }
+                    .sheet(isPresented: $isShowingMailView) {
+                        MailView(isShowing: self.$isShowingMailView, result: self.$result)
+                    }
                     HStack {
                         Button("In-App Purchases") {
                             showInAppPurchaseModal()
@@ -114,21 +130,21 @@ struct SettingsView: View {
                         Spacer()
                     }
                     
+                }
+                .padding(20)
+            }
+            .font(.title3)
+            Spacer()
+            HStack {
+                Text ("Spex version 1.08")
+                    .font(.body)
+                    .opacity(0.5)
+                Spacer()
+                
             }
             .padding(20)
         }
-        .font(.title3)
-        Spacer()
-        HStack {
-            Text ("Spex version 1.03")
-                .font(.body)
-                .opacity(0.5)
-            Spacer()
-            
-        }
-        .padding(20)
     }
-}
 }
 
 //struct SettingsView_Previews: PreviewProvider {

@@ -55,6 +55,10 @@ struct PlaylistView: View {
               
                 SongsView(navigationTitleText: playlistName ?? "Unknown Name").onAppear {
                     model.songList = collection.items
+                    if !model.audioPlayerNodeL1.isPlaying {
+                        model.cachedAudioFrame = nil
+                        model.playQueue = [MPMediaItem]()
+                    }
                 }
             } label: {
                 HStack {    

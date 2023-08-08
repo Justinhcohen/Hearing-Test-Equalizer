@@ -40,6 +40,10 @@ struct ArtistView: View {
                 NavigationLink {
                     SongsView(navigationTitleText: artistName ?? "Unknown name").onAppear {
                         model.songList = artist.items
+                        if !model.audioPlayerNodeL1.isPlaying {
+                            model.cachedAudioFrame = nil
+                            model.playQueue = [MPMediaItem]()
+                        }
                     }
                         .contentShape(Rectangle())
                 } label: {

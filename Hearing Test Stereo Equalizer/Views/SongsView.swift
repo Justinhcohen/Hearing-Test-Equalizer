@@ -33,14 +33,6 @@ struct SongsView: View {
         return 0
     }
     
-//    var searchResults: [MPMediaItem] {
-//        if searchText.isEmpty {
-//            return model.songList
-//        } else {
-//            return model.songList.filter { ($0.title ?? "Unknown Title").lowercased().contains(searchText.lowercased()) }
-//        }
-//    }
-    
     var searchResults: [MPMediaItem] {
         var filteredItems = model.songList
         filteredItems.removeAll(where: {$0.hasProtectedAsset == true})

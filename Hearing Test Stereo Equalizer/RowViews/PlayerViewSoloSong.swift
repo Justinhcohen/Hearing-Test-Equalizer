@@ -13,10 +13,10 @@ struct PlayerViewSoloSong: View {
     
     @State var soundLevelIsEditing = false
     @State private var fineTuneSoundLevel: Float = 0 
-    @State private var shouldShowEQViewModal = false
+    @State private var shouldShowSwitchUserProfileViewModal = false
     
-    func showEQViewModal () {
-        shouldShowEQViewModal = true
+    func showSwitchUserProfileViewModal () {
+        shouldShowSwitchUserProfileViewModal = true
     }
     
     func dismiss () {
@@ -29,14 +29,28 @@ struct PlayerViewSoloSong: View {
             if model.showSpexToggle {
                 
                 ZStack {
+//                    if model.equalizerIsActive {
+//                        Image("SpexOwl1024")
+//                            .resizable()
+//                            .frame(width: 50, height: 50, alignment: .center)
+//                    } else {
+//                        Image("SpexOwl1024BW")
+//                            .resizable()
+//                            .frame(width: 50, height: 50, alignment: .center)
+//                    }
                     if model.equalizerIsActive {
-                        Image("SpexOwl1024")
-                            .resizable()
-                            .frame(width: 50, height: 50, alignment: .center)
+                        Button (action: showSwitchUserProfileViewModal) {
+                            Image("SpexOwl1024")
+                                .resizable()
+                                .frame(width: 50, height: 50, alignment: .center)
+                        }
+                            
                     } else {
-                        Image("SpexOwl1024BW")
-                            .resizable()
-                            .frame(width: 50, height: 50, alignment: .center)
+                        Button (action: showSwitchUserProfileViewModal) {
+                            Image("SpexOwl1024BW")
+                                .resizable()
+                                .frame(width: 50, height: 50, alignment: .center)
+                        }
                     }
                     Toggle("", isOn: $model.equalizerIsActive)
                         .onChange(of: model.equalizerIsActive) { value in
@@ -46,6 +60,9 @@ struct PlayerViewSoloSong: View {
                         .padding(.leading)
                         .font(.title3)
                         .foregroundColor(model.equalizerIsActive ? .blue : .gray)
+                }
+                .sheet(isPresented: $shouldShowSwitchUserProfileViewModal, onDismiss: dismiss) {
+                    SwitchUserProfileView()
                 }
             }
             
@@ -101,11 +118,30 @@ struct PlayerViewSoloSong: View {
                     .disabled(model.songList.isEmpty || model.demoIsPlaying)
                     
                 }
-                
-                .font(.largeTitle)
-                .padding()
-                
+                if model.showRepeatButton {
+                    HStack {
+                        Spacer()
+                       
+                            Button (action: model.tapRepeatSetting) {
+                                switch model.repeatSetting {
+                                case .off:
+                                    Image(systemName: "repeat")
+                                        .opacity(0.3)
+                                case .on:
+                                    Image(systemName: "repeat")
+                                        .opacity(1.0)
+                                case .one:
+                                    Image(systemName: "repeat.1")
+                                        .opacity(1.0)
+                                }
+                            }
+                            .disabled(model.songList.isEmpty || model.demoIsPlaying)
+                        }
+                    .padding()
+                    }
             }
+            .font(.largeTitle)
+            .padding()
         }
     }
 }

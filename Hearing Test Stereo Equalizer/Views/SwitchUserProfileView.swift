@@ -15,6 +15,8 @@ struct SwitchUserProfileView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) private var dismiss
     @State private var refreshID = UUID()
+    @State private var intensity: Double = 11.0
+    @State private var intensityIsEditing = false
     
     func setCurrentProfile () {
         model.currentUserProfile = userProfiles.first {$0.isActive} ?? userProfiles.first!
@@ -41,20 +43,27 @@ struct SwitchUserProfileView: View {
         setCurrentProfile()
     }
     
-   
+    func saveIntensity () {
+        let activeUser = userProfiles.first {
+            $0.isActive
+        }!
+        activeUser.intensity = intensity
+        try? moc.save()
+    }
     
     var body: some View {
         VStack (spacing: 30) {
             ZStack {
                 Text ("Switch User Profile")
                     .font(.largeTitle)
+                    .foregroundColor(model.equalizerIsActive ? .green : .gray )
                 .padding()
             }
             
             if !userProfiles.isEmpty {
                 List  {
                     ForEach (userProfiles, id: \.id) { userProfile in
-                        UserProfileRowView(userProfile: userProfile)
+                        UserProfileRowView(userProfile: userProfile, intensity: userProfile.intensity)
                             .onTapGesture {
                                 if !model.equalizerIsActive {
                                     model.equalizerIsActive = true
@@ -80,6 +89,34 @@ struct SwitchUserProfileView: View {
                     refreshState()
                 }
             }
+            if model.equalizerIsActive {
+                Image("SpexOwl1024")
+                    .resizable()
+                    .frame(width: 50, height: 50, alignment: .center)
+            } else {
+                Image("SpexOwl1024BW")
+                    .resizable()
+                    .frame(width: 50, height: 50, alignment: .center)
+            }
+            Text ("Intensity: \(intensity.decimals(2))")
+                .foregroundColor(intensityIsEditing ? .gray : model.equalizerIsActive ? .blue : .gray)
+                .font(.title3)
+            Slider (value: $intensity, in: 2.0...20.0, step: 0.25, onEditingChanged: { editing in
+                // model.currentUserProfile.intensity = intensity
+                model.currentIntensity = intensity
+                model.setEQBands(for: model.currentUserProfile)
+                saveIntensity()
+                intensityIsEditing = editing
+                model.intensityAdjusted += 1
+                FirebaseAnalytics.Analytics.logEvent("adjust_intensity", parameters: [
+                    "intensity_adjusted": model.intensityAdjusted,
+                    "intensity": model.currentIntensity
+                ])
+            })
+            .disabled (!model.equalizerIsActive)
+            .padding(.leading)
+            .padding (.trailing)
+            .padding (.bottom)
         }
         .onAppear {
             //           
@@ -87,6 +124,7 @@ struct SwitchUserProfileView: View {
             if model.testStatus != .stopped {
                 model.stopAndResetTest()
             }
+            intensity = model.currentIntensity
         }
     }
 }
