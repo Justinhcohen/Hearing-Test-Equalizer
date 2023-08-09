@@ -52,18 +52,21 @@ struct UserProfileView: View {
             let profile = userProfiles[index]
             if userProfiles.count > 1 {
                 moc.delete(profile)
+                try? moc.save()
             }
             for profile in userProfiles {
                 if profile.isActive == true {
                     activeFlag = true
+                    print ("ACTIVE FLAG IS SET")
                 }
             }
-            if !activeFlag {
-                userProfiles[0].isActive = true
-                model.currentUserProfile = userProfiles[0]
-            }
-            try? moc.save()
         }
+        if !activeFlag {
+            userProfiles[0].isActive = true
+            model.currentUserProfile = userProfiles[0]
+            print ("ACTIVE FLAG NOT SET")
+        }
+        try? moc.save()
     }
     
     func setIsActiveStatus (userProfile: UserProfile) {
