@@ -842,7 +842,7 @@ class Model: ObservableObject, RemoteCommandHandler {
             case .stopped, .interrupted:
                 startFadeInTimer()
                 playTrack()
-                startPlaybackTimer()
+              //  startPlaybackTimer()
             case .paused:
                 startFadeInTimer()
                 unPauseTrack()
@@ -864,6 +864,7 @@ class Model: ObservableObject, RemoteCommandHandler {
                 self.cachedAudioFrame = (self.cachedAudioFrame ?? 0) + (self.lastAudioFrame ?? 0)
             } 
             playState = .paused
+            stopTimer()
         }
         
         func unPauseTrack () {
