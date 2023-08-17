@@ -100,7 +100,7 @@ struct LibraryView: View {
         userProfile.isActive = true
         userProfile.iD = UUID()
         userProfile.dateCreated = Date.now
-        userProfile.intensity = 0
+        userProfile.intensity = 2.0
         userProfile.left60 = 0
         userProfile.right60 = 0
         userProfile.left100 = 0

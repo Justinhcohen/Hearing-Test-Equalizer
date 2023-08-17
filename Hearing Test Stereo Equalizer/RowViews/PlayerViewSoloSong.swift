@@ -6,17 +6,30 @@
 //
 
 import SwiftUI
+import FirebaseAnalytics
 
 struct PlayerViewSoloSong: View {
     @EnvironmentObject var model: Model
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(key: "dateCreated", ascending: false)]) var userProfiles: FetchedResults<UserProfile>
+    @Environment(\.managedObjectContext) var moc
  //   @ObservedObject private var volObserver = VolumeObserver() 
     
     @State var soundLevelIsEditing = false
     @State private var fineTuneSoundLevel: Float = 0 
     @State private var shouldShowSwitchUserProfileViewModal = false
+    @State private var intensity: Double = 11.0
+    @State private var intensityIsEditing = false
     
     func showSwitchUserProfileViewModal () {
         shouldShowSwitchUserProfileViewModal = true
+    }
+    
+    func saveIntensity () {
+        let activeUser = userProfiles.first {
+            $0.isActive
+        }!
+        activeUser.intensity = intensity
+        try? moc.save()
     }
     
     func dismiss () {
@@ -26,35 +39,43 @@ struct PlayerViewSoloSong: View {
     var body: some View {
         VStack {
             
-            if model.showSpexToggle {
+            if model.showSpexOnPlayer {
                 
                 ZStack {
-//                    if model.equalizerIsActive {
-//                        Image("SpexOwl1024")
-//                            .resizable()
-//                            .frame(width: 50, height: 50, alignment: .center)
-//                    } else {
-//                        Image("SpexOwl1024BW")
-//                            .resizable()
-//                            .frame(width: 50, height: 50, alignment: .center)
-//                    }
                     if model.equalizerIsActive {
-                        Button (action: showSwitchUserProfileViewModal) {
-                            Image("SpexOwl1024")
-                                .resizable()
-                                .frame(width: 50, height: 50, alignment: .center)
-                        }
-                            
+                        Image("SpexOwl1024")
+                            .resizable()
+                            .frame(width: 50, height: 50, alignment: .center)
                     } else {
-                        Button (action: showSwitchUserProfileViewModal) {
-                            Image("SpexOwl1024BW")
-                                .resizable()
-                                .frame(width: 50, height: 50, alignment: .center)
-                        }
+                        Image("SpexOwl1024BW")
+                            .resizable()
+                            .frame(width: 50, height: 50, alignment: .center)
                     }
+//                    if model.equalizerIsActive {
+//                        Button (action: showSwitchUserProfileViewModal) {
+//                            Image("SpexOwl1024")
+//                                .resizable()
+//                                .frame(width: 50, height: 50, alignment: .center)
+//                        }
+//                            
+//                    } else {
+//                        Button (action: showSwitchUserProfileViewModal) {
+//                            Image("SpexOwl1024BW")
+//                                .resizable()
+//                                .frame(width: 50, height: 50, alignment: .center)
+//                        }
+//                    }
                     Toggle("", isOn: $model.equalizerIsActive)
                         .onChange(of: model.equalizerIsActive) { value in
                             model.setEQBands(for: model.currentUserProfile)
+                            model.spexToggled += 1
+                            FirebaseAnalytics.Analytics.logEvent("toggle_spex", parameters: [
+                                "spex_toggled": model.spexToggled,
+                                "spex_status": "\(model.equalizerIsActive)"
+                            ])
+                        }
+                        .onChange(of: model.currentIntensity) { value in
+                            intensity = model.currentIntensity
                         }
                         .padding(.trailing)
                         .padding(.leading)
@@ -63,6 +84,30 @@ struct PlayerViewSoloSong: View {
                 }
                 .sheet(isPresented: $shouldShowSwitchUserProfileViewModal, onDismiss: dismiss) {
                     SwitchUserProfileView()
+                }
+                Text ("Intensity: \(intensity.decimals(2))")
+                    .foregroundColor(intensityIsEditing ? .gray : model.equalizerIsActive ? .blue : .gray)
+                    .font(.title3)
+                Slider (value: $intensity, in: 2.0...20.0, step: 0.25, onEditingChanged: { editing in
+                    // model.currentUserProfile.intensity = intensity
+                    model.currentIntensity = intensity
+                    saveIntensity()
+                    model.setEQBands(for: model.currentUserProfile)
+                    intensityIsEditing = editing
+                    model.intensityAdjusted += 1
+                    FirebaseAnalytics.Analytics.logEvent("adjust_intensity", parameters: [
+                        "intensity_adjusted": model.intensityAdjusted,
+                        "intensity": model.currentIntensity
+                    ])
+                })
+                .padding([.bottom, .leading, .trailing], 20)
+                .disabled (!model.equalizerIsActive)
+                .onAppear{
+//                    setCurrentProfile()
+//                    if !model.audioEngine.isRunning {
+//                        model.prepareAudioEngine()
+//                    }
+                    intensity = model.currentIntensity
                 }
             }
             

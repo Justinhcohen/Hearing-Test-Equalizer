@@ -20,16 +20,16 @@ class Model: ObservableObject, RemoteCommandHandler {
         userDefaults.register(
             defaults: [
                 "equalizerIsActive": true,
-                "manualAdjustmentsAreActive": true,
+                "manualAdjustmentsAreActive": false,
                 "showPlaytimeSlider": true,
-                "showSpexToggle": true,
+                "showSpexOnPlayer": true,
                 "showSubtleVolumeSlider": false,
                 "showDemoSongButtons": true,
-                "showManualAdjustmentsButton": true,
+                "showManualAdjustmentsButton": false,
                 "showSongInformation": true,
                 "showAirPlayButton": true,
                 "fineTuneSoundLevel": 0.0,
-                "showIntensityWithProfile": false,
+                "showIntensityWithProfile": true,
                 "repeatSetting": 0,
                 "showRepeatButton": true
             ]
@@ -46,7 +46,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         
         // Settings
         showPlaytimeSlider = userDefaults.bool(forKey: "showPlaytimeSlider")
-        showSpexToggle = userDefaults.bool(forKey: "showSpexToggle")
+        showSpexOnPlayer = userDefaults.bool(forKey: "showSpexOnPlayer")
         showSubtleVolumeSlider = userDefaults.bool(forKey: "showSubtleVolumeSlider")
         showDemoSongButtons = userDefaults.bool(forKey: "showDemoSongButtons")
         showManualAdjustmentsButton = userDefaults.bool(forKey: "showManualAdjustmentsButton")
@@ -252,9 +252,9 @@ class Model: ObservableObject, RemoteCommandHandler {
             userDefaults.set(newValue, forKey: "showPlaytimeSlider")
         }
     }
-    @Published var showSpexToggle = true {
+    @Published var showSpexOnPlayer = true {
         willSet {
-            userDefaults.set(newValue, forKey: "showSpexToggle")
+            userDefaults.set(newValue, forKey: "showSpexOnPlayer")
         }
     }
     @Published var showSubtleVolumeSlider = true {
@@ -953,6 +953,7 @@ class Model: ObservableObject, RemoteCommandHandler {
         
         
         func setEQBands (for currentUserProfile: UserProfile) {
+            print ("CURRENT INTENSITY ON SET: \(currentUserProfile.intensity)")
             let multiplier = Float (currentUserProfile.intensity / 6.0)
             if equalizerL1 == nil {
                 prepareAudioEngine()

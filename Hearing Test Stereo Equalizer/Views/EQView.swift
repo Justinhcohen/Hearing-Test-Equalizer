@@ -31,6 +31,7 @@ struct EQView: View {
     @State private var sliderDidEdit = false
     @State private var showUserProfilesModalView = false
     @State private var showManualControlsView = false
+    @State private var showEQHelpView = false
     
     func didDismiss () {
         //  intensity = model.currentIntensity
@@ -49,6 +50,13 @@ struct EQView: View {
         model.currentIntensity = model.currentUserProfile.intensity
         intensity = model.currentUserProfile.intensity
         model.setEQBands(for: model.currentUserProfile)
+    }
+    func showEQHelpViewModal () {
+        showEQHelpView = true
+    }
+    
+    func dismiss () {
+        
     }
     
     var body: some View {
@@ -74,6 +82,9 @@ struct EQView: View {
                                 "spex_status": "\(model.equalizerIsActive)"
                             ])
                         }
+                        .onChange(of: model.currentIntensity) { value in
+                            intensity = model.currentIntensity
+                        }
                         .padding(.trailing)
                         .padding(.leading)
                         .font(.title3)
@@ -85,8 +96,8 @@ struct EQView: View {
                 Slider (value: $intensity, in: 2.0...20.0, step: 0.25, onEditingChanged: { editing in
                     // model.currentUserProfile.intensity = intensity
                     model.currentIntensity = intensity
-                    model.setEQBands(for: model.currentUserProfile)
                     saveIntensity()
+                    model.setEQBands(for: model.currentUserProfile)
                     intensityIsEditing = editing
                     model.intensityAdjusted += 1
                     FirebaseAnalytics.Analytics.logEvent("adjust_intensity", parameters: [
@@ -188,10 +199,18 @@ struct EQView: View {
                 VStack {
                     Group {
                         ZStack {
-                            Text ("Spex Stereo EQ Boost")
-                                .foregroundColor(model.equalizerIsActive ? .green : .gray)
-                                .font(.title3)
-                                .padding()
+                            HStack {
+                                Text ("Spex Stereo EQ Boost")
+                                    .foregroundColor(model.equalizerIsActive ? .green : .gray)
+                                    .font(.title3)
+                                    .padding()
+                                Button (action: showEQHelpViewModal) {
+                                    Image(systemName: "questionmark.circle")
+                                }
+                                .sheet(isPresented: $showEQHelpView, onDismiss: dismiss) {
+                                    EQHelpView()
+                                }
+                            }
                             if model.showManualAdjustmentsButton {
                                 HStack {
                                     Spacer ()

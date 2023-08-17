@@ -57,7 +57,7 @@ struct SwitchUserProfileView: View {
                 Text ("Switch User Profile")
                     .font(.largeTitle)
                     .foregroundColor(model.equalizerIsActive ? .green : .gray )
-                .padding()
+                    .padding()
             }
             
             if !userProfiles.isEmpty {
@@ -89,42 +89,55 @@ struct SwitchUserProfileView: View {
                     refreshState()
                 }
             }
-            if model.equalizerIsActive {
-                Image("SpexOwl1024")
-                    .resizable()
-                    .frame(width: 50, height: 50, alignment: .center)
-            } else {
-                Image("SpexOwl1024BW")
-                    .resizable()
-                    .frame(width: 50, height: 50, alignment: .center)
-            }
-            Text ("Intensity: \(intensity.decimals(2))")
-                .foregroundColor(intensityIsEditing ? .gray : model.equalizerIsActive ? .blue : .gray)
-                .font(.title3)
-            Slider (value: $intensity, in: 2.0...20.0, step: 0.25, onEditingChanged: { editing in
-                // model.currentUserProfile.intensity = intensity
-                model.currentIntensity = intensity
-                model.setEQBands(for: model.currentUserProfile)
-                saveIntensity()
-                intensityIsEditing = editing
-                model.intensityAdjusted += 1
-                FirebaseAnalytics.Analytics.logEvent("adjust_intensity", parameters: [
-                    "intensity_adjusted": model.intensityAdjusted,
-                    "intensity": model.currentIntensity
-                ])
-            })
-            .disabled (!model.equalizerIsActive)
-            .padding(.leading)
-            .padding (.trailing)
-            .padding (.bottom)
-        }
-        .onAppear {
-            //           
-            setCurrentProfile()
-            if model.testStatus != .stopped {
-                model.stopAndResetTest()
-            }
-            intensity = model.currentIntensity
+            
+//            ZStack {
+//                if model.equalizerIsActive {
+//                    Image("SpexOwl1024")
+//                        .resizable()
+//                        .frame(width: 50, height: 50, alignment: .center)
+//                } else {
+//                    Image("SpexOwl1024BW")
+//                        .resizable()
+//                        .frame(width: 50, height: 50, alignment: .center)
+//                }
+//                Toggle("", isOn: $model.equalizerIsActive)
+//                    .onChange(of: model.equalizerIsActive) { value in
+//                        model.setEQBands(for: model.currentUserProfile)
+//                        model.spexToggled += 1
+//                        FirebaseAnalytics.Analytics.logEvent("toggle_spex", parameters: [
+//                            "spex_toggled": model.spexToggled,
+//                            "spex_status": "\(model.equalizerIsActive)"
+//                        ])
+//                    }
+//                    .padding(.trailing)
+//                    .padding(.leading)
+//                    .font(.title3)
+//                    .foregroundColor(model.equalizerIsActive ? .blue : .gray)
+//            }
+//            Text ("Intensity: \(intensity.decimals(2))")
+//                .foregroundColor(intensityIsEditing ? .gray : model.equalizerIsActive ? .blue : .gray)
+//                .font(.title3)
+//            Slider (value: $intensity, in: 2.0...20.0, step: 0.25, onEditingChanged: { editing in
+//                // model.currentUserProfile.intensity = intensity
+//                model.currentIntensity = intensity
+//                saveIntensity()
+//                model.setEQBands(for: model.currentUserProfile)
+//                intensityIsEditing = editing
+//                model.intensityAdjusted += 1
+//                FirebaseAnalytics.Analytics.logEvent("adjust_intensity", parameters: [
+//                    "intensity_adjusted": model.intensityAdjusted,
+//                    "intensity": model.currentIntensity
+//                ])
+//            })
+//            .padding([.bottom, .leading, .trailing], 20)
+//            .disabled (!model.equalizerIsActive)
+//            .onAppear{
+//                setCurrentProfile()
+//                if !model.audioEngine.isRunning {
+//                    model.prepareAudioEngine()
+//                }
+//                intensity = model.currentIntensity
+//            }
         }
     }
 }

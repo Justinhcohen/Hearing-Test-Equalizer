@@ -53,14 +53,14 @@ struct SettingsView: View {
                                 ])
                             }
                         
-                        Toggle("Show Spex Toggle", isOn: $model.showSpexToggle)
-                            .onChange(of: model.showSpexToggle) { value in
-                                FirebaseAnalytics.Analytics.logEvent("toggle_show_spex_toggle", parameters: [
-                                    "spex_toggle_is_showing": "\(model.showSpexToggle)"
+                        Toggle("Show Spex On Player", isOn: $model.showSpexOnPlayer)
+                            .onChange(of: model.showSpexOnPlayer) { value in
+                                FirebaseAnalytics.Analytics.logEvent("toggle_show_spex_on_player", parameters: [
+                                    "spex_on_player_is_showing": "\(model.showSpexOnPlayer)"
                                 ])
                             }
                         
-                        Toggle("Show Intensity with Profile", isOn: $model.showIntensityWithProfile)
+                        Toggle("Show Intensity with Profile Name", isOn: $model.showIntensityWithProfile)
                             .onChange(of: model.showIntensityWithProfile) { value in
                                 FirebaseAnalytics.Analytics.logEvent("toggle_show_intensity_with_profile", parameters: [
                                     "show_intensity_with_profile": "\(model.showIntensityWithProfile)"
@@ -88,7 +88,7 @@ struct SettingsView: View {
                                 ])
                             }
                         
-                        Toggle("Show Manual Adjustments Button", isOn: $model.showManualAdjustmentsButton)
+                        Toggle("Show Manual EQ Button", isOn: $model.showManualAdjustmentsButton)
                             .onChange(of: model.showManualAdjustmentsButton) { value in
                                 if model.manualAdjustmentsAreActive {
                                     model.manualAdjustmentsAreActive = false
@@ -136,7 +136,7 @@ struct SettingsView: View {
             .font(.title3)
             Spacer()
             HStack {
-                Text ("Spex version 1.08")
+                Text ("Spex version 1.11")
                     .font(.body)
                     .opacity(0.5)
                 Spacer()

@@ -72,13 +72,13 @@ struct TestResultsView: View {
                             Spacer()
                         }
                         HStack {
-                            Text ("Head over to Spex Tab and move the Intensity slider to different positions while listening to the demo songs to find your sweet spot.")
+                            Text ("Head over to Spex Tab and move the Intensity slider to different positions while listening to the demo songs and the songs in your music library to find your ideal intensity. The default intensity level is set to 11 but your ideal intensity will likely be higher or lower so you'll want to experiment.")
                             Spacer()
                       }
-//                        HStack {
-//                            Text ("If you can't get it just right, you'll have the option to tweak the boost of each frequency individually.")
-//                            Spacer()
-//                        }
+                        HStack {
+                            Text ("If you're still thinking the sound could be improved after you've found your ideal intensity, you can choose to show the Manual Adjustments button via a toggle in the Settings, which will give you full control over the EQ, but make sure you find your ideal intensity first.")
+                            Spacer()
+                      }
                     }
                     
                 }
@@ -100,8 +100,8 @@ struct TestResultsView: View {
     }
 }
 
-struct TestResultsView_Previews: PreviewProvider {
-    static var previews: some View {
-        TestResultsView()
-    }
-}
+//struct TestResultsView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TestResultsView()
+//    }
+//}

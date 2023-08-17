@@ -38,6 +38,7 @@
 		0D8762A32947CEC50089B138 /* Band60.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629B2947CEC50089B138 /* Band60.mp3 */; };
 		0D8762A42947CEC50089B138 /* Band5400.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629C2947CEC50089B138 /* Band5400.mp3 */; };
 		0D8762A52947CEC50089B138 /* Band12000.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0D87629D2947CEC50089B138 /* Band12000.mp3 */; };
+		0DB81C112A89776F00F53E8B /* EQHelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DB81C102A89776F00F53E8B /* EQHelpView.swift */; };
 		0DBA9CD62A0967EC008FE103 /* twinsmusic-dancinginthesand.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0DBA9CD52A0967EC008FE103 /* twinsmusic-dancinginthesand.mp3 */; };
 		0DCB0E2E2964FF8800083DB4 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */; };
 		0DCB0E33296504E000083DB4 /* SongsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCB0E32296504E000083DB4 /* SongsView.swift */; };
@@ -91,6 +92,7 @@
 		0D87629B2947CEC50089B138 /* Band60.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band60.mp3; sourceTree = "<group>"; };
 		0D87629C2947CEC50089B138 /* Band5400.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band5400.mp3; sourceTree = "<group>"; };
 		0D87629D2947CEC50089B138 /* Band12000.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Band12000.mp3; sourceTree = "<group>"; };
+		0DB81C102A89776F00F53E8B /* EQHelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EQHelpView.swift; sourceTree = "<group>"; };
 		0DBA9CD52A0967EC008FE103 /* twinsmusic-dancinginthesand.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "twinsmusic-dancinginthesand.mp3"; sourceTree = "<group>"; };
 		0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		0DCB0E32296504E000083DB4 /* SongsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongsView.swift; sourceTree = "<group>"; };
@@ -132,6 +134,7 @@
 				0D65AD9B293D14F10017E4F8 /* ContentView.swift */,
 				0DCB0E2D2964FF8800083DB4 /* LibraryView.swift */,
 				0DE36F382A02E18D00AB44A8 /* InstructionsView.swift */,
+				0DB81C102A89776F00F53E8B /* EQHelpView.swift */,
 				0D4235852A1E9AC100F203B9 /* InAppPurchaseView.swift */,
 				0DF1B8BA2A07E2D800DDA2D2 /* SettingsView.swift */,
 				0DE942D02968A5A100FFA006 /* PlaylistView.swift */,
@@ -375,6 +378,7 @@
 				0DE942D12968A5A100FFA006 /* PlaylistView.swift in Sources */,
 				0DCB0E2E2964FF8800083DB4 /* LibraryView.swift in Sources */,
 				0D37679129551E0E00F3FF59 /* EQView.swift in Sources */,
+				0DB81C112A89776F00F53E8B /* EQHelpView.swift in Sources */,
 				0D249C8B29723C760075FED3 /* DataController.swift in Sources */,
 				0DE942D52969F3DC00FFA006 /* Extensions.swift in Sources */,
 				0D5CCEC62A12892200F69CF0 /* CollectionRowView.swift in Sources */,
@@ -511,7 +515,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 35;
 				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;
@@ -530,7 +534,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.08;
+				MARKETING_VERSION = 1.11;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jcohenmusic.Spex;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -549,7 +553,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 35;
 				DEVELOPMENT_ASSET_PATHS = "\"Hearing Test Stereo Equalizer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9A45C3WD8;
 				ENABLE_PREVIEWS = YES;
@@ -567,7 +571,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.08;
+				MARKETING_VERSION = 1.11;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jcohenmusic.Spex;
 				PRODUCT_NAME = "$(TARGET_NAME)";
